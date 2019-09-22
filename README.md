@@ -1,5 +1,5 @@
 # abriTAMR
 
-abriTAMR runs AMRFinder on a list of given isolates and collates the results into a table, separating genes identified into functionally relevant groups.
+abriTAMR runs AMRFinderPlus on a list of given isolates and collates the results into a table, separating genes identified into functionally relevant groups.
 
 
