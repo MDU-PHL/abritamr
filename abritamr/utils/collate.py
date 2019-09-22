@@ -294,8 +294,9 @@ class MduCollate(Collate):
 
 if __name__ == "__main__":
     
-    if sys.argv[1] == 'mduqc':
-        c = MduCollate()
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'mduqc':
+            c = MduCollate()
     else:
         c = Collate()
     c.run()
