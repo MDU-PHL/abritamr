@@ -14,6 +14,12 @@ class Collate:
     RTM = 'Other aminoglycoside resistance (non-RMT)'
     MAC = 'Macrolide, lincosamide & streptogramin resistance'
 
+    def bifunctionals(self):
+
+        df = pandas.read_csv(self.REFGENES)
+        
+
+
     def joins(self, dict_for_joining):
         '''
         make them a comma separated list
