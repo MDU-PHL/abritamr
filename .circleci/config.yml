@@ -12,7 +12,7 @@ jobs: # A basic unit of work in a run
       - checkout # check out source code to working directory
       - run: conda config --add channels conda-forge
       - run: conda config --add channels bioconda 
-      - run: conda install -c bioconda ncbi-amrfinderplus snakemakex
+      - run: conda install -c bioconda ncbi-amrfinderplus snakemake
       - restore_cache:
       # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
