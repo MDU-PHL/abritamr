@@ -9,6 +9,7 @@ abritamr = {editable = true,path = "."}
 jinja2 = "*"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.7"
