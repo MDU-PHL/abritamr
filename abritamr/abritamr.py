@@ -1,6 +1,6 @@
 import pathlib, argparse, logging, sys, os
 
-from AmrSetup import Setupmduamr
+from .AmrSetup import Setupamr
 
 
 '''
@@ -27,8 +27,8 @@ def set_parsers():
     parser = argparse.ArgumentParser(description='MDU AMR',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('--mduqc', '-m', action='store_true', help='Set if running on MDU QC data. If set please provide the MDU QC .csv as further input and an additional output suitable for lims input will be provided.')
-    parser.add_argument('--contigs','-c' default='', help = 'Tab-delimited file with sample ID as column 1 and path to assemblies as column 2')
-    parser.add_argument('--amrfinder_output','-o' default='', help = 'Tab-delimited file with sample ID as column 1 and path to amr_finder output files as column 2')
+    parser.add_argument('--contigs','-c', default='', help = 'Tab-delimited file with sample ID as column 1 and path to assemblies as column 2')
+    parser.add_argument('--amrfinder_output','-o', default='', help = 'Tab-delimited file with sample ID as column 1 and path to amr_finder output files as column 2')
     parser.add_argument('--workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='Working directory, default is current directory')
     parser.add_argument('--resources','-r', default = f"{pathlib.Path(__file__).parent }", help='Directory where templates are stored')
     parser.add_argument('--drug_classes', '-d', default=f"{pathlib.Path(__file__).parent / 'db' / 'refgenes.csv'}", help = "Path to file ")
