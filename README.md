@@ -32,16 +32,11 @@ optional arguments:
                         to amr_finder output files as column 2 (default: )
   --workdir WORKDIR, -w WORKDIR
                         Working directory, default is current directory
-                        (default: /Users/andersgoncalves/OneDrive - The
-                        University of Melbourne/dev/abritamr)
+                        (default: .)
   --resources RESOURCES, -r RESOURCES
-                        Directory where templates are stored (default:
-                        /Users/andersgoncalves/OneDrive - The University of
-                        Melbourne/dev/abritamr/abritamr)
+                        Directory where templates are stored (default: .)
   --drug_classes DRUG_CLASSES, -d DRUG_CLASSES
-                        Path to file (default: /Users/andersgoncalves/OneDrive
-                        - The University of
-                        Melbourne/dev/abritamr/abritamr/db/refgenes.csv)
+                        Path to file (default: ./db/refgenes.csv)
   --jobs JOBS, -j JOBS  Number of AMR finder jobs to run in parallel.
                         (default: 16)
   --keep, -k            If you would like to keep intermediate files and
