@@ -1,0 +1,7 @@
+__pycache__
+abritamr/__pycache__/*
+test/__pycache__/*
+*egg*
+build
+dist
+.pytest_cache/*
