@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from abritamr.AmrSetup import Setupamr
 
+test_folder = pathlib.Path(__file__).parent
 
 def test_file_present():
         '''
@@ -11,7 +12,7 @@ def test_file_present():
         '''
         with patch.object(Setupamr, "__init__", lambda x: None):
                 amr_obj = Setupamr()
-                p = pathlib.Path('abritamr','test', 'contigs_input_file.txt')
+                p = test_folder / 'contigs_input_file.txt'
                 assert amr_obj.file_present(p)
 
 
@@ -33,7 +34,7 @@ def test_input_exists_conitgs():
 
         with patch.object(Setupamr, "__init__", lambda x:None):
                 amr_obj = Setupamr()     
-                amr_obj.contigs = f"{pathlib.Path('abritamr', 'test', 'contigs_input_file.txt')}"
+                amr_obj.contigs = test_folder / 'contigs_input_file.txt'
                 print(amr_obj.contigs)
                 amr_obj.mduqc = False
                 amr_obj.amrfinder_output = ''
@@ -45,16 +46,16 @@ def test_input_exists_amrfinder():
                 amr_obj = Setupamr()     
                 amr_obj.contigs = ''
                 amr_obj.mduqc = False
-                amr_obj.amrfinder_output = f"{pathlib.Path('abritamr', 'test', 'amrfinder_input_file.txt')}"
+                amr_obj.amrfinder_output = test_folder / 'amrfinder_input_file.txt'
                 assert amr_obj.check_input_exists() == True
 
 def test_input_exists_amrfinder_contigs_fail():
 
         with patch.object(Setupamr, "__init__", lambda x:None):
                 amr_obj = Setupamr()     
-                amr_obj.contigs = f"{pathlib.Path('abritamr', 'test', 'contigs_input_file.txt')}"
+                amr_obj.contigs = test_folder / 'contigs_input_file.txt'
                 amr_obj.mduqc = False
-                amr_obj.amrfinder_output = f"{pathlib.Path('abritamr', 'test', 'amrfinder_input_file.txt')}"
+                amr_obj.amrfinder_output = test_folder / 'amrfinder_input_file.txt'
                 with pytest.raises(SystemExit):
                         amr_obj.check_input_exists()
 
@@ -74,6 +75,6 @@ def test_input_exists_mduqc_fail():
                 amr_obj = Setupamr()     
                 amr_obj.contigs = ''
                 amr_obj.mduqc = True
-                amr_obj.amrfinder_output = f"{pathlib.Path('abritamr', 'test', 'amrfinder_input_file.txt')}"
+                amr_obj.amrfinder_output = test_folder / 'amrfinder_input_file.txt'
                 with pytest.raises(SystemExit):
                         amr_obj.check_input_exists()
