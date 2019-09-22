@@ -10,6 +10,9 @@ jobs: # A basic unit of work in a run
           PIPENV_VENV_IN_PROJECT: true
     steps: # steps that comprise the `build` job
       - checkout # check out source code to working directory
+      - run:
+          name: Installing GCC
+          command: 'apt-get update && apt-get install -y gcc g++'
       - run: conda config --add channels conda-forge
       - run: conda config --add channels bioconda 
       - run: conda install -c bioconda ncbi-amrfinderplus snakemake
