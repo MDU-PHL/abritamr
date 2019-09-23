@@ -1,0 +1,33 @@
+version: 2 # use CircleCI 2.0
+jobs: # A basic unit of work in a run
+  build: # runs not using Workflows must have a `build` job as entry point
+    # directory where steps are run
+    working_directory: ~/repo
+    docker: # run the steps with Docker
+      # CircleCI Python images available at: https://hub  .docker.com/r/circleci/python/
+      - image: continuumio/miniconda3
+        environment: # environment variables for primary container
+          PIPENV_VENV_IN_PROJECT: true
+    steps: # steps that comprise the `build` job
+      - checkout # check out source code to working directory
+      - run:
+          name: Installing GCC
+          command: 'apt-get update && apt-get install -y gcc g++'
+      - run: conda config --add channels conda-forge
+      - run: conda config --add channels bioconda 
+      - run: conda install -c bioconda ncbi-amrfinderplus snakemake
+      - restore_cache:
+      # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+      - run:
+          command: |
+            pip install pipenv
+            pipenv install --dev
+      - save_cache: # cache Python dependencies using checksum of Pipfile as the cache-key
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          paths:
+            - ".venv"
+            - "/opt/conda"
+      - run:
+          command: |
+            pipenv run pytest

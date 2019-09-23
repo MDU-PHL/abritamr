@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+e1839a8 = {editable = true,path = "."}
+abritamr = {editable = true,path = "."}
+jinja2 = "*"
+
+[dev-packages]
+pytest = "*"
+
+[requires]
+python_version = "3.7"

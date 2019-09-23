@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 __pycache__
 abritamr/__pycache__/*
 test/__pycache__/*
@@ -5,3 +6,12 @@ test/__pycache__/*
 build
 dist
 .pytest_cache/*
+=======
+*.egg-info/
+__pycache__/
+build/
+dist/
+.pytest_cache/
+.coverage
+*.simg
+>>>>>>> 682602e6f61f896938c82600a7ecd6ecbc1bb7e8
