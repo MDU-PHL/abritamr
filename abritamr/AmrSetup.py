@@ -19,6 +19,11 @@ class Setupamr(object):
         self.amrfinder_output = args.amrfinder_output
         self.from_contigs = True
         self.keep = args.keep
+        self.run_singulairty = args.Singularity
+        self.singularity_path = f"shub://phgenomics-singularity/amrfinderplus" if args.singularity_path == '' else args.singularity_path
+        
+    
+    
 
     def file_present(self, name):
         """
@@ -73,16 +78,21 @@ class Setupamr(object):
         link files
         """
         target_name = "contigs.fa" if self.from_contigs else f"{first_column}.out"
+        
         isolate_dir = self.workdir / f"{first_column}"
         if not isolate_dir.exists():
             isolate_dir.mkdir()
 
         target = isolate_dir / target_name
+        print(target)
+        print(f"{second_column}")
+        print(not target.exists())
+
         if not target.exists():
             target.symlink_to(pathlib.Path(f"{second_column}"))
 
     def check_input_tab(self, tab):
-
+        
         if tab.shape[1] == 2:
             return True
         else:
@@ -100,12 +110,19 @@ class Setupamr(object):
             if self.from_contigs
             else pathlib.Path(self.amrfinder_output)
         )
-        tab = pandas.read_csv(input_files, engine="python", header=None)
+        tab = pandas.read_csv(input_file, engine="python", header=None, sep = '\t')
         self.check_input_tab(tab)
         for row in tab.iterrows():
             if self.file_present(row[1][1]):
-                self.make_links(first_column=row[1][0], second_column=row[1][0])
+                self.make_links(first_column=row[1][0], second_column=row[1][1])
         return list(tab[0])
+
+    def check_singularity(self):
+        '''
+        if singularity path check it exists.
+        '''
+        if self.singularity_path != f"shub://phgenomics-singularity/amrfinderplus":
+            return self.file_present(self.singularity_path)
 
     def generate_workflow_files(self):
         # varaiables for config.yaml
@@ -114,6 +131,7 @@ class Setupamr(object):
         mduqc = "mduqc" if self.mduqc else ""
 
         config_source = self.resources / "templates" / "config.yaml"
+
         config_template = jinja2.Template(config_source).read_text()
         config_target = self.workdir / "config.yaml"
         config_target.write_text(
@@ -121,7 +139,6 @@ class Setupamr(object):
                 script_path=script_path, amrfinder=amrfinder, mduqc=mduqc
             )
         )
-
         # variables for snakemake
         finaloutput = (
             f"MMS118.xlsx"
@@ -129,12 +146,16 @@ class Setupamr(object):
             else f"summary_matches.csv, summary_partials.csv"
         )
         workdir = f"'{self.workdir}''"
+        singularity_path = (
+            f"singularity:{self.singularity_path}" 
+            if self.run_singulairty 
+            else "")
 
         snk_source = self.resources / "templates" / "Snakefile"
         snk_template = jinja2.Template(snk_source).read_text()
         snk_target = self.workdir / "Snakefile"
         snk_target.write_text(
-            snk_template.render(finaloutput=finaloutput, workdir=workdir)
+            snk_template.render(finaloutput=finaloutput, workdir=workdir, singularity_path = singularity_path)
         )
 
         logging.info(f"Written Snakefile and config.yaml to {self.workdir}")
@@ -169,7 +190,6 @@ class Setupamr(object):
 
         # setup the pipeline
         self.check_input_exists()
-        self.check_input_tab()
         self.link_input_files()
         # write snakefile
         self.generate_workflow_files()

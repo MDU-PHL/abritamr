@@ -10,9 +10,12 @@ rule all:
 if config['amrfinder'] == 'run_amrfinder':
     input: "{sample}/contigs.fa"
     output: "{sample}/{sample}.out"
+{% endraw %}
+    {{singularity_path}}
+{% raw %}
     shell:
         """
-        singularity run ~/dev/Singularity/amrfinderplus/amrfinderplus.simg amrfinder -n {input} -o {output} -t 1
+        amrfinder -n {input} -o {output} -t 1
         """
 rule collate:
     input:expand("{sample}/{sample}.out", sample = SAMPLES)

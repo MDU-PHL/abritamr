@@ -1,4 +1,4 @@
-import pathlib, pandas, math, sys
+import pathlib, pandas, math, sys, toml, re
 
 
 class Collate:
@@ -38,12 +38,7 @@ class Collate:
     RTM = "Other aminoglycoside resistance (non-RMT)"
     MAC = "Macrolide, lincosamide & streptogramin resistance"
 
-    def bifunctionals(self):
-
-        df = pandas.read_csv(self.REFGENES)
-        
-
-
+    
     def joins(self, dict_for_joining):
         """
         make them a comma separated list
@@ -74,6 +69,38 @@ class Collate:
         else:
             return d
 
+    def extract_bifunctional_name(self, protein, reftab):
+        """
+        extract the joint name of bifunctional genes
+        """
+        return reftab[reftab["refseq protein"] == protein]["gene family"].values[0]
+    
+    def setup_dict(self, drugclass_dict, reftab, row):
+        """
+        return the dictionary for collation
+        """
+        if row[1]["Gene symbol"] in list(reftab["#allele"]):
+                    drugclass = self.get_drugclass(
+                        reftab=reftab, row=row, colname="#allele"
+                    )
+                    drugname = row[1]["Gene symbol"]
+        elif row[1]["Gene symbol"] in list(reftab["gene family"]):
+            drugclass = self.get_drugclass(
+                reftab=reftab, row=row, colname="gene family"
+            )
+            drugname = row[1]["Gene symbol"]
+        elif "bifunctional" in row[1]["Sequence name"]:
+            drugclass = self.get_drugclass(
+                reftab = reftab, row = row, colname = "Accession of closest protein"
+            )
+            drugname = self.extract_bifunctional_name(protein = row[1]["Accession of closest protein"], reftab = reftab)
+        if drugclass in drugclass_dict:
+            drugclass_dict[drugclass].append(drugname)
+        else:
+            drugclass_dict[drugclass] = drugname
+
+        return drugclass_dict
+
     def get_per_isolate(self, reftab, df, isolate):
         """
         make two dictionaries for each isolate that contain the drug class assignments for each match that is one of ALLELEX, EXACTX or BLASTX and then another dictionary which lists all partial mathces
@@ -82,25 +109,10 @@ class Collate:
         partials = {"Isolate": isolate}
         for row in df.iterrows():
             # if the match is good then generate a drugclass dict
-            if row[1]["Method"] in self.MATCH:
-                if row[1]["Gene symbol"] in list(reftab["#allele"]):
-                    drugclass = self.get_drugclass(
-                        reftab=reftab, row=row, colname="#allele"
-                    )
-                elif row[1]["Gene symbol"] in list(reftab["gene family"]):
-                    drugclass = self.get_drugclass(
-                        reftab=reftab, row=row, colname="gene family"
-                    )
-
-                if drugclass in drugclass_dict:
-                    drugclass_dict[drugclass].append(row[1]["Gene symbol"])
-                else:
-                    drugclass_dict[drugclass] = [row[1]["Gene symbol"]]
+            if row[1]["Method"] in self.MATCH and row[1]["Scope"] == "core" and row[1]["Element type"] == "AMR":
+                drugclass_dict = self.setup_dict(drugclass_dict = drugclass_dict, reftab = reftab, row = row)
             else:
-                if row[1]["Method"] in partials:
-                    partials[row[1]["Method"]].append(row[1]["Gene symbol"])
-                else:
-                    partials[row[1]["Method"]] = [row[1]["Gene symbol"]]
+                partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
         drugclass_dict = self.joins(dict_for_joining=drugclass_dict)
         partials = self.joins(dict_for_joining=partials)
 
@@ -191,69 +203,35 @@ class MduCollate(Collate):
         """
         generate lists of isolates that passed QC and need AMR, failed QC and should have AMR and all other isolates
         """
-        # get isolates that have passed and are supposed to have AMR, isolates that have failed and were supposed to have AMR and then isolates that were not supposed to have amr
-        # RUPR – Projects :  AMR and PRXXX
-        # Enterics - Projects : Salmonella, Shigella, STEC, PR2017-010, PR2018-020.
-        # FEOR – Any E. coli, Salmonella, Shigella (these are less likely to come from FEOR)
+        
 
         qc = pandas.read_csv(qc_name, sep=None, engine="python")
         qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
-        # print(qc.columns)
-        # print(qc['ISOLATE'])
-        rupr = qc[
-            (qc["SECTION"] == "RUPR")
-            & (
-                (qc["MDU_JOB_NO"] == "AMR")
-                | (qc["MDU_JOB_NO"].str.startswith("PR"))
-                | (qc["MDU_JOB_NO"].str.startswith("J"))
-            )
-        ]["ISOLATE"]
-        enterics = qc[
-            (qc["SECTION"] == "ENTERICS")
-            & (
-                (qc["MDU_JOB_NO"].isin(["Salmonella", "Shigella", "STEC"]))
-                | (qc["MDU_JOB_NO"].str.startswith("PR"))
-            )
-        ]["ISOLATE"]
-        feor = qc[
-            (qc["SECTION"] == "FEOR")
-            & (
-                (qc["MDU_JOB_NO"].isin(["Salmonella", "Shigella"]))
-                | (qc["SPECIES_OBS"] == "Escherichia coli")
-            )
-        ]["ISOLATE"]
-        fa = list(rupr) + list(enterics) + list(feor)
-
-        not_for_amr = list(
-            qc[(~qc["ISOLATE"].isin(fa))]["ISOLATE"]
-        )  # isolates that did not have the appropriate section or job for amr
-        for_amr = list(
-            qc[(qc["ISOLATE"].isin(fa)) & (qc["TEST_QC"] != "FAIL")]["ISOLATE"]
-        )  # isolates that passed qc and should have amr
-        for_amr_failed = list(
-            qc[(qc["ISOLATE"].isin(fa)) & (qc["TEST_QC"] == "FAIL")]["ISOLATE"]
+        
+        failed = list(
+            qc[qc["TEST_QC"] == "FAIL"]["ISOLATE"]
+        )  # isolates that failed qc and should have amr
+        passed = list(
+            qc[qc["TEST_QC"] == "FAIL"]["ISOLATE"]
         )  # isolates that failed qc and should have amr
 
-        return (not_for_amr, for_amr, for_amr_failed)
+        return (passed, failed)
 
     def split_dfs(
-        self, not_for_amr, for_amr, for_amr_failed, summary_drugs, summary_partial
+        self, passed, failed, summary_drugs, summary_partial
     ):
 
-        passed_match = summary_drugs[summary_drugs.index.isin(for_amr)]
-        passed_partials = summary_partial[summary_partial.index.isin(for_amr)]
-        failed_match = summary_drugs[summary_drugs.index.isin(for_amr_failed)]
-        failed_partials = summary_partial[summary_partial.index.isin(for_amr_failed)]
-        other_match = summary_drugs[summary_drugs.index.isin(not_for_amr)]
-        other_partial = summary_partial[summary_partial.index.isin(not_for_amr)]
+        passed_match = summary_drugs[summary_drugs.index.isin(passed)]
+        passed_partials = summary_partial[summary_partial.index.isin(passed)]
+        failed_match = summary_drugs[summary_drugs.index.isin(failed)]
+        failed_partials = summary_partial[summary_partial.index.isin(failed)]
+        
 
         return (
             passed_match,
             passed_partials,
             failed_match,
-            failed_partials,
-            other_match,
-            other_partial,
+            failed_partials
         )
 
     # Carbapenemase to be reported for all cases
@@ -264,7 +242,7 @@ class MduCollate(Collate):
     # Aminoglycosides (Ribosomal methyltransferases) ALL
     # Colistin ALL
     # Oxazolidinone & phenicol resistance if Genus = Enterococcus or Staphylococcus aureus and Staphylococcus argenteus
-    # Vancomycin is genus = Enterococcus
+    # report vanA*, B*, C*, vanD*, vanE*, vanG*, vanL*, vanM*, vanN* 
     # Methicillin ALL
 
     def get_all_genes(self, row):
@@ -296,6 +274,8 @@ class MduCollate(Collate):
             "Vancomycin",
             "Methicillin",
         ]
+        van_match = re.compile("van[A,B,C,D,E,G,L,M,N].[^\S]*")
+        mec_match = re.compile("mec[^IR]")
         genes_reported = []  # genes for reporting
         genes_not_reported = []  # genes found but not reportable
         for r in reportable:
@@ -329,16 +309,17 @@ class MduCollate(Collate):
                     elif r == "Oxazolidinone & phenicol resistance" and (
                         genus == "Enterococcus"
                         or species
-                        in ["Staphylococcus aureus," "Staphylococcus argenteus"]
+                        in ["Staphylococcus aureus", "Staphylococcus argenteus"]
                     ):
                         genes_reported.append(gene)
-                    elif r == "Vancomycin" and genus == "Enterococcus":
+                    elif r == "Vancomycin" and gene.match(van_match):
                         genes_reported.append(gene)
+                    elif r = "Methicilin" and gene.match(mec_match):
+                        genes_reported.append(gene)ss
                     elif r in [
                         "Carbapenemase",
                         "Aminoglycosides (Ribosomal methyltransferases",
-                        "Colistin",
-                        "Methicillin",
+                        "Colistin"
                     ]:
                         genes_reported.append(gene)
                     else:
@@ -351,23 +332,28 @@ class MduCollate(Collate):
 
         return genes_reported, genes_not_reported
 
-    def mdu_reporting(self, passed_match):
+    def mdu_reporting(self, match):
 
         reporting_df = pandas.DataFrame()
         qc = pandas.read_csv(self.mduqc, sep=None, engine="python")
         qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
         for row in passed_match.iterrows():
-            d = {"Isolate": row[0]}
+            d = {"MDU sample ID": row[0]}
             qcdf = qc[qc["ISOLATE"] == row[0]]
             exp_species = qcdf["SPECIES_EXP"].values[0]
-            d["Species"] = exp_species
+            obs_species = qcdf["SPECIES_OBS"].values[0]
+            if qcfd["TEST_QC"].values[0] == 'FAIL':
+                d["Species_exp"] = exp_species
+            d["Species_obs"] = obs_species
+            species = obs_species if obs_species == exp_species else exp_species
             genes_reported, genes_not_reported = self.reporting_logic(
-                row=row, species=exp_species
+                row=row, species=species
             )
-            d["Reportable genes"] = ",".join(genes_reported)
-            d["Non-reportable genes"] = ",".join(genes_not_reported)
+            d["Item code"] = qcdf["ITEM_CODE"].values[0] 
+            d["Resistance genes (alleles) detected"] = ",".join(genes_reported)
+            d["Resistance genes (alleles) det (non-rpt)"] = ",".join(genes_not_reported)
             tempdf = pandas.DataFrame(d, index=[0])
-            tempdf = tempdf.set_index("Isolate")
+            tempdf = tempdf.set_index("MDU sample ID")
             # print(tempdf)
             if reporting_df.empty:
                 reporting_df = tempdf
@@ -375,27 +361,50 @@ class MduCollate(Collate):
                 reporting_df = reporting_df.append(tempdf)
         return reporting_df
 
+    def mdu_partials(self, partials):
+        '''
+        split the partial matches into reportable/nonreportable
+        input is a dataframe with partial type as colnames 
+        '''
+        partial_names = ['PARTIALX', 'PARTIAL_CONTIG_ENDX']
+        partial_df = pandas.DataFrame()
+        for row in partials.iterrows:
+            qc = pandas.read_csv(self.mduqc, sep=None, engine="python")
+            qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
+            exp_species = qcdf["SPECIES_EXP"].values[0]
+            obs_species = qcdf["SPECIES_OBS"].values[0]
+            species = obs_species if obs_species == exp_species else exp_species
+            d = {"MDU sample ID": row[0]}
+            
     def save_spreadsheet(
         self,
         reporting_df,
         passed_match,
         passed_partials,
         failed_match,
-        failed_partials,
-        other_match,
-        other_partial,
+        failed_partials
     ):
         writer = pandas.ExcelWriter("MMS118.xlsx", engine="xlsxwriter")
 
-        reporting_df.to_excel(writer, sheet_name="MMS118 - reporting")
+        reporting_df.to_excel(writer, sheet_name="MMS118")
         passed_match.to_excel(writer, sheet_name="MMS118 - passed QC matches")
         passed_partials.to_excel(writer, sheet_name="MMS118 - passed QC partial")
         failed_match.to_excel(writer, sheet_name="failed QC matches")
         failed_partials.to_excel(writer, sheet_name="failed QC partial")
-        other_match.to_excel(writer, sheet_name="other - matches")
-        other_partial.to_excel(writer, sheet_name="other - partial")
 
         writer.close()
+
+    def get_toml(self):
+        '''
+        get the toml file
+        '''
+        pass
+
+    def write_to_toml(self):
+        '''
+        write the output of amrfinder to the toml
+        '''
+        pass
 
     def run(self):
         # get isolates binned into groups.
@@ -403,7 +412,7 @@ class MduCollate(Collate):
         # get collated data
         summary_drugs, summary_partial = self.collate()
         # get dfs for specific groups
-        passed_match, passed_partials, failed_match, failed_partials, other_match, other_partial = self.split_dfs(
+        passed_match, passed_partials, failed_match, failed_partials= self.split_dfs(
             not_for_amr, for_amr, for_amr_failed, summary_drugs, summary_partial
         )
         # generate front tab for MDU reporting
@@ -414,9 +423,7 @@ class MduCollate(Collate):
             passed_match,
             passed_partials,
             failed_match,
-            failed_partials,
-            other_match,
-            other_partial,
+            failed_partials
         )
 
 

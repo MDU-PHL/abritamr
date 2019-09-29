@@ -1,6 +1,6 @@
 import pathlib, argparse, logging, sys, os
 
-from .AmrSetup import Setupamr
+from AmrSetup import Setupamr
 
 
 """
@@ -14,7 +14,7 @@ Input types:
 
 def run_pipeline(args):
 
-    P = Setupmduamr(args)
+    P = Setupamr(args)
     return P.run_amr()
 
 
@@ -31,6 +31,18 @@ def set_parsers():
         "-m",
         action="store_true",
         help="Set if running on MDU QC data. If set please provide the MDU QC .csv as further input and an additional output suitable for lims input will be provided.",
+    )
+    parser.add_argument(
+        "--Singularity",
+        "-S",
+        action="store_true",
+        help="If using singularity container for AMRfinderplus"
+    )
+    parser.add_argument(
+        "--singularity_path",
+        "-s",
+        default="",
+        help="Path to the singularity container for AMRfinderplus, if empty will defualt to shub://phgenomics-singularity/amrfinderplus"
     )
     parser.add_argument(
         "--contigs",

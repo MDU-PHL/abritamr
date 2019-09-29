@@ -1,4 +1,4 @@
-﻿#allele,gene family,product name,scope,type,subtype,class,subclass,refseq protein,refseq nucleotide,genbank protein,genbank nucleotide,curated refseq start,upload_date,enhanced_subclass
+#allele,gene family,product name,scope,type,subtype,class,subclass,refseq protein,refseq nucleotide,genbank protein,genbank nucleotide,curated refseq start,upload_date,enhanced_subclass
 ,aph(2'')-IIIa,aminoglycoside O-phosphotransferase APH(2'')-IIIa,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/GENTAMICIN/KANAMYCIN/TOBRAMYCIN,WP_018659526.1,NG_047399.1,AAB49832.1,U51479.1,No,6/9/19,Amikacin/Gentamicin/Kanamycin/Tobramycin
 ,aph(2'')-IIa,aminoglycoside O-phosphotransferase APH(2'')-IIa,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/GENTAMICIN/KANAMYCIN/TOBRAMYCIN,WP_016439437.1,NG_047400.1,AAG13458.1,AF207840.1,No,6/9/19,Amikacin/Gentamicin/Kanamycin/Tobramycin
 ,aph(2'')-IIa,aminoglycoside O-phosphotransferase APH(2'')-IIa,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/GENTAMICIN/KANAMYCIN/TOBRAMYCIN,WP_063840674.1,NG_047401.1,AAK63040.1,AF337947.1,No,6/9/19,Amikacin/Gentamicin/Kanamycin/Tobramycin
@@ -29,11 +29,11 @@
 ,aac(6')-Ib11,aminoglycoside N-acetyltransferase AAC(6')-Ib11,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_032490438.1,NG_048578.1,AAN41403.1,AY136758.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
 ,aac(6')-Ib11,aminoglycoside N-acetyltransferase AAC(6')-Ib11,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_069985732.1,NG_052506.1,AEU10765.1,JN412067.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
 aac(6')-Ib3,aac(6')-Ib,aminoglycoside N-acetyltransferase AAC(6')-Ib3,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_032488579.1,NG_051438.1,AAG33663.1,AY007784.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
-,,bifunctional aminoglycoside N-acetyltransferase AAC(6')-Ie/aminoglycoside O-phosphotransferase APH(2'')-Ia,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_001028144.1,NG_047055.1,AAA88548.1,GU565967.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
-,,bifunctional aminoglycoside N-acetyltransferase AAC(6')-Ie/aminoglycoside O-phosphotransferase APH(2'')-Ia,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_032490744.1,NG_047212.1,CAD60196.1,AJ536195.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
-,,bifunctional aminoglycoside N-acetyltransferase AAC(6')-Ie/aminoglycoside O-phosphotransferase APH(2'')-Ia,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_012655884.1,NG_047217.1,BAH18719.1,AP009486.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
-,,bifunctional aminoglycoside N-acetyltransferase AAC(6')-Ie2/aminoglycoside O-phosphotransferase APH(2'')-If2,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_057097547.1,NG_062220.1,AGV79342.1,KF652095.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
-,,bifunctional AAC(6')-Ie family aminoglycoside N-acetyltransferase/APH(2'') family aminoglycoside O-phosphotransferase,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_122630840.1,NG_062248.1,AUV57982.1,MF547665.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
+,aac(6')-Ie/aph(2'')-Ia,bifunctional aminoglycoside N-acetyltransferase AAC(6')-Ie/aminoglycoside O-phosphotransferase APH(2'')-Ia,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_001028144.1,NG_047055.1,AAA88548.1,GU565967.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
+,aac(6')-Ie/aph(2'')-Ia,bifunctional aminoglycoside N-acetyltransferase AAC(6')-Ie/aminoglycoside O-phosphotransferase APH(2'')-Ia,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_032490744.1,NG_047212.1,CAD60196.1,AJ536195.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
+,aac(6')-Ie/aph(2'')-Ia,bifunctional aminoglycoside N-acetyltransferase AAC(6')-Ie/aminoglycoside O-phosphotransferase APH(2'')-Ia,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_012655884.1,NG_047217.1,BAH18719.1,AP009486.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
+,aac(6')-Ie/aph(2'')-If2,bifunctional aminoglycoside N-acetyltransferase AAC(6')-Ie2/aminoglycoside O-phosphotransferase APH(2'')-If2,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_057097547.1,NG_062220.1,AGV79342.1,KF652095.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
+,aac(6')/aph(2''),bifunctional AAC(6')-Ie family aminoglycoside N-acetyltransferase/APH(2'') family aminoglycoside O-phosphotransferase,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_122630840.1,NG_062248.1,AUV57982.1,MF547665.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
 ,aac(6')-If,aminoglycoside N-acetyltransferase AAC(6')-If,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_048233550.1,NG_052054.1,KLV54643.1,LESO01000005.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
 ,aac(6')-If,aminoglycoside N-acetyltransferase AAC(6')-If,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_071593229.1,NG_047295.2,,X55353.1,Yes,6/9/19,Amikacin/Kanamycin/Tobramycin
 aac(6')-Ig,aac(6')-I,aminoglycoside N-acetyltransferase AAC(6')-Ig,core,AMR,AMR,AMINOGLYCOSIDE,AMIKACIN/KANAMYCIN/TOBRAMYCIN,WP_005081764.1,NG_047296.1,AAA21889.1,L09246.1,No,6/9/19,Amikacin/Kanamycin/Tobramycin
@@ -105,7 +105,7 @@ aac(3)-VIIIa,aac(3)-VIII,aminoglycoside N-acetyltransferase AAC(3)-VIIIa,core,AM
 ,aac(3)-Xa,aminoglycoside N-acetyltransferase AAC(3)-Xa,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_012377682.1,NG_047263.1,BAA78619.1,AB028210.1,No,6/9/19,Aminoglycosides
 aac(6')-29a,aac(6')-29,aminoglycoside N-acetyltransferase AAC(6')-29a,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_064190968.1,NG_048575.1,,AF263519.1,Yes,6/9/19,Aminoglycosides
 aac(6')-29b,aac(6')-29,aminoglycoside N-acetyltransferase AAC(6')-29b,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_064190969.1,NG_048576.1,,AF263519.1,Yes,6/9/19,Aminoglycosides
-,,bifunctional aminoglycoside N-acetyltransferase AAC(6')-30/aminoglycoside N-acetyltransferase AAC(6')-Ib',core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_063838853.1,NG_047213.1,CAE48335.2,AJ584652.2,No,6/9/19,Aminoglycosides
+,aac(6')-30/aac(6')-Ib',bifunctional aminoglycoside N-acetyltransferase AAC(6')-30/aminoglycoside N-acetyltransferase AAC(6')-Ib',core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_063838853.1,NG_047213.1,CAE48335.2,AJ584652.2,No,6/9/19,Aminoglycosides
 ,aac(6')-30,aminoglycoside 6'-N-acetyltransferase AAC(6')-30,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_051645529.1,NG_051559.1,KDF29949.1,JMUP01000027.1,No,6/9/19,Aminoglycosides
 ,aac(6')-31,aminoglycoside N-acetyltransferase AAC(6')-31,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_044424439.1,NG_047265.1,CAK55563.1,AM283490.1,No,6/9/19,Aminoglycosides
 aac(6')-32,aac(6'),aminoglycoside N-acetyltransferase AAC(6')-32,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_032491968.1,NG_047266.1,ABR10839.1,EF614235.1,No,6/9/19,Aminoglycosides
@@ -262,7 +262,7 @@ aacA56,aac(6'),AAC(6')-Ia family aminoglycoside 6'-N-acetyltransferase AacA56,co
 ,aac(6')-Im,aminoglycoside N-acetyltransferase AAC(6')-Im,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_057038955.1,NG_052222.1,KWV61377.1,LKIV02000117.1,No,6/9/19,Aminoglycosides
 ,aac(6')-Im,aminoglycoside N-acetyltransferase AAC(6')-Im,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_002592614.1,NG_052530.1,ENZ04101.1,AGYO01000035.1,No,6/9/19,Aminoglycosides
 ,aad9,ANT(9) family aminoglycoside nucleotidyltransferase,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_002578722.1,NG_047322.1,AAW34145.1,AY701528.1,No,6/9/19,Aminoglycosides
-,,bifunctional aminoglycoside nucleotidyltransferase ANT(3'')-Ij/aminoglycoside N-acetyltransferase AAC(6')-Ib,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_063839875.1,NG_047214.1,AAU89126.1,AY740681.1,No,6/9/19,Aminoglycosides
+,ant(3'')-Ij/aac(6')-Ib,bifunctional aminoglycoside nucleotidyltransferase ANT(3'')-Ij/aminoglycoside N-acetyltransferase AAC(6')-Ib,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_063839875.1,NG_047214.1,AAU89126.1,AY740681.1,No,6/9/19,Aminoglycosides
 ,aph(3')-Va,aminoglycoside O-phosphotransferase APH(3')-Va,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_063842176.1,NG_047450.1,AAA26699.1,K00432.1,No,6/9/19,Aminoglycosides
 ,aph(3')-Va,aminoglycoside O-phosphotransferase APH(3')-Va,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_031129630.1,NG_047451.1,BAD95814.1,AB211959.1,No,6/9/19,Aminoglycosides
 ,aph(3')-Vb,aminoglycoside O-phosphotransferase APH(3')-Vb,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_063842177.1,NG_047452.1,AAC32025.1,M22126.1,No,6/9/19,Aminoglycosides
@@ -272,7 +272,7 @@ aacA56,aac(6'),AAC(6')-Ia family aminoglycoside 6'-N-acetyltransferase AacA56,co
 ,aph(6),APH(6) family putative aminoglycoside O-phosphotransferase,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_063841666.1,NG_047427.1,ADQ43422.1,HQ424461.1,No,6/9/19,Aminoglycosides
 ,apmA,aminocyclitol acetyltransferase ApmA,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_032494221.1,NG_051938.1,CBL58181.1,FN806789.3,No,6/9/19,Aminoglycosides
 ,apmA,aminocyclitol acetyltransferase ApmA,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_015059965.1,NG_047475.1,CCE60912.1,HE611647.1,No,6/9/19,Aminoglycosides
-,,bifunctional type B-3 chloramphenicol O-acetyltransferase CatB8/aminoglycoside N-acetyltransferase AAC(6')-Ib,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_071593228.1,NG_052052.1,BAK79091.1,AB625455.1,No,6/9/19,Aminoglycosides
+,catB8/aac(6')-Ib,bifunctional type B-3 chloramphenicol O-acetyltransferase CatB8/aminoglycoside N-acetyltransferase AAC(6')-Ib,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_071593228.1,NG_052052.1,BAK79091.1,AB625455.1,No,6/9/19,Aminoglycosides
 ,grm,Grm family 16S rRNA (guanine(1405)-N(7))-methyltransferase,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_063851283.1,NG_047907.1,AAA25338.1,M55521.1,No,6/9/19,Aminoglycosides
 ,kamB,16S rRNA (adenine(1408)-N(1))-methyltransferase KamB,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_063964000.1,NG_050561.1,,AJ629123.1,Yes,6/9/19,Aminoglycosides
 ,kamB,16S rRNA (adenine(1408)-N(1))-methyltransferase KamB,core,AMR,AMR,AMINOGLYCOSIDE,AMINOGLYCOSIDE,WP_063964001.1,NG_050562.1,,AJ875019.1,Yes,6/9/19,Aminoglycosides
@@ -916,7 +916,7 @@ blaOXA-833,blaOXA,OXA-48 family class D beta-lactamase OXA-833,core,AMR,AMR,BETA
 blaOXA-835,blaOXA,OXA-46 family oxacillin-hydrolyzing class D beta-lactamase OXA-835,core,AMR,AMR,BETA-LACTAM,BETA-LACTAM,WP_148044422.1,NG_065880.1,QDC28550.1,MN057923.1,No,6/9/19,Beta-lactamase (unknown spectrum)
 blaOXA-836,blaOXA,OXA-10 family class D beta-lactamase OXA-836,core,AMR,AMR,BETA-LACTAM,BETA-LACTAM,WP_148044423.1,NG_065881.1,QDO71691.1,MN186038.1,No,6/9/19,Beta-lactamase (unknown spectrum)
 blaOXA-837,blaOXA,class D beta-lactamase OXA-837,core,AMR,AMR,BETA-LACTAM,BETA-LACTAM,WP_148281568.1,NG_066071.1,QEE23059.1,MN313890.1,No,6/9/19,Beta-lactamase (unknown spectrum)
-,,bifunctional class C beta-lactamase/class D beta-lactamase fusion protein LRA-13,core,AMR,AMR,BETA-LACTAM,BETA-LACTAM,WP_063839877.1,NG_047216.1,ACH58991.1,EU408352.1,No,6/9/19,Beta-lactamase (unknown spectrum)
+,class C/D beta-lactamse  LRA-13,bifunctional class C beta-lactamase/class D beta-lactamase fusion protein LRA-13,core,AMR,AMR,BETA-LACTAM,BETA-LACTAM,WP_063839877.1,NG_047216.1,ACH58991.1,EU408352.1,No,6/9/19,Beta-lactamase (unknown spectrum)
 blaPAU-1,blaPAU,class A beta-lactamase PAU-1,core,AMR,AMR,BETA-LACTAM,BETA-LACTAM,WP_148044424.1,NG_065882.1,APC57487.2,KU881625.1,No,6/9/19,Beta-lactamase (unknown spectrum)
 ,blaRHO,RHO family class C beta-lactamase,core,AMR,AMR,BETA-LACTAM,BETA-LACTAM,WP_011339581.1,NG_056490.1,ABA81355.1,CP000144.2,No,6/9/19,Beta-lactamase (unknown spectrum)
 blaROB-2,blaROB,class A beta-lactamase ROB-2,core,AMR,AMR,BETA-LACTAM,CEPHALOSPORIN,WP_015431537.1,NG_059321.1,AGH37381.1,CP003745.1,No,6/9/19,Beta-lactamase (unknown spectrum)
@@ -3718,7 +3718,7 @@ aacA35,aac(6')-II,AAC(6')-II family aminoglycoside 6'-N-acetyltransferase AacA35
 ,aph(3')-Ia,aminoglycoside O-phosphotransferase APH(3')-Ia,core,AMR,AMR,AMINOGLYCOSIDE,KANAMYCIN,WP_063842148.1,NG_047437.1,AAN59785.1,AF498082.1,No,6/9/19,Kanamycin
 ,aph(3')-Ib,aminoglycoside O-phosphotransferase APH(3')-Ib,core,AMR,AMR,AMINOGLYCOSIDE,KANAMYCIN,WP_038404948.1,NG_047442.1,AAA26412.1,M20305.1,No,6/9/19,Kanamycin
 ,aph(3')-Ib,aminoglycoside O-phosphotransferase APH(3')-Ib,core,AMR,AMR,AMINOGLYCOSIDE,KANAMYCIN,WP_011205810.1,NG_059324.1,KSP76147.1,LLTF01000079.1,No,6/9/19,Kanamycin
-,,bifunctional aminoglycoside N-acetyltransferase AAC(3)-Ib/aminoglycoside N-acetyltransferase AAC(6')-Ib'',core,AMR,AMR,AMINOGLYCOSIDE,KANAMYCIN/TOBRAMYCIN,WP_063838852.1,NG_047210.1,AAL82588.1,AF355189.1,No,6/9/19,Kanamycin/Tobramycin
+,aac(3)-Ib/aac(6')-Ib'',bifunctional aminoglycoside N-acetyltransferase AAC(3)-Ib/aminoglycoside N-acetyltransferase AAC(6')-Ib'',core,AMR,AMR,AMINOGLYCOSIDE,KANAMYCIN/TOBRAMYCIN,WP_063838852.1,NG_047210.1,AAL82588.1,AF355189.1,No,6/9/19,Kanamycin/Tobramycin
 ,aacA43,AAC(6')-Ia family aminoglycoside 6'-N-acetyltransferase AacA43,core,AMR,AMR,AMINOGLYCOSIDE,KANAMYCIN/TOBRAMYCIN,WP_032495046.1,NG_047321.1,AEA07977.1,HQ247816.1,No,6/9/19,Kanamycin/Tobramycin
 ,aadD1,aminoglycoside O-nucleotidyltransferase ANT(4')-Ia,core,AMR,AMR,AMINOGLYCOSIDE,KANAMYCIN/TOBRAMYCIN,WP_001795128.1,NG_047375.1,AAF85647.1,AF181950.1,No,6/9/19,Kanamycin/Tobramycin
 ,aadD1,aminoglycoside O-nucleotidyltransferase ANT(4')-Ia,core,AMR,AMR,AMINOGLYCOSIDE,KANAMYCIN/TOBRAMYCIN,WP_032542910.1,NG_047372.1,AAA92254.1,K02551.1,No,6/9/19,Kanamycin/Tobramycin
@@ -4462,8 +4462,8 @@ aadA17,ant(3'')-Ia,ANT(3'')-Ia family aminoglycoside nucleotidyltransferase AadA
 ,ant(3'')-IIc,aminoglycoside nucleotidyltransferase ANT(3'')-IIc,core,AMR,AMR,AMINOGLYCOSIDE,STREPTOMYCIN/SPECTINOMYCIN,WP_004680079.1,NG_054650.1,ENU37733.1,APOM01000001.1,No,6/9/19,Streptomycin/Spectinomycin
 ,ant(3'')-IIc,aminoglycoside nucleotidyltransferase ANT(3'')-IIc,core,AMR,AMR,AMINOGLYCOSIDE,STREPTOMYCIN/SPECTINOMYCIN,WP_004758588.1,NG_054654.1,ESK39014.1,AYEQ01000163.1,No,6/9/19,Streptomycin/Spectinomycin
 ,ant(3'')-IIc,aminoglycoside nucleotidyltransferase ANT(3'')-IIc,core,AMR,AMR,AMINOGLYCOSIDE,STREPTOMYCIN/SPECTINOMYCIN,WP_005001597.1,NG_054653.1,ENV80847.1,APQC01000003.1,No,6/9/19,Streptomycin/Spectinomycin
-,,bifunctional aminoglycoside nucleotidyltransferase ANT(3'')-Ih/aminoglycoside N-acetyltransferase AAC(6')-Iid,core,AMR,AMR,AMINOGLYCOSIDE,STREPTOMYCIN/SPECTINOMYCIN,WP_063839878.1,NG_047218.1,AAL51021.2,AF453998.2,No,6/9/19,Streptomycin/Spectinomycin
-,,bifunctional aminoglycoside nucleotidyltransferase ANT(3'')-Ia/aminoglycoside N-acetyltransferase AAC(6')-IIa,core,AMR,AMR,AMINOGLYCOSIDE,STREPTOMYCIN/SPECTINOMYCIN,WP_070342373.1,NG_051910.1,SAH70860.1,FKGY01000068.1,No,6/9/19,Streptomycin/Spectinomycin
+,ant(3'')-Ih/aac(6')-Iid,bifunctional aminoglycoside nucleotidyltransferase ANT(3'')-Ih/aminoglycoside N-acetyltransferase AAC(6')-Iid,core,AMR,AMR,AMINOGLYCOSIDE,STREPTOMYCIN/SPECTINOMYCIN,WP_063839878.1,NG_047218.1,AAL51021.2,AF453998.2,No,6/9/19,Streptomycin/Spectinomycin
+,ant(3'')-Ia/aac(6')-Iia,bifunctional aminoglycoside nucleotidyltransferase ANT(3'')-Ia/aminoglycoside N-acetyltransferase AAC(6')-IIa,core,AMR,AMR,AMINOGLYCOSIDE,STREPTOMYCIN/SPECTINOMYCIN,WP_070342373.1,NG_051910.1,SAH70860.1,FKGY01000068.1,No,6/9/19,Streptomycin/Spectinomycin
 ,sul1,sulfonamide-resistant dihydropteroate synthase Sul1,core,AMR,AMR,SULFONAMIDE,SULFONAMIDE,WP_000946487.1,NG_048083.1,CAC08522.1,AJ294721.1,No,6/9/19,Sulfonamide
 ,sul1,sulfonamide-resistant dihydropteroate synthase Sul1,core,AMR,AMR,SULFONAMIDE,SULFONAMIDE,WP_000259032.1,NG_048081.1,CAA33123.1,X15024.1,No,6/9/19,Sulfonamide
 ,sul1,sulfonamide-resistant dihydropteroate synthase Sul1,core,AMR,AMR,SULFONAMIDE,SULFONAMIDE,WP_032490794.1,NG_048086.1,CAD57197.1,AJ517791.1,No,6/9/19,Sulfonamide
