@@ -1,29 +1,31 @@
+import pathlib
 workdir:{{workdir}}
 configfile:'config.yaml'
 
+SAMPLES = config['samples'].split()
 
+def get_contigs(wildcards):
+    return {"contigs": f"{pathlib.Path(wildcards.sample, 'contigs.fa')}"}
+
+def get_amr(wildcards):
+    return {"amr": pathlib.Path(wildcards.sample, f"{wildcards.sample}.out").absolute().as_posix()}
 
 rule all:
     input:{{finaloutput}}
 
 {% raw %}
 if config['amrfinder'] == 'run_amrfinder':
-    input: "{sample}/contigs.fa"
-    output: "{sample}/{sample}.out"
-{% endraw %}
-    {{singularity_path}}
-{% raw %}
-    shell:
-        """
-        amrfinder -n {input} -o {output} -t 1
-        """
+    rule amr_finder:
+        input:unpack(get_contigs)
+        output:"{sample}/{sample}.out"{% endraw %}
+        {{singularity_path}}{% raw %}
+        shell:"amrfinder -n {input} -o {output} -t 1"
+
 rule collate:
-    input:expand("{sample}/{sample}.out", sample = SAMPLES)
-{% endraw %}
-    output:{{finaloutput}}
-{% raw %}
+    input:expand("{sample}/{sample}.out", sample = SAMPLES){% endraw %}
+    output:{{finaloutput}}{% raw %}
     params:
-        mduqc = config['mduqc']
+        mduqc = config['mduqc'],
         script_path = config['script_path']
     shell:
         """

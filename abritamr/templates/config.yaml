@@ -4,3 +4,5 @@ mduqc:
   {{mduqc}}
 script_path:
   {{script_path}}
+samples:
+  {{samples}}

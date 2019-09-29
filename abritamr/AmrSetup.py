@@ -80,16 +80,15 @@ class Setupamr(object):
         target_name = "contigs.fa" if self.from_contigs else f"{first_column}.out"
         
         isolate_dir = self.workdir / f"{first_column}"
+        
         if not isolate_dir.exists():
             isolate_dir.mkdir()
-
+        source = pathlib.Path(f"{second_column}").absolute()
+        
         target = isolate_dir / target_name
-        print(target)
-        print(f"{second_column}")
-        print(not target.exists())
-
+        
         if not target.exists():
-            target.symlink_to(pathlib.Path(f"{second_column}"))
+            target.symlink_to(source)
 
     def check_input_tab(self, tab):
         
@@ -124,35 +123,35 @@ class Setupamr(object):
         if self.singularity_path != f"shub://phgenomics-singularity/amrfinderplus":
             return self.file_present(self.singularity_path)
 
-    def generate_workflow_files(self):
+    def generate_workflow_files(self, samples):
         # varaiables for config.yaml
         script_path = self.resources / "utils"
-        amrfinder = "" if self.from_contigs else "run_amrfinder"
+        amrfinder = " " if not self.from_contigs else "run_amrfinder"
         mduqc = "mduqc" if self.mduqc else ""
 
         config_source = self.resources / "templates" / "config.yaml"
-
-        config_template = jinja2.Template(config_source).read_text()
+        
+        config_template = jinja2.Template(config_source.read_text())
         config_target = self.workdir / "config.yaml"
         config_target.write_text(
             config_template.render(
-                script_path=script_path, amrfinder=amrfinder, mduqc=mduqc
+                script_path=script_path, amrfinder=amrfinder, mduqc=mduqc, samples = ' '.join(samples)
             )
         )
         # variables for snakemake
         finaloutput = (
-            f"MMS118.xlsx"
+            f"'MMS118.xlsx'"
             if self.mduqc
-            else f"summary_matches.csv, summary_partials.csv"
+            else f"'summary_matches.csv', 'summary_partials.csv'"
         )
-        workdir = f"'{self.workdir}''"
+        workdir = f"'{self.workdir}'"
         singularity_path = (
-            f"singularity:{self.singularity_path}" 
+            f"singularity:'{self.singularity_path}'" 
             if self.run_singulairty 
-            else "")
+            else " ")
 
         snk_source = self.resources / "templates" / "Snakefile"
-        snk_template = jinja2.Template(snk_source).read_text()
+        snk_template = jinja2.Template(snk_source.read_text())
         snk_target = self.workdir / "Snakefile"
         snk_target.write_text(
             snk_template.render(finaloutput=finaloutput, workdir=workdir, singularity_path = singularity_path)
@@ -163,7 +162,9 @@ class Setupamr(object):
     def run_snakemake(self):
 
         logging.info("Running pipeline. This may take some time.")
-        cmd = f"snakemake -s Snakefile -j {self.jobs} 2>&1 | tee -a job.log"
+        singularity = "--use-singularity" if self.run_singulairty else ""
+        cmd = f"snakemake -s Snakefile -j {self.jobs} {singularity} 2>&1 | tee -a job.log"
+        print(cmd)
         wkfl = subprocess.run(cmd, shell=True, capture_output=True)
 
         if wkfl.returncode == 0:
@@ -190,11 +191,12 @@ class Setupamr(object):
 
         # setup the pipeline
         self.check_input_exists()
-        self.link_input_files()
+        samples = self.link_input_files()
         # write snakefile
-        self.generate_workflow_files()
+        self.generate_workflow_files(samples)
         # run snakefile
-        if self.run_snakemake():
+        wkflow = self.run_snakemake()
+        if wkflow:
             logging.info(f"Pipeline completed")
             if not self.keep:
                 logging.info(f"Cleaning up the working directory.")
