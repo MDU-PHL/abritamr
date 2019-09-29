@@ -37,6 +37,7 @@ setup(
     entry_points={
         "console_scripts": [
             "mdu-amr-detection=abritamr.abritamr:main",
+            "abritamr=abritamr.abritamr:main",
         ]
     },
     classifiers=[
