@@ -161,10 +161,10 @@ class Setupamr(object):
 
     def run_snakemake(self):
 
-        logging.info("Running pipeline. This may take some time.")
+        
         singularity = "--use-singularity" if self.run_singulairty else ""
         cmd = f"snakemake -s Snakefile -j {self.jobs} {singularity} 2>&1 | tee -a job.log"
-        print(cmd)
+        logging.info(f"Running pipeline using command {cmd}. This may take some time.")
         wkfl = subprocess.run(cmd, shell=True, capture_output=True)
 
         if wkfl.returncode == 0:
@@ -202,3 +202,5 @@ class Setupamr(object):
                 logging.info(f"Cleaning up the working directory.")
                 self.clean()
             logging.info("Thank you and come again!")
+        else:
+            logging.info(f"Pipeline did not complete successfully. Check logs and try again")
