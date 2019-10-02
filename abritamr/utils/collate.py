@@ -39,6 +39,8 @@ class Collate:
     MAC = "Macrolide, lincosamide & streptogramin resistance"
 
     
+    
+
     def joins(self, dict_for_joining):
         """
         make them a comma separated list
@@ -157,9 +159,9 @@ class Collate:
             summary_drugs = pandas.DataFrame()
             summary_partial = pandas.DataFrame()
             for a in amr_output:
+                isolate = f"{a.parts[-2]}"
                 
                 df = pandas.read_csv(a, sep="\t")
-                isolate = f"{a.parts[-2]}"
                 
                 drug, partial = self.get_per_isolate(
                     reftab=reftab, df=df, isolate=isolate
@@ -209,12 +211,18 @@ class MduCollate(Collate):
             )
             raise SystemExit
 
+    def strip_bla(self, gene):
+        '''
+        strip bla from front of genes except
+        '''
+        if gene.startswith("bla") and len(gene) >5:
+            gene = gene.replace("bla", "")
+        return gene
+
     def get_passed_isolates(self, qc_name):
         """
         generate lists of isolates that passed QC and need AMR, failed QC and should have AMR and all other isolates
         """
-        
-
         qc = pandas.read_csv(qc_name, sep=None, engine="python")
         qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
         
@@ -265,14 +273,6 @@ class MduCollate(Collate):
                     all_genes.append(r)
         return all_genes
 
-    def strip_bla(self, gene):
-        '''
-        strip bla from front of genes except
-        '''
-        if gene.startswith("bla") and gene != "blaZ":
-            gene = gene.replace("bla", "")
-        return gene
-
     def reporting_logic(self, row, species):
         # get all genes found
         all_genes = self.get_all_genes(row)
@@ -306,41 +306,41 @@ class MduCollate(Collate):
                         "Acinetobacter pittii",
                         "Acinetobacter baumannii complex",
                     ]:
-                        genes_reported.append(gene)
+                        genes_reported.append(self.strip_bla(gene))
                     elif (
                         r == "Carbapenemase (MBL)"
                         and species != "Stenotrophomonas maltophilia"
                     ):
-                        genes_reported.append(gene)
+                        genes_reported.append(self.strip_bla(gene))
                     elif (
                         r == "Carbapenemase (MBL)"
                         and species == "Stenotrophomonas maltophilia"
                         and gene != "blaL1"
                     ):
-                        genes_reported.append(gene)
+                        genes_reported.append(self.strip_bla(gene))
                     elif r in ["ESBL", "ESBL (Amp C type)"] and genus in [
                         "Salmonella",
                         "Shigella",
                     ]:
-                        genes_reported.append(gene)
+                        genes_reported.append(self.strip_bla(gene))
                     elif r == "Oxazolidinone & phenicol resistance" and (
                         genus == "Enterococcus"
                         or species
                         in ["Staphylococcus aureus", "Staphylococcus argenteus"]
                     ):
-                        genes_reported.append(gene)
+                        genes_reported.append(self.strip_bla(gene))
                     elif r == "Vancomycin" and gene.match(van_match):
-                        genes_reported.append(gene)
+                        genes_reported.append(self.strip_bla(gene))
                     elif r == "Methicilin" and gene.match(mec_match):
-                        genes_reported.append(gene)
+                        genes_reported.append(self.strip_bla(gene))
                     elif r in [
                         "Carbapenemase",
                         "Aminoglycosides (Ribosomal methyltransferases",
                         "Colistin"
                     ]:
-                        genes_reported.append(gene)
+                        genes_reported.append(self.strip_bla(gene))
                     else:
-                        genes_not_reported.append(gene)
+                        genes_not_reported.append(self.strip_bla(gene))
 
             except:
                 print(f"{r} not found")
@@ -449,6 +449,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "mduqc":
             c = MduCollate()
+        else:
+            c = Collate()
     else:
         c = Collate()
     c.run()

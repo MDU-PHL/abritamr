@@ -86,7 +86,8 @@ class Setupamr(object):
         source = pathlib.Path(f"{second_column}").absolute()
         
         target = isolate_dir / target_name
-        
+        # cmd = f"cp {source} {target}"
+        # subprocess.run(cmd, shell = True)
         if not target.exists():
             target.symlink_to(source)
 
@@ -162,7 +163,7 @@ class Setupamr(object):
     def run_snakemake(self):
 
         
-        singularity = "--use-singularity" if self.run_singulairty else ""
+        singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
         cmd = f"snakemake -s Snakefile -j {self.jobs} {singularity} 2>&1 | tee -a job.log"
         logging.info(f"Running pipeline using command {cmd}. This may take some time.")
         wkfl = subprocess.run(cmd, shell=True, capture_output=True)
