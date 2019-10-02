@@ -276,77 +276,90 @@ class MduCollate(Collate):
     def reporting_logic(self, row, species):
         # get all genes found
         all_genes = self.get_all_genes(row)
+        isodict = row[1].to_dict()
+        print(isodict)
         # determine the genus EXPECTED
         genus = species.split()[0]
+        print(genus)
         # A list of reportable genes - TODO move to a class variable
         reportable = [
             "Carbapenemase",
             "Carbapenemase (MBL)",
             "Carbapenemase (OXA-51 family)",
             "ESBL",
-            "ESBL (Amp C type)",
+            "ESBL (AmpC type)",
             "Aminoglycosides (Ribosomal methyltransferases",
             "Colistin",
             "Oxazolidinone & phenicol resistance",
             "Vancomycin",
-            "Methicillin",
+            "Methicillin"
         ]
-        van_match = re.compile("van[A,B,C,D,E,G,L,M,N].[^\S]*")
+        # print(reportable)
+        non_caveat_reportable = [
+            "Carbapenemase",
+            "Aminoglycosides (Ribosomal methyltransferases)",
+            "Colistin"
+        ]
+
+        abacter_excluded = [
+            "Acinetobacter baumannii",
+            "Acinetobacter calcoaceticus",
+            "Acinetobacter nosocomialis",
+            "Acinetobacter pittii",
+            "Acinetobacter baumannii complex"
+        ]
+
+        # print(reportable)
+        van_match = re.compile("van[A,B,C,D,E,G,L,M,N][\S]*")
         mec_match = re.compile("mec[^IR]")
+      
         genes_reported = []  # genes for reporting
         genes_not_reported = []  # genes found but not reportable
-        for r in reportable:
-            try:
-                genes = row[1][r].split(",")
-                for gene in genes:
-                    if r == "Carbapenemase (OXA-51 family)" and species not in [
-                        "Acinetobacter baumannii",
-                        "Acinetobacter calcoaceticus",
-                        "Acinetobacter nosocomialis",
-                        "Acinetobacter pittii",
-                        "Acinetobacter baumannii complex",
-                    ]:
-                        genes_reported.append(self.strip_bla(gene))
-                    elif (
-                        r == "Carbapenemase (MBL)"
-                        and species != "Stenotrophomonas maltophilia"
-                    ):
-                        genes_reported.append(self.strip_bla(gene))
-                    elif (
-                        r == "Carbapenemase (MBL)"
-                        and species == "Stenotrophomonas maltophilia"
-                        and gene != "blaL1"
-                    ):
-                        genes_reported.append(self.strip_bla(gene))
-                    elif r in ["ESBL", "ESBL (Amp C type)"] and genus in [
-                        "Salmonella",
-                        "Shigella",
-                    ]:
-                        genes_reported.append(self.strip_bla(gene))
-                    elif r == "Oxazolidinone & phenicol resistance" and (
-                        genus == "Enterococcus"
-                        or species
-                        in ["Staphylococcus aureus", "Staphylococcus argenteus"]
-                    ):
-                        genes_reported.append(self.strip_bla(gene))
-                    elif r == "Vancomycin" and gene.match(van_match):
-                        genes_reported.append(self.strip_bla(gene))
-                    elif r == "Methicilin" and gene.match(mec_match):
-                        genes_reported.append(self.strip_bla(gene))
-                    elif r in [
-                        "Carbapenemase",
-                        "Aminoglycosides (Ribosomal methyltransferases",
-                        "Colistin"
-                    ]:
-                        genes_reported.append(self.strip_bla(gene))
+        print('ESBL (AmpC type)' in reportable)
+        for i in isodict:
+            # print(i)
+            print(i)
+            
+            genes = []
+            if not isinstance(isodict[i], float):
+                genes = isodict[i].split(',')
+            
+            # print(isodict[i])
+            if genes != []: # for each bin we do things to genes
+                
+                if i in reportable:
+                    
+                    # print(isodict[i])
+                    if i in non_caveat_reportable:
+                        genes_reported.extend(genes)
+                    elif i == "Carbapenemase (MBL)" and species != "Stenotrophomonas maltophilia":
+                        genes_reported.extend(genes)
+                    elif i == "Carbapenemase (MBL)" and species == "Stenotrophomonas maltophilia":
+                         # if species is "Stenotrophomonas maltophilia" don't report blaL1
+                        genes_reported.extend([g for g in genes if g != "blaL1"])
+                        genes_not_reported.extend([g for g in genes if g == "blaL1"])
+                    elif i == "Carbapenemase (OXA-51 family)" and species not in abacter_excluded:
+                        genes_reported.extend(genes)
+                    elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Salmonella", "Shigella"]:
+                        genes_reported.extend(genes)
+                    elif i == "Oxazolidinone & phenicol resistance":
+                        if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
+                            genes_reported.extend(genes)
+                        else:
+                            genes_not_reported.extend(genes)
+                    elif i == "Vancomycin":
+                        genes_reported.extend([g for g in genes if van_match.match(g)])
+                        genes_not_reported.extend([g for g in genes if not van_match.match(g)])
+                    elif i == "Methicillin":
+                        genes_reported.extend([g for g in genes if mec_match.match(g)])
+                        genes_not_reported.extend([g for g in genes if not mec_match.match(g)])
                     else:
-                        genes_not_reported.append(self.strip_bla(gene))
+                        genes_not_reported.extend(genes)
 
-            except:
-                print(f"{r} not found")
-
-        genes_not_reported.extend([a for a in all_genes if a not in genes_reported])
-
+                else:
+                    genes_not_reported.extend(genes)
+            break
+    
         return genes_reported, genes_not_reported
 
     def mdu_reporting(self, match):

@@ -26,8 +26,7 @@ rule collate:
     output:{{finaloutput}}{% raw %}
     params:
         mduqc = config['mduqc'],
-        script_path = config['script_path'],
-        bla=config['bla']
+        script_path = config['script_path']
     shell:
         """
         python3 {params.script_path}/collate.py {params.mduqc} {params.bla}
