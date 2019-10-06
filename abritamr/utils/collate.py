@@ -78,7 +78,14 @@ class Collate:
         extract the joint name of bifunctional genes
         """
         return reftab[reftab["refseq protein"] == protein]["gene family"].values[0]
-    
+    def extract_gene_name(self, protein, reftab):
+
+        if reftab[reftab["refseq protein"] == protein]["#allele"].values[0] != '-':
+            
+            return reftab[reftab["refseq protein"] == protein]["#allele"].values[0]
+        else:
+            return reftab[reftab["refseq protein"] == protein]["gene family"].values[0]
+            
     def setup_dict(self, drugclass_dict, reftab, row):
         """
         return the dictionary for collation
@@ -89,12 +96,14 @@ class Collate:
             drugclass = self.get_drugclass(
                     reftab=reftab, row=row, colname="#allele"
                     )
-            drugname = row[1]["Gene symbol"]
+            drugname = self.extract_gene_name(protein = row[1]["Accession of closest sequence"], reftab = reftab)
+
         elif row[1]["Gene symbol"] in list(reftab["gene family"]):
             drugclass = self.get_drugclass(
                 reftab=reftab, row=row, colname="gene family"
             )
-            drugname = row[1]["Gene symbol"]
+            drugname = self.extract_gene_name(protein = row[1]["Accession of closest sequence"], reftab = reftab)
+
         elif row[1]["Accession of closest sequence"] in list(reftab["refseq protein"]):
             drugclass = self.get_drugclass(
                 reftab = reftab, row = row, colname = "refseq protein"
@@ -358,7 +367,7 @@ class MduCollate(Collate):
 
                 else:
                     genes_not_reported.extend(genes)
-            break
+            # break
     
         return genes_reported, genes_not_reported
 

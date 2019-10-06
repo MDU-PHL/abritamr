@@ -29,6 +29,6 @@ rule collate:
         script_path = config['script_path']
     shell:
         """
-        python3 {params.script_path}/collate.py {params.mduqc} {params.bla}
+        python3 {params.script_path}/collate.py {params.mduqc}
         """
 {% endraw %}
