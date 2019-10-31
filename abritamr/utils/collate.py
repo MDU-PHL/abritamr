@@ -81,7 +81,6 @@ class Collate:
     def extract_gene_name(self, protein, reftab):
 
         if reftab[reftab["refseq protein"] == protein]["#allele"].values[0] != '-':
-            
             return reftab[reftab["refseq protein"] == protein]["#allele"].values[0]
         else:
             return reftab[reftab["refseq protein"] == protein]["gene family"].values[0]
@@ -102,13 +101,13 @@ class Collate:
             drugclass = self.get_drugclass(
                 reftab=reftab, row=row, colname="gene family"
             )
-            drugname = self.extract_gene_name(protein = row[1]["Accession of closest sequence"], reftab = reftab)
-
+            drugname = f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}*"
+            
         elif row[1]["Accession of closest sequence"] in list(reftab["refseq protein"]):
             drugclass = self.get_drugclass(
                 reftab = reftab, row = row, colname = "refseq protein"
             )
-            drugname = self.extract_bifunctional_name(protein = row[1]["Accession of closest sequence"], reftab = reftab)
+            drugname = self.extract_bifunctional_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)
         else:
             drugclass = "Unknown"
         if drugclass in drugclass_dict:
@@ -286,11 +285,9 @@ class MduCollate(Collate):
         # get all genes found
         all_genes = self.get_all_genes(row)
         isodict = row[1].to_dict()
-        print(isodict)
         # determine the genus EXPECTED
         genus = species.split()[0]
-        print(genus)
-        # A list of reportable genes - TODO move to a class variable
+         # A list of reportable genes - TODO move to a class variable
         reportable = [
             "Carbapenemase",
             "Carbapenemase (MBL)",
@@ -388,6 +385,9 @@ class MduCollate(Collate):
             genes_reported, genes_not_reported = self.reporting_logic(
                 row=row, species=species
             )
+            # strip bla
+            genes_not_reported = [self.strip_bla(g) for g in genes_not_reported]
+            genes_reported = [self.strip_bla(g) for g in genes_reported]
             d["Item code"] = qcdf["ITEM_CODE"].values[0] 
             d["Resistance genes (alleles) detected"] = ",".join(genes_reported)
             d["Resistance genes (alleles) det (non-rpt)"] = ",".join(genes_not_reported)
@@ -426,7 +426,7 @@ class MduCollate(Collate):
 
         
         passed_match.to_excel(writer, sheet_name="MMS118")
-        passed_partials.to_excel(writer, sheet_name="MMS118 - passed QC partial")
+        passed_partials.to_excel(writer, sheet_name="Passed QC partial")
         failed_match.to_excel(writer, sheet_name="failed QC matches")
         failed_partials.to_excel(writer, sheet_name="failed QC partial")
 
