@@ -36,7 +36,7 @@ class Collate:
         "Streptogramin",
     ]
     RTM = "Other aminoglycoside resistance (non-RMT)"
-    MAC = "Macrolide, lincosamide & streptogramin resistance"
+    MAC = "Macrolide, lincosamide and/or streptogramin resistance"
 
     
     
@@ -78,6 +78,7 @@ class Collate:
         extract the joint name of bifunctional genes
         """
         return reftab[reftab["refseq protein"] == protein]["gene family"].values[0]
+
     def extract_gene_name(self, protein, reftab):
 
         if reftab[reftab["refseq protein"] == protein]["#allele"].values[0] != '-':
@@ -127,7 +128,9 @@ class Collate:
         for row in df.iterrows():
             
             # if the match is good then generate a drugclass dict
-            if row[1]["Method"] in self.MATCH and row[1]["Scope"] == "core" and row[1]["Element subtype"] == "AMR":
+            if row[1]["Gene symbol"] == "aac(6')-Ib-cr" and row[1]["Method"] in ["EXACTX", "ALLELEX"]: # restrict the calling of quinolone resistance - if not an exact match then is should be considered a partial match
+                partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
+            elif row[1]["Method"] in self.MATCH and row[1]["Scope"] == "core" and row[1]["Element subtype"] == "AMR":
                 drugclass_dict = self.setup_dict(drugclass_dict = drugclass_dict, reftab = reftab, row = row)
             elif row[1]["Method"] not in self.MATCH and row[1]["Scope"] == "core" and row[1]["Element subtype"] == "AMR":
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
@@ -346,7 +349,7 @@ class MduCollate(Collate):
                         genes_not_reported.extend([g for g in genes if g == "blaL1"])
                     elif i == "Carbapenemase (OXA-51 family)" and species not in abacter_excluded:
                         genes_reported.extend(genes)
-                    elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Salmonella", "Shigella"]:
+                    elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Salmonella"]: # removed Shigella - Norelles request
                         genes_reported.extend(genes)
                     elif i == "Oxazolidinone & phenicol resistance":
                         if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
