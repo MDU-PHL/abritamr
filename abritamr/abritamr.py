@@ -1,6 +1,6 @@
 import pathlib, argparse, logging, sys, os
 
-from AmrSetup import Setupamr
+from abritamr.AmrSetup import Setupamr
 
 
 """
