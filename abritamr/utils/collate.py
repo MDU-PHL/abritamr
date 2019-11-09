@@ -57,11 +57,8 @@ class Collate:
         """
         if the enhanced subclass is in either NONRTM or MACROLIDES then then use the groups specified by Norelle. If it is empty (-) then fall back on the AMRFinder subclass, else report the extended subclass
         """
-        gene_id_col = "Gene symbol" if colname != "refseq protein" else "Accession of closest sequence"
-        d = reftab[reftab[colname] == row[1][gene_id_col]][
-            "enhanced_subclass"
-        ].unique()[0]
-
+        gene_id_col = "Gene symbol" if colname != "refseq_protein_accession" else "Accession of closest sequence"
+        d = reftab[reftab[colname] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
         if d in self.NONRTM:
             return self.RTM
         elif d in self.MACROLIDES:
@@ -77,36 +74,36 @@ class Collate:
         """
         extract the joint name of bifunctional genes
         """
-        return reftab[reftab["refseq protein"] == protein]["gene family"].values[0]
+        return reftab[reftab["refseq_protein_accession"] == protein]["gene_family"].values[0]
 
     def extract_gene_name(self, protein, reftab):
 
-        if reftab[reftab["refseq protein"] == protein]["#allele"].values[0] != '-':
-            return reftab[reftab["refseq protein"] == protein]["#allele"].values[0]
+        if reftab[reftab["refseq_protein_accession"] == protein]["allele"].values[0] != '-':
+            return reftab[reftab["refseq_protein_accession"] == protein]["allele"].values[0]
         else:
-            return reftab[reftab["refseq protein"] == protein]["gene family"].values[0]
+            return reftab[reftab["refseq_protein_accession"] == protein]["gene_family"].values[0]
             
     def setup_dict(self, drugclass_dict, reftab, row):
         """
         return the dictionary for collation
         """
 
-        if row[1]["Gene symbol"] in list(reftab["#allele"]):
+        if row[1]["Gene symbol"] in list(reftab["allele"]):
 
             drugclass = self.get_drugclass(
-                    reftab=reftab, row=row, colname="#allele"
+                    reftab=reftab, row=row, colname="allele"
                     )
             drugname = self.extract_gene_name(protein = row[1]["Accession of closest sequence"], reftab = reftab)
 
-        elif row[1]["Gene symbol"] in list(reftab["gene family"]):
+        elif row[1]["Gene symbol"] in list(reftab["gene_family"]):
             drugclass = self.get_drugclass(
-                reftab=reftab, row=row, colname="gene family"
+                reftab=reftab, row=row, colname="gene_family"
             )
             drugname = f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}*"
             
-        elif row[1]["Accession of closest sequence"] in list(reftab["refseq protein"]):
+        elif row[1]["Accession of closest sequence"] in list(reftab["refseq_protein_accession"]):
             drugclass = self.get_drugclass(
-                reftab = reftab, row = row, colname = "refseq protein"
+                reftab = reftab, row = row, colname = "refseq_protein_accession"
             )
             drugname = self.extract_bifunctional_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)
         else:
@@ -226,7 +223,9 @@ class MduCollate(Collate):
         '''
         strip bla from front of genes except
         '''
-        if gene.startswith("bla") and len(gene) >5:
+        if gene.startswith("bla") and len(gene) >6 and gene.endswith("*"):
+            gene = gene.replace("bla", "")
+        elif gene.startswith("bla") and len(gene) >5 and not gene.endswith("*"):
             gene = gene.replace("bla", "")
         return gene
 
@@ -324,11 +323,9 @@ class MduCollate(Collate):
       
         genes_reported = []  # genes for reporting
         genes_not_reported = []  # genes found but not reportable
-        print('ESBL (AmpC type)' in reportable)
         for i in isodict:
             # print(i)
-            print(i)
-            
+                        
             genes = []
             if not isinstance(isodict[i], float):
                 genes = isodict[i].split(',')
@@ -377,13 +374,12 @@ class MduCollate(Collate):
         qc = pandas.read_csv(self.mduqc, sep=None, engine="python")
         qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
         for row in match.iterrows():
-            d = {"MDU sample ID": row[0]}
+            item_code = row[0].split("-")[-1] if len(row[0].split("-")) > 2 else ""
+            d = {"MDU sample ID": "-".join(row[0].split("-")[:2]), "Item code" : item_code}
             qcdf = qc[qc["ISOLATE"] == row[0]]
             exp_species = qcdf["SPECIES_EXP"].values[0]
             obs_species = qcdf["SPECIES_OBS"].values[0]
-            if qcdf["TEST_QC"].values[0] == 'FAIL':
-                d["Species_exp"] = exp_species
-            d["Species_obs"] = obs_species
+            
             species = obs_species if obs_species == exp_species else exp_species
             genes_reported, genes_not_reported = self.reporting_logic(
                 row=row, species=species
@@ -391,9 +387,11 @@ class MduCollate(Collate):
             # strip bla
             genes_not_reported = [self.strip_bla(g) for g in genes_not_reported]
             genes_reported = [self.strip_bla(g) for g in genes_reported]
-            d["Item code"] = qcdf["ITEM_CODE"].values[0] 
             d["Resistance genes (alleles) detected"] = ",".join(genes_reported)
             d["Resistance genes (alleles) det (non-rpt)"] = ",".join(genes_not_reported)
+            if qcdf["TEST_QC"].values[0] == 'FAIL': # species not needed for MDU LIMS upload
+                d["Species_exp"] = exp_species
+            d["Species_obs"] = obs_species
             tempdf = pandas.DataFrame(d, index=[0])
             tempdf = tempdf.set_index("MDU sample ID")
             # print(tempdf)
@@ -401,7 +399,10 @@ class MduCollate(Collate):
                 reporting_df = tempdf
             else:
                 reporting_df = reporting_df.append(tempdf)
-        return reporting_df
+        # print(reporting_df.head())
+        # print(reporting_df.index)
+        #  reporting_df = reporting_df[["MDU sample ID",'Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs']]
+        return reporting_df.reindex(labels = ['Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs'], axis = 'columns')
 
     def mdu_partials(self, partials):
         '''
@@ -435,19 +436,51 @@ class MduCollate(Collate):
 
         writer.close()
 
-    def get_toml(self):
+    def get_toml(self, toml_file):
         '''
         get the toml file
         '''
-        pass
+        if len(toml_file) > 0:
+            data = toml.load(f"{toml_file[0]}")
+            return data
+
+    def get_single_amr(self, amr_file):
+        '''
+        get a single amr output
+        '''
+        if len(amr_file) > 0:
+            data = pandas.read_csv(amr_file[0], sep = "\t")
+            return data
+        
+    def generate_dict_for_toml(self,data, amr):
+
+        amr_dict = amr.to_dict("index")
+        for d in data:
+            data[d]['amrfinder'] = amr_dict
+        return data
+
 
     def write_to_toml(self):
         '''
         write the output of amrfinder to the toml
         '''
-        pass
+        path = pathlib.Path().cwd()
+        for p in path.iterdir():
+            if p.is_dir():
+                amr = self.get_single_amr(sorted(p.glob("*.out")))
+                data = self.get_toml(sorted(p.glob("final.toml")))
+                filename = p / "final_amr.toml"
+                if data and amr:
+                    toml_object = self.generate_dict_for_toml(data = data, amr =amr)
+                    with open(filename, 'wt') as f:
+                        toml.dump(toml_object, f)
+
+
 
     def run(self):
+
+        # fill in toml files
+        self.write_to_toml()
         # get isolates binned into groups.
         for_amr, for_amr_failed = self.get_passed_isolates(self.mduqc)
         # get collated data
@@ -479,3 +512,7 @@ if __name__ == "__main__":
     else:
         c = Collate()
     c.run()
+
+
+
+# SOP output name 

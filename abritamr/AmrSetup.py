@@ -20,7 +20,7 @@ class Setupamr(object):
         self.from_contigs = True
         self.keep = args.keep
         self.run_singulairty = args.Singularity
-        self.singularity_path = f"shub://phgenomics-singularity/amrfinderplus" if args.singularity_path == '' else args.singularity_path
+        self.singularity_path = f"shub://phgenomics-singularity/amrfinderplus" if args.singularity_path == '' else args.singularity_path # this needs to addressed before formal release.
         
     
     
@@ -129,9 +129,7 @@ class Setupamr(object):
         script_path = self.resources / "utils"
         amrfinder = " " if not self.from_contigs else "run_amrfinder"
         mduqc = "mduqc" if self.mduqc else ""
-
         config_source = self.resources / "templates" / "config.yaml"
-        
         config_template = jinja2.Template(config_source.read_text())
         config_target = self.workdir / "config.yaml"
         config_target.write_text(
@@ -153,7 +151,7 @@ class Setupamr(object):
 
         snk_source = self.resources / "templates" / "Snakefile"
         snk_template = jinja2.Template(snk_source.read_text())
-        snk_target = self.workdir / "Snakefile"
+        snk_target = self.workdir / "Snakefile_abritamr"
         snk_target.write_text(
             snk_template.render(finaloutput=finaloutput, workdir=workdir, singularity_path = singularity_path)
         )
@@ -162,9 +160,8 @@ class Setupamr(object):
 
     def run_snakemake(self):
 
-        
         singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
-        cmd = f"snakemake -s Snakefile -j {self.jobs} {singularity} 2>&1 | tee -a job.log"
+        cmd = f"snakemake -s Snakefile_abritamr -j {self.jobs} {singularity} 2>&1 | tee -a job.log"
         logging.info(f"Running pipeline using command {cmd}. This may take some time.")
         wkfl = subprocess.run(cmd, shell=True, capture_output=True)
 
@@ -189,9 +186,7 @@ class Setupamr(object):
                 logging.info("Cleaned unused conda environments")
 
     def run_amr(self):
-
         # setup the pipeline
-        self.check_input_exists()
         samples = self.link_input_files()
         # write snakefile
         self.generate_workflow_files(samples)
