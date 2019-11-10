@@ -51,5 +51,5 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
-    package_data={"abritamr": ["templates/*", "db/*"]}
+    package_data={"abritamr": ["templates/*", "db/*", "utils/*"]}
 )
