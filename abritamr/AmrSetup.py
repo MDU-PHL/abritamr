@@ -162,6 +162,7 @@ class Setupamr(object):
 
         singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
         cmd = f"snakemake -s Snakefile_abritamr -j {self.jobs} {singularity} 2>&1 | tee -a job.log"
+        print(f"Running pipeline using command {cmd}. This may take some time.")
         logging.info(f"Running pipeline using command {cmd}. This may take some time.")
         wkfl = subprocess.run(cmd, shell=True, capture_output=True)
 
