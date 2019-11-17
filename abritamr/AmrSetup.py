@@ -14,6 +14,7 @@ class Setupamr(object):
         self.resources = pathlib.Path(args.resources)
         self.jobs = args.jobs
         self.mduqc = args.mduqc
+        self.positive_control = args.positive_control
         self.drugs = pathlib.Path(args.drug_classes)
         self.contigs = args.contigs
         self.amrfinder_output = args.amrfinder_output
@@ -46,6 +47,12 @@ class Setupamr(object):
         if self.mduqc and not self.file_present("mdu_qc_checked.csv"):
             logging.warning(
                 "You appear to be trying to run mdu-amr in the context of mdu-qc, but the mdu_qc_checked.csv file is not present. Please check your settings and try again."
+            )
+            raise SystemExit
+
+        if self.mduqc and self.positive_control == "":
+            logging.warning(
+                "You appear to be trying to run mdu-amr in the context of mdu-qc, but you have not provided a path to positive control. Please check your settings and try again."
             )
             raise SystemExit
 
@@ -112,10 +119,15 @@ class Setupamr(object):
         )
         tab = pandas.read_csv(input_file, engine="python", header=None, sep = '\t')
         self.check_input_tab(tab)
+        isos = list(tab[0])
         for row in tab.iterrows():
             if self.file_present(row[1][1]):
                 self.make_links(first_column=row[1][0], second_column=row[1][1])
-        return list(tab[0])
+        if self.positive_control != "":
+            if self.file_present(self.positve_control):
+                self.make_links(first_column = "9999-99888", second_column = self.positive_control)
+                isos.append("9999-99888")
+        return isos
 
     def check_singularity(self):
         '''
