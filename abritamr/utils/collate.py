@@ -346,7 +346,7 @@ class MduCollate(Collate):
                         genes_not_reported.extend([g for g in genes if g == "blaL1"])
                     elif i == "Carbapenemase (OXA-51 family)" and species not in abacter_excluded:
                         genes_reported.extend(genes)
-                    elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Salmonella"]: # removed Shigella - Norelles request
+                    elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Salmonella", "Shigella"]: 
                         genes_reported.extend(genes)
                     elif i == "Oxazolidinone & phenicol resistance":
                         if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
