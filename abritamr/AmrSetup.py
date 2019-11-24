@@ -124,7 +124,7 @@ class Setupamr(object):
             if self.file_present(row[1][1]):
                 self.make_links(first_column=row[1][0], second_column=row[1][1])
         if self.positive_control != "":
-            if self.file_present(self.positve_control):
+            if self.file_present(self.positive_control):
                 self.make_links(first_column = "9999-99888", second_column = self.positive_control)
                 isos.append("9999-99888")
         return isos

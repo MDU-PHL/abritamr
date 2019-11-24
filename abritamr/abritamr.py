@@ -33,7 +33,7 @@ def set_parsers():
         help="Set if running on MDU QC data. If set please provide the MDU QC .csv as further input and an additional output suitable for lims input will be provided.",
     )
     parser.add_argument(
-        "--posive_control",
+        "--positive_control",
         "-p",
         help = "Path to positive control sequence - must be set if using -m",
         default= ""

@@ -207,7 +207,15 @@ class MduCollate(Collate):
     def __init__(self):
         self.workdir = pathlib.Path.cwd()
         self.mduqc = self.workdir / "mdu_qc_checked.csv"
+        
         self.check_for_mduqc()
+        self.mduqctab = self.mdu_qc_tab()
+
+    def mdu_qc_tab(self):
+
+        tab = pandas.read_csv(self.mduqc)
+        pos = pandas.DataFrame(data = {"ISOLATE": "9999-99888", "TEST_QC" : "PASS", "SPECIES_EXP":"Staphylococcus aureus", "SPECIES_OBS":"Staphylococcus aureus" }, index = [0])
+        return tab.append(pos)
 
     def check_for_mduqc(self):
 
@@ -233,14 +241,13 @@ class MduCollate(Collate):
         """
         generate lists of isolates that passed QC and need AMR, failed QC and should have AMR and all other isolates
         """
-        qc = pandas.read_csv(qc_name, sep=None, engine="python")
-        qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
+        
         
         failed = list(
-            qc[qc["TEST_QC"] == "FAIL"]["ISOLATE"]
+            self.mduqctab[self.mduqctab["TEST_QC"] == "FAIL"]["ISOLATE"]
         )  # isolates that failed qc and should have amr
         passed = list(
-            qc[qc["TEST_QC"] == "PASS"]["ISOLATE"]
+            self.mduqctab[self.mduqctab["TEST_QC"] == "PASS"]["ISOLATE"]
         )  # isolates that failed qc and should have amr
         
         return (passed, failed)
@@ -296,7 +303,7 @@ class MduCollate(Collate):
             "Carbapenemase (OXA-51 family)",
             "ESBL",
             "ESBL (AmpC type)",
-            "Aminoglycosides (Ribosomal methyltransferases",
+            "Aminoglycosides (Ribosomal methyltransferase",
             "Colistin",
             "Oxazolidinone & phenicol resistance",
             "Vancomycin",
@@ -376,7 +383,7 @@ class MduCollate(Collate):
         for row in match.iterrows():
             item_code = row[0].split("-")[-1] if len(row[0].split("-")) > 2 else ""
             d = {"MDU sample ID": "-".join(row[0].split("-")[:2]), "Item code" : item_code}
-            qcdf = qc[qc["ISOLATE"] == row[0]]
+            qcdf = self.mduqctab[self.mduqctab["ISOLATE"] == row[0]]
             exp_species = qcdf["SPECIES_EXP"].values[0]
             obs_species = qcdf["SPECIES_OBS"].values[0]
             
@@ -414,8 +421,8 @@ class MduCollate(Collate):
         for row in partials.iterrows:
             qc = pandas.read_csv(self.mduqc, sep=None, engine="python")
             qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
-            exp_species = qcdf["SPECIES_EXP"].values[0]
-            obs_species = qcdf["SPECIES_OBS"].values[0]
+            exp_species = self.mduqctab["SPECIES_EXP"].values[0]
+            obs_species = self.mduqctab["SPECIES_OBS"].values[0]
             species = obs_species if obs_species == exp_species else exp_species
             d = {"MDU sample ID": row[0]}
             
