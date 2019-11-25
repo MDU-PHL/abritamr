@@ -303,7 +303,7 @@ class MduCollate(Collate):
             "Carbapenemase (OXA-51 family)",
             "ESBL",
             "ESBL (AmpC type)",
-            "Aminoglycosides (Ribosomal methyltransferase",
+            "Aminoglycosides (Ribosomal methyltransferase)",
             "Colistin",
             "Oxazolidinone & phenicol resistance",
             "Vancomycin",
