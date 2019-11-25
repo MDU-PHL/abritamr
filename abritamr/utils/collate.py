@@ -57,8 +57,12 @@ class Collate:
         """
         if the enhanced subclass is in either NONRTM or MACROLIDES then then use the groups specified by Norelle. If it is empty (-) then fall back on the AMRFinder subclass, else report the extended subclass
         """
+        # print(row)
         gene_id_col = "Gene symbol" if colname != "refseq_protein_accession" else "Accession of closest sequence"
+        # print(gene_id_col)
+        # print(reftab[reftab[colname] == row[1][gene_id_col]])
         d = reftab[reftab[colname] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
+        # print(d)
         if d in self.NONRTM:
             return self.RTM
         elif d in self.MACROLIDES:
@@ -97,9 +101,9 @@ class Collate:
 
         elif row[1]["Gene symbol"] in list(reftab["gene_family"]):
             drugclass = self.get_drugclass(
-                reftab=reftab, row=row, colname="gene_family"
+                reftab=reftab, row=row, colname="refseq_protein_accession"
             )
-            drugname = f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}*"
+            drugname = f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}*" if not row[1]["Method"] in ["EXACTX", "ALLELEX"] else f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}"
             
         elif row[1]["Accession of closest sequence"] in list(reftab["refseq_protein_accession"]):
             drugclass = self.get_drugclass(
@@ -312,7 +316,7 @@ class MduCollate(Collate):
         # print(reportable)
         non_caveat_reportable = [
             "Carbapenemase",
-            "Aminoglycosides (Ribosomal methyltransferases)",
+            "Aminoglycosides (Ribosomal methyltransferase)",
             "Colistin"
         ]
 
@@ -327,7 +331,9 @@ class MduCollate(Collate):
         # print(reportable)
         van_match = re.compile("van[A,B,C,D,E,G,L,M,N][\S]*")
         mec_match = re.compile("mec[^IR]")
-      
+        # print(row)
+        # print(species)
+        # print(genus)
         genes_reported = []  # genes for reporting
         genes_not_reported = []  # genes found but not reportable
         for i in isodict:
@@ -336,7 +342,7 @@ class MduCollate(Collate):
             genes = []
             if not isinstance(isodict[i], float):
                 genes = isodict[i].split(',')
-            
+                # print(genes)
             # print(isodict[i])
             if genes != []: # for each bin we do things to genes
                 
@@ -349,12 +355,15 @@ class MduCollate(Collate):
                         genes_reported.extend(genes)
                     elif i == "Carbapenemase (MBL)" and species == "Stenotrophomonas maltophilia":
                          # if species is "Stenotrophomonas maltophilia" don't report blaL1
-                        genes_reported.extend([g for g in genes if g != "blaL1"])
-                        genes_not_reported.extend([g for g in genes if g == "blaL1"])
+                        genes_reported.extend([g for g in genes if not g.startswith("blaL1")])
+                        genes_not_reported.extend([g for g in genes if g.startswith("blaL1")])
                     elif i == "Carbapenemase (OXA-51 family)" and species not in abacter_excluded:
                         genes_reported.extend(genes)
-                    elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Salmonella", "Shigella"]: 
+                    elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Salmonella"]: 
                         genes_reported.extend(genes)
+                    elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Shigella"]: 
+                        genes_reported.extend([g for g in genes if "blaEC" not in g])
+                        genes_not_reported.extend([g for g in genes if "blaEC" in g]) # don't report blaEC for shigella
                     elif i == "Oxazolidinone & phenicol resistance":
                         if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
                             genes_reported.extend(genes)
@@ -382,11 +391,18 @@ class MduCollate(Collate):
         qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
         for row in match.iterrows():
             item_code = row[0].split("-")[-1] if len(row[0].split("-")) > 2 else ""
+            
             d = {"MDU sample ID": "-".join(row[0].split("-")[:2]), "Item code" : item_code}
             qcdf = self.mduqctab[self.mduqctab["ISOLATE"] == row[0]]
             exp_species = qcdf["SPECIES_EXP"].values[0]
             obs_species = qcdf["SPECIES_OBS"].values[0]
-            
+            # TODO clarify with Susan, Norella and sections about how to handle - leave as is for now 191124
+            # if obs_species == exp_species:
+            #     species = obs_species
+            # elif "Citrobacter freundi" in exp_species and "Salmonella" in obs_species:
+            #     species = obs_species
+            # else:
+            #     species = exp_species
             species = obs_species if obs_species == exp_species else exp_species
             genes_reported, genes_not_reported = self.reporting_logic(
                 row=row, species=species
@@ -399,6 +415,7 @@ class MduCollate(Collate):
             if qcdf["TEST_QC"].values[0] == 'FAIL': # species not needed for MDU LIMS upload
                 d["Species_exp"] = exp_species
             d["Species_obs"] = obs_species
+            d["Species_exp"] = exp_species
             tempdf = pandas.DataFrame(d, index=[0])
             tempdf = tempdf.set_index("MDU sample ID")
             # print(tempdf)
@@ -409,7 +426,7 @@ class MduCollate(Collate):
         # print(reporting_df.head())
         # print(reporting_df.index)
         #  reporting_df = reporting_df[["MDU sample ID",'Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs']]
-        return reporting_df.reindex(labels = ['Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs'], axis = 'columns')
+        return reporting_df.reindex(labels = ['Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs', 'Species_exp'], axis = 'columns')
 
     def mdu_partials(self, partials):
         '''
