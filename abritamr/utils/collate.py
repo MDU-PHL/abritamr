@@ -313,6 +313,7 @@ class MduCollate(Collate):
     def reporting_logic(self, row, species):
         # get all genes found
         all_genes = self.get_all_genes(row)
+        # print(row)
         isodict = row[1].to_dict()
         # determine the genus EXPECTED
         genus = species.split()[0]
@@ -396,8 +397,9 @@ class MduCollate(Collate):
 
                 else:
                     genes_not_reported.extend(genes)
-            if genes_reported == []:
-                genes_reported = [self.none_replacement_code(genus= genus)]
+            print(genes_reported)
+        if genes_reported == []:
+            genes_reported = [self.none_replacement_code(genus= genus)]
             # break
     
         return genes_reported, genes_not_reported
