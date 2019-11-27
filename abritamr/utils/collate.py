@@ -215,6 +215,14 @@ class MduCollate(Collate):
         self.check_for_mduqc()
         self.mduqctab = self.mdu_qc_tab()
 
+        self.NONE_CODES = {
+            "Salmonella":"SALM_SHIG_AMR_NEG1",
+            "Shigella":"SALM_SHIG_AMR_NEG1",
+            "Staphylococcus":"STAPH_AMR_NEG1",
+            "Enterococcus":"ENTRC_AMR_NEG1",
+            "Other":"GENRL_AMR_NEG1"
+        }
+
     def mdu_qc_tab(self):
 
         tab = pandas.read_csv(self.mduqc)
@@ -294,6 +302,14 @@ class MduCollate(Collate):
                     all_genes.append(r)
         return all_genes
 
+    def none_replacement_code(self, genus):
+
+        if genus in self.NONE_CODES:
+            return self.NONE_CODES[genus]
+        else:
+            return "GENRL_AMR_NEG1"
+
+
     def reporting_logic(self, row, species):
         # get all genes found
         all_genes = self.get_all_genes(row)
@@ -336,12 +352,12 @@ class MduCollate(Collate):
         # print(genus)
         genes_reported = []  # genes for reporting
         genes_not_reported = []  # genes found but not reportable
-        for i in isodict:
+        for iso in isodict:
             # print(i)
                         
             genes = []
-            if not isinstance(isodict[i], float):
-                genes = isodict[i].split(',')
+            if not isinstance(isodict[iso], float):
+                genes = isodict[iso].split(',')
                 # print(genes)
             # print(isodict[i])
             if genes != []: # for each bin we do things to genes
@@ -380,6 +396,8 @@ class MduCollate(Collate):
 
                 else:
                     genes_not_reported.extend(genes)
+            if genes_reported == []:
+                genes_reported = [self.none_replacement_code(genus= genus)]
             # break
     
         return genes_reported, genes_not_reported
