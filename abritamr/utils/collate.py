@@ -353,12 +353,12 @@ class MduCollate(Collate):
         # print(genus)
         genes_reported = []  # genes for reporting
         genes_not_reported = []  # genes found but not reportable
-        for iso in isodict:
+        for i in isodict:
             # print(i)
                         
             genes = []
-            if not isinstance(isodict[iso], float):
-                genes = isodict[iso].split(',')
+            if not isinstance(isodict[i], float):
+                genes = isodict[i].split(',')
                 # print(genes)
             # print(isodict[i])
             if genes != []: # for each bin we do things to genes
