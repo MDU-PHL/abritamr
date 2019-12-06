@@ -22,6 +22,7 @@ class Setupamr(object):
         self.keep = args.keep
         self.run_singulairty = args.Singularity
         self.singularity_path = f"shub://phgenomics-singularity/amrfinderplus" if args.singularity_path == '' else args.singularity_path # this needs to addressed before formal release.
+        self.conda_path = pathlib.Path(args.conda_path)
         
     
     
@@ -172,7 +173,8 @@ class Setupamr(object):
 
     def run_snakemake(self):
 
-        singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
+        # singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
+        conda = f"--use-conda --conda-prefix {self.conda_path}"
         cmd = f"snakemake -s Snakefile_abritamr -j {self.jobs} {singularity} 2>&1 | tee -a job.log"
         logging.info(f"Running pipeline using command {cmd}. This may take some time.")
         wkfl = subprocess.run(cmd, shell=True, capture_output=True)

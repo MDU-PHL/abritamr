@@ -19,6 +19,7 @@ if config['amrfinder'] == 'run_amrfinder':
         input:unpack(get_contigs)
         output:"{sample}/{sample}.out"{% endraw %}
         {{singularity_path}}{% raw %}
+        conda:"amrfinderplus.yaml"
         shell:"amrfinder -n {input} -o {output} -t 1"
 
 rule collate:
