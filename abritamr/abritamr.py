@@ -52,7 +52,7 @@ def set_parsers():
     )
     parser.add_argument(
         "--conda_path",
-        default=f"{pathlib.Path(__file__).parent / 'db'}",
+        default=f"{pathlib.Path(__file__).parent / 'envs'}",
         help="Path to the conda environment for AMRfinderplus, if empty will defualt to shub://phgenomics-singularity/amrfinderplus"
     )
     parser.add_argument(
