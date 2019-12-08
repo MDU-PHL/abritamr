@@ -1,4 +1,0 @@
-channels:
-  - bioconda
-dependencies:
-  - amrfinderplus=3.2.3

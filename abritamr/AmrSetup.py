@@ -22,8 +22,11 @@ class Setupamr(object):
         self.keep = args.keep
         self.run_singulairty = args.Singularity
         self.singularity_path = f"shub://phgenomics-singularity/amrfinderplus" if args.singularity_path == '' else args.singularity_path # this needs to addressed before formal release.
-        self.conda_path = pathlib.Path(args.conda_path)
-        
+        self.finaloutput = (
+            f"'MMS118.xlsx'"
+            if self.mduqc
+            else f"'summary_matches.csv', 'summary_partials.csv'"
+        )
     
     
 
@@ -151,11 +154,7 @@ class Setupamr(object):
             )
         )
         # variables for snakemake
-        finaloutput = (
-            f"'MMS118.xlsx'"
-            if self.mduqc
-            else f"'summary_matches.csv', 'summary_partials.csv'"
-        )
+        
         workdir = f"'{self.workdir}'"
         singularity_path = (
             f"singularity:'{self.singularity_path}'" 
@@ -166,16 +165,15 @@ class Setupamr(object):
         snk_template = jinja2.Template(snk_source.read_text())
         snk_target = self.workdir / "Snakefile_abritamr"
         snk_target.write_text(
-            snk_template.render(finaloutput=finaloutput, workdir=workdir, singularity_path = singularity_path)
+            snk_template.render(finaloutput=self.finaloutput, workdir=workdir, singularity_path = singularity_path)
         )
 
         logging.info(f"Written Snakefile and config.yaml to {self.workdir}")
 
     def run_snakemake(self):
 
-        # singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
-        conda = f"--use-conda --conda-prefix {self.conda_path}"
-        cmd = f"snakemake -s Snakefile_abritamr -j {self.jobs} {conda} 2>&1 | tee -a job.log"
+        singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
+        cmd = f"snakemake -s Snakefile_abritamr -j {self.jobs} {singularity} 2>&1 | tee -a job.log"
         logging.info(f"Running pipeline using command {cmd}. This may take some time.")
         wkfl = subprocess.run(cmd, shell=True, capture_output=True)
         
@@ -208,6 +206,11 @@ class Setupamr(object):
         wkflow = self.run_snakemake()
         if wkflow:
             logging.info(f"Pipeline completed")
+            for i in self.finaloutput:
+                if pathlib.Path(f"{i}").exists():
+                    logging.info(f"{i} found, pipeline successfully completed. Come again soon.")
+                else:
+                    logging.warning(f"{i} is not present. Please check logs and try again.")
             if not self.keep:
                 logging.info(f"Cleaning up the working directory.")
                 self.clean()
