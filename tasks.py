@@ -43,7 +43,7 @@ def gittag(ctx):
     # message = ' '.join(message.split('_'))
     # ctx.run("git add -A")
     # ctx.run(f"git commit -m '{message}'")
-    ctx.run(f"git tag -a {tag} -m {message}")
+    # ctx.run(f"git tag -a {tag} -m {message}")
     ctx.run("git push origin --tags")
     # ctx.run("git push kristy --tags")
 
