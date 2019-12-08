@@ -219,13 +219,18 @@ class Setupamr(object):
         wkflow = self.run_snakemake()
         if wkflow:
             logger.info(f"Pipeline completed")
-            for i in self.finaloutput:
-                if pathlib.Path(f"{i}").exists():
-                    logger.info(f"{i} found, pipeline successfully completed. Come again soon.")
+            if self.mduqc:
+                if pathlib.Path(f"MMS118.xlsx").exists():
+                    logger.info(f"MMS118.xlsx found, pipeline successfully completed. Come again soon.")
                 else:
-                    logger.warning(f"{i} is not present. Please check logs and try again.")
+                    logger.warning(f"MMS118.xlsx is not present. Please check logs and try again.")
                     raise SystemExit
-
+            else:
+                if pathlib.Path("summary_matches.csv").exists() and pathlib.Path("summary_partials.csv"):
+                    logger.info(f"'summary_matches.csv' and 'summary_partials.csv' found, pipeline successfully completed. Come again soon.")
+                else:
+                    logger.warning(f"'summary_matches.csv' and 'summary_partials.csv' are not present. Please check logs and try again.")
+                    raise SystemExit
             if not self.keep:
                 logger.info(f"Cleaning up the working directory.")
                 self.clean()

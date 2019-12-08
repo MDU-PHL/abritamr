@@ -23,7 +23,7 @@ def run_pipeline(args):
 
 def set_parsers():
     parser = argparse.ArgumentParser(
-        description="MDU AMR", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        description="MDU AMR gene detection pipeline", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
     parser.add_argument(
