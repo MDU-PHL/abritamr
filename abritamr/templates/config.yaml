@@ -6,3 +6,5 @@ script_path:
   {{script_path}}
 samples:
   {{samples}}
+qc:
+  {{qc}}

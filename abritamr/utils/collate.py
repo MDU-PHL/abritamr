@@ -208,9 +208,9 @@ class Collate:
 
 
 class MduCollate(Collate):
-    def __init__(self):
+    def __init__(self, qc):
         self.workdir = pathlib.Path.cwd()
-        self.mduqc = self.workdir / "mdu_qc_checked.csv"
+        self.mduqc = self.workdir / f"{qc}"
         
         self.check_for_mduqc()
         self.mduqctab = self.mdu_qc_tab()
@@ -397,9 +397,11 @@ class MduCollate(Collate):
 
                 else:
                     genes_not_reported.extend(genes)
-            print(genes_reported)
+            # print(genes_reported)
         if genes_reported == []:
             genes_reported = [self.none_replacement_code(genus= genus)]
+        if genes_not_reported == []:
+            genes_not_reported = ["No non-reportable genes found."]
             # break
     
         return genes_reported, genes_not_reported
@@ -548,9 +550,9 @@ class MduCollate(Collate):
 
 if __name__ == "__main__":
 
-    if len(sys.argv) > 1:
+    if len(sys.argv) == 3:
         if sys.argv[1] == "mduqc":
-            c = MduCollate()
+            c = MduCollate(qc = f"{sys.argv[2]}")
         else:
             c = Collate()
     else:

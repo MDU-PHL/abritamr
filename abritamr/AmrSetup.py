@@ -27,6 +27,7 @@ class Setupamr(object):
             if self.mduqc
             else f"'summary_matches.csv', 'summary_partials.csv'"
         )
+        self.qc = args.qc
     
     
 
@@ -153,13 +154,15 @@ class Setupamr(object):
         script_path = self.resources / "utils"
         amrfinder = " " if not self.from_contigs else "run_amrfinder"
         mduqc = "mduqc" if self.mduqc else ""
+        if self.mduqc:
+            self.file_present(self.qc)
         config_source = self.resources / "templates" / "config.yaml"
         logger.info(f"Writing config file")
         config_template = jinja2.Template(config_source.read_text())
         config_target = self.workdir / "config.yaml"
         config_target.write_text(
             config_template.render(
-                script_path=script_path, amrfinder=amrfinder, mduqc=mduqc, samples = ' '.join(samples)
+                script_path=script_path, amrfinder=amrfinder, mduqc=mduqc, samples = ' '.join(samples), qc = self.qc
             )
         )
         # variables for snakemake

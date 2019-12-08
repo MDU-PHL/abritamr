@@ -27,9 +27,10 @@ rule collate:
     output:{{finaloutput}}{% raw %}
     params:
         mduqc = config['mduqc'],
-        script_path = config['script_path']
+        script_path = config['script_path'], 
+        qc= config['qc']
     shell:
         """
-        python3 {params.script_path}/collate.py {params.mduqc}
+        python3 {params.script_path}/collate.py {params.mduqc} {params.qc}
         """
 {% endraw %}
