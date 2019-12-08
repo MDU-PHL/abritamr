@@ -1,6 +1,0 @@
-amrfinderplus_version = "3.1.1b"
-db_version = "2019-09-06.1"
-author = "Kristy Horan"
-build = "1.0"
-archive_dir = '/home/seq/MDU/CONTAINERS/ARCHIVE/AMRFINDERPLUS'
-contianer_dir = '/home/linuxbrew/singularity/images/'
