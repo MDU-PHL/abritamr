@@ -1,7 +1,7 @@
 import pathlib, argparse, logging, sys, os
 
 from abritamr.AmrSetup import Setupamr
-
+import abritamr.abritamr_logger 
 
 """
 mdu_amr is designed to implement AMRFinder and parse the results compatible for MDU use. It may also be used for other purposes where the format of output is compatible
@@ -102,28 +102,7 @@ def main():
     args = set_parsers()
     if vars(args) == {}:
         parser.print_help(sys.stderr)
-    else:
-        # TODO see this page https://realpython.com/python-logging/ for logging
-        # create logger with 'spam_application'
-        logger = logging.getLogger(__name__)
-        logger.setLevel(logging.INFO)
-        # create file handler which logs even debug messages
-        fh = logging.FileHandler("qc.log")
-        fh.setLevel(logging.WARNING)
-        # create console handler with a higher log level
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-        # create formatter and add it to the handlers
-        formatter = logging.Formatter(
-            "[%(levelname)s:%(asctime)s] %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p"
-        )
-        fh.setFormatter(formatter)
-        ch.setFormatter(formatter)
-        # add the handlers to the logger
-        logger.addHandler(ch)
-        logger.addHandler(fh)
-        args.func(args)
-
+    
 
 if __name__ == "__main__":
     main()
