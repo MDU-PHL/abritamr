@@ -25,10 +25,10 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/MDU-PHL/abritamr",
     author="Kristy Horan",
-    author_email="kristy.horan@unimelb.edu.au",
+    author_email="kristyhoran15@gmail.com",
     maintainer="Kristy Horan",
-    maintainer_email="kristy.horan.unimelb.edu.au",
-    python_requires=">=3.6, <4",
+    maintainer_email="kristyhoran15@gmail.com",
+    python_requires=">=3.7, <4",
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
     zip_safe=False,
     install_requires=["snakemake", "pandas", "click", "jinja2"],
@@ -36,7 +36,7 @@ setup(
     tests_require=["nose", "pytest"],
     entry_points={
         "console_scripts": [
-            "mdu-amr-detection=abritamr.abritamr:main",
+            # "mdu-amr-detection=abritamr.abritamr:main",
             "abritamr=abritamr.abritamr:main",
         ]
     },
@@ -51,5 +51,5 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
-    package_data={"abritamr": ["templates/*", "db/*", "utils/*"]}
+    package_data={"abritamr": ["templates/*", "db/*", "utils/*", "test/*"]}
 )
