@@ -108,6 +108,8 @@ def main():
     args = set_parsers()
     if vars(args) == {}:
         parser.print_help(sys.stderr)
+    else:
+        args.func(args)
     
 
 if __name__ == "__main__":

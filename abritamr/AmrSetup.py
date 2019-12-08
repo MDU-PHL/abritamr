@@ -1,5 +1,5 @@
 import pathlib, pandas, datetime, getpass, logging, jinja2, re, subprocess, os
-import abritamr.abritamr_logger
+from abritamr.abritamr_logger import logger
 
 """
 A class for setting up mdu-amr
