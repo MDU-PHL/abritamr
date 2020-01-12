@@ -31,7 +31,8 @@ setup(
     python_requires=">=3.7, <4",
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
     zip_safe=False,
-    install_requires=["snakemake", "pandas", "click", "jinja2"],
+    install_requires=["snakemake", "pandas",
+                      "click", "jinja2", "toml", "xlsxwriter"],
     test_suite="nose.collector",
     tests_require=["nose", "pytest"],
     entry_points={

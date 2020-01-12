@@ -13,6 +13,7 @@ class Setupamr(object):
 
         self.workdir = pathlib.Path(args.workdir)
         self.resources = pathlib.Path(args.resources)
+        self.snakefile = self.resources / "templates" / "Snakefile.smk"
         self.jobs = args.jobs
         self.mduqc = args.mduqc
         self.positive_control = args.positive_control
@@ -24,9 +25,9 @@ class Setupamr(object):
         self.run_singulairty = args.Singularity
         self.singularity_path = f"shub://phgenomics-singularity/amrfinderplus" if args.singularity_path == '' else args.singularity_path # this needs to addressed before formal release.
         self.finaloutput = (
-            f"'MMS118.xlsx'"
+            ['MMS118.xlsx']
             if self.mduqc
-            else f"'summary_matches.csv', 'summary_partials.csv'"
+            else ['summary_matches.csv', 'summary_partials.csv']
         )
         self.qc = args.qc
     
@@ -174,17 +175,34 @@ class Setupamr(object):
         script_path = self.resources / "utils"
         amrfinder = " " if not self.from_contigs else "run_amrfinder"
         mduqc = "mduqc" if self.mduqc else ""
+        singularity_path = (
+            f"singularity:'{self.singularity_path}'"
+            if self.run_singulairty
+            else " ")
         if self.mduqc:
             self.file_present(self.qc)
+<<<<<<< HEAD
         config_source = self.resources / "templates" / "config.yaml"
         self.logger.info(f"Writing config file")
+=======
+        config_source = self.resources / "templates" / "config.j2"
+        logger.info(f"Writing config file")
+>>>>>>> 3d3fd9d219c81de9b98d6a7ffdaedfd35b74ed69
         config_template = jinja2.Template(config_source.read_text())
         config_target = self.workdir / "config.yaml"
         config_target.write_text(
             config_template.render(
-                script_path=script_path, amrfinder=amrfinder, mduqc=mduqc, samples = ' '.join(samples), qc = self.qc
+                script_path=script_path,
+                amrfinder=amrfinder,
+                mduqc=mduqc,
+                samples=' '.join(samples),
+                qc=self.qc,
+                final_output=self.finaloutput,
+                workdir=self.workdir,
+                singularity_path=singularity_path
             )
         )
+<<<<<<< HEAD
         # variables for snakemake
         
         workdir = f"'{self.workdir}'"
@@ -202,12 +220,20 @@ class Setupamr(object):
         )
 
         self.logger.info(f"Written Snakefile and config.yaml to {self.workdir}")
+=======
+        logger.info(f"Written config.yaml to {self.workdir}")
+>>>>>>> 3d3fd9d219c81de9b98d6a7ffdaedfd35b74ed69
 
     def run_snakemake(self):
 
         singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
+<<<<<<< HEAD
         cmd = f"snakemake -s Snakefile_abritamr -j {self.jobs} {singularity} 2>&1 | tee -a job.log"
         self.logger.info(f"Running pipeline using command {cmd}. This may take some time.")
+=======
+        cmd = f"snakemake -s \"{self.snakefile}\" -j {self.jobs} -d {self.workdir} {singularity} 2>&1 | tee -a {self.workdir}/job.log"
+        logger.info(f"Running pipeline using command {cmd}. This may take some time.")
+>>>>>>> 3d3fd9d219c81de9b98d6a7ffdaedfd35b74ed69
         wkfl = subprocess.run(cmd, shell=True, capture_output=True)
         
         if wkfl.returncode == 0:
@@ -240,14 +266,27 @@ class Setupamr(object):
         if wkflow:
             self.logger.info(f"Pipeline completed")
             if self.mduqc:
+<<<<<<< HEAD
                 if pathlib.Path(f"MMS118.xlsx").exists():
                     self.logger.info(f"MMS118.xlsx found, pipeline successfully completed. Come again soon.")
+=======
+                outfile = self.workdir / "MMS118.xlsx"
+                if outfile.exists():
+                    logger.info(f"MMS118.xlsx found, pipeline successfully completed. Come again soon.")
+>>>>>>> 3d3fd9d219c81de9b98d6a7ffdaedfd35b74ed69
                 else:
                     self.logger.warning(f"MMS118.xlsx is not present. Please check logs and try again.")
                     raise SystemExit
             else:
+<<<<<<< HEAD
                 if pathlib.Path("summary_matches.csv").exists() and pathlib.Path("summary_partials.csv"):
                     self.logger.info(f"'summary_matches.csv' and 'summary_partials.csv' found, pipeline successfully completed. Come again soon.")
+=======
+                outfile_matches = self.workdir / "summary_matches.csv"
+                outfile_partials = self.workdir / "summary_partials.csv"
+                if outfile_matches.exists() and outfile_partials.exists():
+                    logger.info(f"'summary_matches.csv' and 'summary_partials.csv' found, pipeline successfully completed. Come again soon.")
+>>>>>>> 3d3fd9d219c81de9b98d6a7ffdaedfd35b74ed69
                 else:
                     self.logger.warning(f"'summary_matches.csv' and 'summary_partials.csv' are not present. Please check logs and try again.")
                     raise SystemExit

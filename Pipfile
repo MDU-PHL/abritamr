@@ -7,6 +7,8 @@ name = "pypi"
 e1839a8 = {editable = true,path = "."}
 abritamr = {editable = true,path = "."}
 jinja2 = "*"
+toml = "*"
+xlsxwriter = "*"
 
 [dev-packages]
 pytest = "*"
