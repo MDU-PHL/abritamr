@@ -1,4 +1,4 @@
-import pathlib, argparse, logging, sys, os
+import pathlib, argparse, sys, os
 
 from abritamr.AmrSetup import Setupamr
 from abritamr.version import __version__
@@ -109,6 +109,7 @@ def main():
     if vars(args) == {}:
         parser.print_help(sys.stderr)
     else:
+        
         args.func(args)
     
 
