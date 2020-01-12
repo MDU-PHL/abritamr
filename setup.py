@@ -7,11 +7,11 @@ from os import environ
 import logging
 import abritamr
 
-logging.basicConfig(level=environ.get("LOGLEVEL", "INFO"))
+# logging.basicConfig(level=environ.get("LOGLEVEL", "INFO"))
 
-if version_info <= (3, 0):
-    logging.fatal("Sorry, requires Python 3.x, not Python 2.x\n")
-    exit(1)
+# if version_info <= (3, 0):
+#     logging.fatal("Sorry, requires Python 3.x, not Python 2.x\n")
+#     exit(1)
 
 
 with open("README.md", "r") as f:

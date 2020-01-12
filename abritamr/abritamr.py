@@ -1,7 +1,7 @@
 import pathlib, argparse, logging, sys, os
 
 from abritamr.AmrSetup import Setupamr
-import abritamr.abritamr_logger 
+from abritamr.version import __version__
 
 """
 mdu_amr is designed to implement AMRFinder and parse the results compatible for MDU use. It may also be used for other purposes where the format of output is compatible
@@ -25,7 +25,7 @@ def set_parsers():
     parser = argparse.ArgumentParser(
         description="MDU AMR gene detection pipeline", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
     parser.add_argument(
         "--mduqc",
         "-m",
