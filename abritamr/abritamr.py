@@ -1,4 +1,4 @@
-import pathlib, argparse, sys, os
+import pathlib, argparse, sys, os, logging
 
 from abritamr.AmrSetup import Setupamr
 from abritamr.version import __version__

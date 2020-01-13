@@ -1,16 +1,17 @@
 import pathlib, pandas, datetime, getpass, logging, jinja2, re, subprocess, os
-# from abritamr_logger import logger
+
 
 """
 A class for setting up mdu-amr
 """
 
 
-
 class Setupamr(object):
     def __init__(self, args):
         # some variables to be use
-
+        # create file handler which logs even debug messages
+        from abritamr.abritamr_logger import logger
+        self.logger = logger
         self.workdir = pathlib.Path(args.workdir)
         self.resources = pathlib.Path(args.resources)
         self.snakefile = self.resources / "templates" / "Snakefile.smk"
@@ -30,25 +31,6 @@ class Setupamr(object):
             else ['summary_matches.csv', 'summary_partials.csv']
         )
         self.qc = args.qc
-    
-    
-    def logger(self):
-        # create logger with 'spam_application'
-        logger = logging.getLogger(__name__)
-        logger.setLevel(logging.INFO)
-        # create file handler which logs even debug messages
-        fh = logging.FileHandler('abritamr.log')
-        fh.setLevel(logging.INFO)
-        # create console handler with a higher log level
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-        # create formatter and add it to the handlers
-        formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-        fh.setFormatter(formatter)
-        ch.setFormatter(formatter)
-        # add the handlers to the logger
-        logger.addHandler(ch)
-        logger.addHandler(fh)
 
 
 
@@ -181,13 +163,8 @@ class Setupamr(object):
             else " ")
         if self.mduqc:
             self.file_present(self.qc)
-<<<<<<< HEAD
-        config_source = self.resources / "templates" / "config.yaml"
-        self.logger.info(f"Writing config file")
-=======
         config_source = self.resources / "templates" / "config.j2"
-        logger.info(f"Writing config file")
->>>>>>> 3d3fd9d219c81de9b98d6a7ffdaedfd35b74ed69
+        self.logger.info(f"Writing config file")
         config_template = jinja2.Template(config_source.read_text())
         config_target = self.workdir / "config.yaml"
         config_target.write_text(
@@ -202,38 +179,13 @@ class Setupamr(object):
                 singularity_path=singularity_path
             )
         )
-<<<<<<< HEAD
-        # variables for snakemake
-        
-        workdir = f"'{self.workdir}'"
-        singularity_path = (
-            f"singularity:'{self.singularity_path}'" 
-            if self.run_singulairty 
-            else " ")
-
-        snk_source = self.resources / "templates" / "Snakefile"
-        snk_template = jinja2.Template(snk_source.read_text())
-        self.logger.info(f"Writing snakefile")
-        snk_target = self.workdir / "Snakefile_abritamr"
-        snk_target.write_text(
-            snk_template.render(finaloutput=self.finaloutput, workdir=workdir, singularity_path = singularity_path)
-        )
-
-        self.logger.info(f"Written Snakefile and config.yaml to {self.workdir}")
-=======
-        logger.info(f"Written config.yaml to {self.workdir}")
->>>>>>> 3d3fd9d219c81de9b98d6a7ffdaedfd35b74ed69
+        self.logger.info(f"Written config.yaml to {self.workdir}")
 
     def run_snakemake(self):
 
         singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
-<<<<<<< HEAD
-        cmd = f"snakemake -s Snakefile_abritamr -j {self.jobs} {singularity} 2>&1 | tee -a job.log"
-        self.logger.info(f"Running pipeline using command {cmd}. This may take some time.")
-=======
         cmd = f"snakemake -s \"{self.snakefile}\" -j {self.jobs} -d {self.workdir} {singularity} 2>&1 | tee -a {self.workdir}/job.log"
-        logger.info(f"Running pipeline using command {cmd}. This may take some time.")
->>>>>>> 3d3fd9d219c81de9b98d6a7ffdaedfd35b74ed69
+        self.logger.info(f"Running pipeline using command {cmd}. This may take some time.")
         wkfl = subprocess.run(cmd, shell=True, capture_output=True)
         
         if wkfl.returncode == 0:
@@ -266,27 +218,17 @@ class Setupamr(object):
         if wkflow:
             self.logger.info(f"Pipeline completed")
             if self.mduqc:
-<<<<<<< HEAD
-                if pathlib.Path(f"MMS118.xlsx").exists():
-                    self.logger.info(f"MMS118.xlsx found, pipeline successfully completed. Come again soon.")
-=======
                 outfile = self.workdir / "MMS118.xlsx"
                 if outfile.exists():
-                    logger.info(f"MMS118.xlsx found, pipeline successfully completed. Come again soon.")
->>>>>>> 3d3fd9d219c81de9b98d6a7ffdaedfd35b74ed69
+                    self.logger.info(f"MMS118.xlsx found, pipeline successfully completed. Come again soon.")
                 else:
                     self.logger.warning(f"MMS118.xlsx is not present. Please check logs and try again.")
                     raise SystemExit
             else:
-<<<<<<< HEAD
-                if pathlib.Path("summary_matches.csv").exists() and pathlib.Path("summary_partials.csv"):
-                    self.logger.info(f"'summary_matches.csv' and 'summary_partials.csv' found, pipeline successfully completed. Come again soon.")
-=======
                 outfile_matches = self.workdir / "summary_matches.csv"
                 outfile_partials = self.workdir / "summary_partials.csv"
                 if outfile_matches.exists() and outfile_partials.exists():
-                    logger.info(f"'summary_matches.csv' and 'summary_partials.csv' found, pipeline successfully completed. Come again soon.")
->>>>>>> 3d3fd9d219c81de9b98d6a7ffdaedfd35b74ed69
+                    self.logger.info(f"'summary_matches.csv' and 'summary_partials.csv' found, pipeline successfully completed. Come again soon.")
                 else:
                     self.logger.warning(f"'summary_matches.csv' and 'summary_partials.csv' are not present. Please check logs and try again.")
                     raise SystemExit
