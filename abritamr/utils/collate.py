@@ -216,11 +216,11 @@ class MduCollate(Collate):
         self.mduqctab = self.mdu_qc_tab()
 
         self.NONE_CODES = {
-            "Salmonella":"SALM_SHIG_AMR_NEG1",
-            "Shigella":"SALM_SHIG_AMR_NEG1",
-            "Staphylococcus":"STAPH_AMR_NEG1",
-            "Enterococcus":"ENTRC_AMR_NEG1",
-            "Other":"GENRL_AMR_NEG1"
+            "Salmonella":"CPase_ESBL_AmpC_16S_NEG",
+            "Shigella":"CPase_ESBL_AmpC_16S_NEG",
+            "Staphylococcus":"Mec_VanAB_Linez_NEG",
+            "Enterococcus":"Van_Linez_NEG",
+            "Other":"Cpase_16S_mcr_NEG"
         }
 
     def mdu_qc_tab(self):
