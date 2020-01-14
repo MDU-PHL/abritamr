@@ -13,7 +13,6 @@ Input types:
 
 
 def run_pipeline(args):
-
     P = Setupamr(args)
     return P.run_amr()
 
@@ -109,7 +108,24 @@ def main():
     if vars(args) == {}:
         parser.print_help(sys.stderr)
     else:
-        
+        # print(logging.__file__)
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.INFO)
+        # # create file handler which logs even debug messages
+        # # create file handler which logs even debug messages
+        fh = logging.FileHandler('abritamr.log')
+        fh.setLevel(logging.INFO)
+        # create console handler with a higher log level
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+        # add the handlers to the logger
+        logger.addHandler(ch)
+        logger.addHandler(fh)
+        logger.info(f"Starting AMR detection using {' '.join(sys.argv)}")
         args.func(args)
     
 

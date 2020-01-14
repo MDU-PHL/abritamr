@@ -1,5 +1,5 @@
-import pathlib, pandas, datetime, getpass, logging, jinja2, re, subprocess, os
-
+import pathlib, pandas, datetime, getpass, jinja2, re, subprocess, os, logging
+# from abritamr.abritamr_logger import logger
 
 """
 A class for setting up mdu-amr
@@ -7,11 +7,23 @@ A class for setting up mdu-amr
 
 
 class Setupamr(object):
+    
     def __init__(self, args):
         # some variables to be use
         # create file handler which logs even debug messages
-        from abritamr.abritamr_logger import logger
-        self.logger = logger
+        # print(logging.__file__)
+        self.logger =logging.getLogger(__name__) 
+        self.logger.setLevel(logging.INFO)
+        fh = logging.FileHandler('abritamr.log')
+        fh.setLevel(logging.INFO)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p') 
+        ch.setFormatter(formatter)
+        fh.setFormatter(formatter)
+        self.logger.addHandler(ch) 
+        self.logger.addHandler(fh)
+        # self.logger = logger
         self.workdir = pathlib.Path(args.workdir)
         self.resources = pathlib.Path(args.resources)
         self.snakefile = self.resources / "templates" / "Snakefile.smk"
