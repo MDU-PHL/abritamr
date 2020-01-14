@@ -10,7 +10,7 @@ MDU_QC = config['mduqc']
 SCRIPT_PATH = config['script_path']
 QC = config['qc']
 RUN_AMRFINDER = config['amrfinder'] == 'run_amrfinder'
-
+DB = config['database_version']
 
 def get_contigs(wildcards):
     return {"contigs": f"{pathlib.Path(wildcards.sample, 'contigs.fa')}"}
@@ -37,8 +37,9 @@ rule collate:
     params:
         mduqc = MDU_QC,
         script_path = SCRIPT_PATH,
-        qc = QC
+        qc = QC,
+        db = DB
     shell:
         """
-        python3 "{params.script_path}/collate.py" {params.mduqc} {params.qc}
+        python3 "{params.script_path}/collate.py" {params.db} {params.mduqc} {params.qc} 
         """

@@ -208,10 +208,10 @@ class Collate:
 
 
 class MduCollate(Collate):
-    def __init__(self, qc):
+    def __init__(self, qc, db):
         self.workdir = pathlib.Path.cwd()
         self.mduqc = self.workdir / f"{qc}"
-        
+        self.db = db
         self.check_for_mduqc()
         self.mduqctab = self.mdu_qc_tab()
 
@@ -438,6 +438,7 @@ class MduCollate(Collate):
                 d["Species_exp"] = exp_species
             d["Species_obs"] = obs_species
             d["Species_exp"] = exp_species
+            d['db_version'] = self.db
             tempdf = pandas.DataFrame(d, index=[0])
             tempdf = tempdf.set_index("MDU sample ID")
             # print(tempdf)
@@ -448,7 +449,7 @@ class MduCollate(Collate):
         # print(reporting_df.head())
         # print(reporting_df.index)
         #  reporting_df = reporting_df[["MDU sample ID",'Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs']]
-        return reporting_df.reindex(labels = ['Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs', 'Species_exp'], axis = 'columns')
+        return reporting_df.reindex(labels = ['Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs', 'Species_exp', 'db_version'], axis = 'columns')
 
     def mdu_partials(self, partials):
         '''
@@ -550,9 +551,12 @@ class MduCollate(Collate):
 
 if __name__ == "__main__":
 
-    if len(sys.argv) == 3:
-        if sys.argv[1] == "mduqc":
-            c = MduCollate(qc = f"{sys.argv[2]}")
+    if len(sys.argv) == 4:
+        if sys.argv[2] == "mduqc":
+            c = MduCollate(qc = f"{sys.argv[3]}", db = f"{sys.argv[1]}")
+            print(f"{sys.argv[1]}")
+            print(f"{sys.argv[2]}")
+            print(f"{sys.argv[3]}")
         else:
             c = Collate()
     else:

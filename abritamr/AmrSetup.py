@@ -1,5 +1,5 @@
 import pathlib, pandas, datetime, getpass, jinja2, re, subprocess, os, logging
-# from abritamr.abritamr_logger import logger
+from abritamr.version import db
 
 """
 A class for setting up mdu-amr
@@ -12,6 +12,7 @@ class Setupamr(object):
         # some variables to be use
         # create file handler which logs even debug messages
         # print(logging.__file__)
+        self.db = db
         self.logger =logging.getLogger(__name__) 
         self.logger.setLevel(logging.INFO)
         fh = logging.FileHandler('abritamr.log')
@@ -188,7 +189,8 @@ class Setupamr(object):
                 qc=self.qc,
                 final_output=self.finaloutput,
                 workdir=self.workdir,
-                singularity_path=singularity_path
+                singularity_path=singularity_path,
+                database_version = self.db
             )
         )
         self.logger.info(f"Written config.yaml to {self.workdir}")
