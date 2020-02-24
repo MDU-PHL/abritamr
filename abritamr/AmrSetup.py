@@ -35,6 +35,7 @@ class Setupamr(object):
         self.contigs = args.contigs
         self.amrfinder_output = args.amrfinder_output
         self.from_contigs = True
+        self.prefix = args.prefix
         self.keep = args.keep
         self.run_singulairty = args.Singularity
         self.singularity_path = f"shub://phgenomics-singularity/amrfinderplus" if args.singularity_path == '' else args.singularity_path # this needs to addressed before formal release.
@@ -126,7 +127,13 @@ class Setupamr(object):
         self.logger.info(f"Checking the structure of your input file.")
         if tab.shape[1] == 2:
             self.logger.info(f"The input file seems to be in the correct format. Thank you.")
-            return True
+            return 'batch'
+        elif tab.shape[1] == 22:
+            self.logger.info(f"You are running abriTAMR on individual samples. Have you provided a prefix for your output structure?")
+            return 'amrfinder_output'
+        elif tab.shape[1] == 1:
+            self.logger.info(f"It seems you might be trying to run abriTAMR directly from an assembly file")
+            return 'assembly'
         else:
             logging.warning(
                 "Your input file should be a tab delimited file with two columns. Please check your input and try again."
@@ -143,18 +150,28 @@ class Setupamr(object):
             else pathlib.Path(self.amrfinder_output)
         )
         tab = pandas.read_csv(input_file, engine="python", header=None, sep = '\t')
-        self.check_input_tab(tab)
-        isos = list(tab[0])
-        self.logger.info(f"Checking that the input data is present. If present will link to {self.workdir}")
-        for row in tab.iterrows():
-            if self.file_present(row[1][1]):
-                self.make_links(first_column=row[1][0], second_column=row[1][1])
-        if self.positive_control != "":
-            self.logger.info(f"You have provided a path the a positive control. Checking if path exists, if present will link to {self.workdir}")
-            if self.file_present(self.positive_control):
-                self.make_links(first_column = "9999-99888", second_column = self.positive_control)
-                isos.append("9999-99888")
-        return isos
+        running_type = self.check_input_tab(tab)
+        if running_type == 'batch':
+            isos = list(tab[0])
+            self.logger.info(f"Checking that the input data is present. If present will link to {self.workdir}")
+            for row in tab.iterrows():
+                if self.file_present(row[1][1]):
+                    self.make_links(first_column=row[1][0], second_column=row[1][1])
+            if self.positive_control != "":
+                self.logger.info(f"You have provided a path the a positive control. Checking if path exists, if present will link to {self.workdir}")
+                if self.file_present(self.positive_control):
+                    self.make_links(first_column = "9999-99888", second_column = self.positive_control)
+                    isos.append("9999-99888")
+        elif running_type == 'amrfinder_output':
+            self.prefix = self.prefix if self.prefix != '' else f'abritamr'
+            self.from_contigs = False
+            self.make_links(first_column=self.prefix, second_column=input_file)
+        elif running_type == 'assembly':
+            self.prefix = self.prefix if self.prefix != '' else f'abritamr'
+            self.from_contigs = True
+            self.make_links(first_column=self.prefix, second_column=input_file)
+
+        return [self.prefix] if running_type != 'batch' else isos
 
     def check_singularity(self):
         '''

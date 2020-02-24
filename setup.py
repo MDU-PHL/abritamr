@@ -39,6 +39,7 @@ setup(
         "console_scripts": [
             # "mdu-amr-detection=abritamr.abritamr:main",
             "abritamr=abritamr.abritamr:main",
+            "abriTAMR=abritamr.abritamr:main",
         ]
     },
     classifiers=[

@@ -59,14 +59,18 @@ def set_parsers():
         "--contigs",
         "-c",
         default="",
-        help="Tab-delimited file with sample ID as column 1 and path to assemblies as column 2",
+        help="Tab-delimited file with sample ID as column 1 and path to assemblies as column 2 OR path to a contig file (used if only doing a single sample - should provide value for -pfx). ",
     )
     parser.add_argument(
         "--amrfinder_output",
         "-o",
         default="",
-        help="Tab-delimited file with sample ID as column 1 and path to amr_finder output files as column 2",
+        help="Tab-delimited file with sample ID as column 1 and path to amr_finder output files as column 2 OR path to a amrfinder ouptu file (used if only doing a single sample - should provide value for -pfx).",
     )
+    parser.add_argument('-pfx',
+        '--prefix',
+        help = 'If using abriTAMR on single file please provide a prefix',
+        default= '')
     parser.add_argument(
         "--workdir",
         "-w",
