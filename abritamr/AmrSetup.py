@@ -193,6 +193,11 @@ class Setupamr(object):
             else " ")
         if self.mduqc:
             self.file_present(self.qc)
+        # if running singleton put summary files in prefix dir
+        if len(samples) == 1:
+            self.finaloutput = [
+                f"{pathlib.Path(samples[0],'summary_matches.csv')}", 
+                f"{pathlib.Path(samples[0],'summary_partials.csv')}"]
         config_source = self.resources / "templates" / "config.j2"
         self.logger.info(f"Writing config file")
         config_template = jinja2.Template(config_source.read_text())
