@@ -310,7 +310,7 @@ class MduCollate(Collate):
             return "GENRL_AMR_NEG1"
 
 
-    def reporting_logic(self, row, species):
+    def reporting_logic(self, row, species, neg_code = True):
         # get all genes found
         all_genes = self.get_all_genes(row)
         # print(row)
@@ -399,14 +399,14 @@ class MduCollate(Collate):
                     genes_not_reported.extend(genes)
             # print(genes_reported)
         if genes_reported == []:
-            genes_reported = [self.none_replacement_code(genus= genus)]
+            genes_reported = [self.none_replacement_code(genus= genus)] if neg_code else ''
         if genes_not_reported == []:
-            genes_not_reported = ["No non-reportable genes found."]
+            genes_not_reported = ["No non-reportable genes found."] if neg_code else ''
             # break
     
         return genes_reported, genes_not_reported
 
-    def mdu_reporting(self, match):
+    def mdu_reporting(self, match, neg_code = True):
 
         reporting_df = pandas.DataFrame()
         qc = pandas.read_csv(self.mduqc, sep=None, engine="python")
@@ -427,7 +427,7 @@ class MduCollate(Collate):
             #     species = exp_species
             species = obs_species if obs_species == exp_species else exp_species
             genes_reported, genes_not_reported = self.reporting_logic(
-                row=row, species=species
+                row=row, species=species, neg_code=neg_code
             )
             # strip bla
             genes_not_reported = [self.strip_bla(g) for g in genes_not_reported]
@@ -538,9 +538,9 @@ class MduCollate(Collate):
         )
         # generate front tab for MDU reporting
         passed_match_df = self.mdu_reporting(match=passed_match)
-        passed_partials_df = self.mdu_reporting(match = passed_partials)
+        passed_partials_df = self.mdu_reporting(match = passed_partials, neg_code=False)
         failed_match_df = self.mdu_reporting(match = failed_match)
-        failed_partials_df = self.mdu_reporting(match = failed_partials)
+        failed_partials_df = self.mdu_reporting(match = failed_partials, neg_code=False)
         self.save_spreadsheet(
             passed_match_df,
             passed_partials_df,

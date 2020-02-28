@@ -194,10 +194,6 @@ class Setupamr(object):
         if self.mduqc:
             self.file_present(self.qc)
         # if running singleton put summary files in prefix dir
-        if len(samples) == 1:
-            self.finaloutput = [
-                f"{pathlib.Path(samples[0],'summary_matches.csv')}", 
-                f"{pathlib.Path(samples[0],'summary_partials.csv')}"]
         config_source = self.resources / "templates" / "config.j2"
         self.logger.info(f"Writing config file")
         config_template = jinja2.Template(config_source.read_text())
@@ -220,7 +216,7 @@ class Setupamr(object):
     def run_snakemake(self):
 
         singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
-        cmd = f"snakemake -s \"{self.snakefile}\" -j {self.jobs} -d {self.workdir} {singularity} 2>&1 | tee -a {self.workdir}/job.log"
+        cmd = f"snakemake -s \"{self.snakefile}\" -j {self.jobs} -d {self.workdir} {singularity} 2>&1"
         self.logger.info(f"Running pipeline using command {cmd}. This may take some time.")
         wkfl = subprocess.run(cmd, shell=True, capture_output=True)
         
