@@ -7,7 +7,7 @@ class Collate:
     a base class for collation of amrfinder results - to be used when not doing MDU QC
     """
 
-    REFGENES = pathlib.Path(__file__).parent.parent / "db" / "refgenes_latest.csv"
+    REFGENES = pathlib.Path(__file__).parent.parent / "db" / "refgenes_3.4.7_2020-01-22.1.csv"
     MATCH = ["ALLELEX", "BLASTX", "EXACTX"]
     NONRTM = [
         "Amikacin/Gentamicin/Kanamycin/Tobramycin",
@@ -91,9 +91,10 @@ class Collate:
         """
         return the dictionary for collation
         """
-
+        # drugname = 'x'
+        print(row[1]["Gene symbol"])
         if row[1]["Gene symbol"] in list(reftab["allele"]):
-
+            print('gene symbol is an allele')
             drugclass = self.get_drugclass(
                     reftab=reftab, row=row, colname="allele"
                     )
@@ -112,9 +113,10 @@ class Collate:
             drugname = self.extract_bifunctional_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)
         else:
             drugclass = "Unknown"
+
         if drugclass in drugclass_dict:
             drugclass_dict[drugclass].append(drugname)
-        else:
+        elif drugclass not in drugclass_dict:
             drugclass_dict[drugclass] = [drugname]
 
         return drugclass_dict
@@ -127,7 +129,7 @@ class Collate:
         partials = {"Isolate": isolate}
         
         for row in df.iterrows():
-            
+            # print(row[1]["Gene symbol"])
             # if the match is good then generate a drugclass dict
             if row[1]["Gene symbol"] == "aac(6')-Ib-cr" and row[1]["Method"] in ["EXACTX", "ALLELEX"]: # restrict the calling of quinolone resistance - if not an exact match then is should be considered a partial match
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
