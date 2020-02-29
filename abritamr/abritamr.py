@@ -83,12 +83,12 @@ def set_parsers():
         default=f"{pathlib.Path(__file__).parent }",
         help="Directory where templates are stored",
     )
-    parser.add_argument(
-        "--drug_classes",
-        "-d",
-        default=f"{pathlib.Path(__file__).parent / 'db' / 'refgenes.csv'}",
-        help="Path to file ",
-    )
+    # parser.add_argument(
+    #     "--drug_classes",
+    #     "-d",
+    #     default=f"{pathlib.Path(__file__).parent / 'db' / 'refgenes.csv'}",
+    #     help="Path to file ",
+    # )
     parser.add_argument(
         "--jobs", "-j", default=16, help="Number of AMR finder jobs to run in parallel."
     )

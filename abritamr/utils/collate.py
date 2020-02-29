@@ -7,7 +7,7 @@ class Collate:
     a base class for collation of amrfinder results - to be used when not doing MDU QC
     """
 
-    REFGENES = pathlib.Path(__file__).parent.parent / "db" / "refgenes_3.4.7_2020-01-22.1.csv"
+    REFGENES = pathlib.Path(__file__).parent.parent / "db" / "refgenes_latest.csv"
     MATCH = ["ALLELEX", "BLASTX", "EXACTX"]
     NONRTM = [
         "Amikacin/Gentamicin/Kanamycin/Tobramycin",
