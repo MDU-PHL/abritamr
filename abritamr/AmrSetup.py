@@ -31,7 +31,7 @@ class Setupamr(object):
         self.jobs = args.jobs
         self.mduqc = args.mduqc
         self.positive_control = args.positive_control
-        self.drugs = pathlib.Path(args.drug_classes)
+        # self.drugs = pathlib.Path(args.drug_classes)
         self.contigs = args.contigs
         self.amrfinder_output = args.amrfinder_output
         self.from_contigs = True
@@ -45,6 +45,7 @@ class Setupamr(object):
             else ['summary_matches.csv', 'summary_partials.csv']
         )
         self.qc = args.qc
+        self.species_detect = args.species_detect
 
 
 
@@ -151,6 +152,7 @@ class Setupamr(object):
         )
         tab = pandas.read_csv(input_file, engine="python", header=None, sep = '\t')
         running_type = self.check_input_tab(tab)
+        # print(running_type)
         if running_type == 'batch':
             isos = list(tab[0])
             self.logger.info(f"Checking that the input data is present. If present will link to {self.workdir}")
@@ -187,6 +189,7 @@ class Setupamr(object):
         script_path = self.resources / "utils"
         amrfinder = " " if not self.from_contigs else "run_amrfinder"
         mduqc = "mduqc" if self.mduqc else ""
+        species = "species" if self.species_detect else ""
         singularity_path = (
             f"singularity:'{self.singularity_path}'"
             if self.run_singulairty
@@ -208,7 +211,8 @@ class Setupamr(object):
                 final_output=self.finaloutput,
                 workdir=self.workdir,
                 singularity_path=singularity_path,
-                database_version = self.db
+                database_version = self.db,
+                species_detect = species
             )
         )
         self.logger.info(f"Written config.yaml to {self.workdir}")
@@ -218,8 +222,16 @@ class Setupamr(object):
         singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
         cmd = f"snakemake -s \"{self.snakefile}\" -j {self.jobs} -d {self.workdir} {singularity} 2>&1"
         self.logger.info(f"Running pipeline using command {cmd}. This may take some time.")
-        wkfl = subprocess.run(cmd, shell=True, capture_output=True)
-        
+        wkfl = subprocess.run(cmd, shell=True)
+        while True:
+                if wkfl.stdout != None:
+                    line = wkfl.stdout.readline().strip()
+                    if not line:
+                        break
+                line = ''
+                break
+                self.logger.info(f"{line}")
+                
         if wkfl.returncode == 0:
             return True
         else:

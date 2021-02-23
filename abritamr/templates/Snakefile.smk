@@ -9,6 +9,7 @@ FINAL_OUTPUT = config['final_output']
 MDU_QC = config['mduqc']
 SCRIPT_PATH = config['script_path']
 QC = config['qc']
+SPECIES_DETECT = config['species_detect'] == 'species'
 RUN_AMRFINDER = config['amrfinder'] == 'run_amrfinder'
 DB = config['database_version']
 

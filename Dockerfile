@@ -1,6 +1,6 @@
 FROM continuumio/miniconda3:4.7.12 as build
 
-ARG amrfinder_version=3.2.1
+ARG amrfinder_version=3.6.10
 
 RUN apt-get --yes update && apt-get --yes upgrade && apt-get install --yes curl wget gzip unzip git && apt-get clean
 

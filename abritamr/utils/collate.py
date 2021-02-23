@@ -92,9 +92,9 @@ class Collate:
         return the dictionary for collation
         """
         # drugname = 'x'
-        print(row[1]["Gene symbol"])
+        # print(row[1]["Gene symbol"])
         if row[1]["Gene symbol"] in list(reftab["allele"]):
-            print('gene symbol is an allele')
+            # print('gene symbol is an allele')
             drugclass = self.get_drugclass(
                     reftab=reftab, row=row, colname="allele"
                     )
@@ -228,7 +228,9 @@ class MduCollate(Collate):
     def mdu_qc_tab(self):
 
         tab = pandas.read_csv(self.mduqc)
+        # print(tab)
         pos = pandas.DataFrame(data = {"ISOLATE": "9999-99888", "TEST_QC" : "PASS", "SPECIES_EXP":"Staphylococcus aureus", "SPECIES_OBS":"Staphylococcus aureus" }, index = [0])
+        # print(tab.append(pos))
         return tab.append(pos)
 
     def check_for_mduqc(self):
@@ -256,20 +258,22 @@ class MduCollate(Collate):
         generate lists of isolates that passed QC and need AMR, failed QC and should have AMR and all other isolates
         """
         
+        print(self.mdu_qc_tab)
         
         failed = list(
-            self.mduqctab[self.mduqctab["TEST_QC"] == "FAIL"]["ISOLATE"]
+            self.mduqctab[self.mduqctab["TEST_QC"] == False]["ISOLATE"]
         )  # isolates that failed qc and should have amr
         passed = list(
-            self.mduqctab[self.mduqctab["TEST_QC"] == "PASS"]["ISOLATE"]
+            self.mduqctab[self.mduqctab["TEST_QC"] == True]["ISOLATE"]
         )  # isolates that failed qc and should have amr
-        
+        print(passed)
         return (passed, failed)
 
     def split_dfs(
         self, passed, failed, summary_drugs, summary_partial
     ):
-
+        # print(passed)
+        # print(summary_drugs)
         passed_match = summary_drugs[summary_drugs.index.isin(passed)]
         passed_partials = summary_partial[summary_partial.index.isin(passed)]
         failed_match = summary_drugs[summary_drugs.index.isin(failed)]
@@ -413,6 +417,7 @@ class MduCollate(Collate):
         reporting_df = pandas.DataFrame()
         qc = pandas.read_csv(self.mduqc, sep=None, engine="python")
         qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
+        # print(match)
         for row in match.iterrows():
             item_code = row[0].split("-")[-1] if len(row[0].split("-")) > 2 else ""
             
@@ -532,13 +537,16 @@ class MduCollate(Collate):
         self.write_to_toml()
         # get isolates binned into groups.
         for_amr, for_amr_failed = self.get_passed_isolates(self.mduqc)
+        # print(for_amr)
         # get collated data
         summary_drugs, summary_partial = self.collate()
+        # print(summary_drugs)
         # get dfs for specific groups
         passed_match, passed_partials, failed_match, failed_partials= self.split_dfs(
             for_amr, for_amr_failed, summary_drugs, summary_partial
         )
         # generate front tab for MDU reporting
+        # print(passed_match)
         passed_match_df = self.mdu_reporting(match=passed_match)
         passed_partials_df = self.mdu_reporting(match = passed_partials, neg_code=False)
         failed_match_df = self.mdu_reporting(match = failed_match)
@@ -556,9 +564,9 @@ if __name__ == "__main__":
     if len(sys.argv) == 4:
         if sys.argv[2] == "mduqc":
             c = MduCollate(qc = f"{sys.argv[3]}", db = f"{sys.argv[1]}")
-            print(f"{sys.argv[1]}")
-            print(f"{sys.argv[2]}")
-            print(f"{sys.argv[3]}")
+            # print(f"{sys.argv[1]}")
+            # print(f"{sys.argv[2]}")
+            # print(f"{sys.argv[3]}")
         else:
             c = Collate()
     else:
