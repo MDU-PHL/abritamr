@@ -19,7 +19,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="abritamr",
-    version=abritamr.__version__,
+    version="0.2.2",
     description="Running AMRFinderPlus for MDU",
     long_description=long_description,
     long_description_content_type="text/markdown",
