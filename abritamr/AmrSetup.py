@@ -34,7 +34,7 @@ class Setupamr(object):
         # self.drugs = pathlib.Path(args.drug_classes)
         self.contigs = args.contigs
         self.amrfinder_output = args.amrfinder_output
-        self.from_contigs = True
+        self.from_contigs = True if args.contigs != '' else False
         self.prefix = args.prefix
         self.keep = args.keep
         self.run_singulairty = args.Singularity
@@ -102,6 +102,7 @@ class Setupamr(object):
             self.from_contigs = True
         elif self.file_present(self.amrfinder_output):
             self.from_contigs = False
+        print(self.from_contigs)
         self.logger.info(f"All files seem to be present and accounted for. Well done.")
         return True
 

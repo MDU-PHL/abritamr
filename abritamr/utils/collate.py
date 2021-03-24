@@ -92,7 +92,7 @@ class Collate:
         return the dictionary for collation
         """
         # drugname = 'x'
-        # print(row[1]["Gene symbol"])
+        # print(row[1])
         if row[1]["Gene symbol"] in list(reftab["allele"]):
             # print('gene symbol is an allele')
             drugclass = self.get_drugclass(
@@ -112,6 +112,7 @@ class Collate:
             )
             drugname = self.extract_bifunctional_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)
         else:
+            drugname = row[1]["Gene symbol"]
             drugclass = "Unknown"
 
         if drugclass in drugclass_dict:
@@ -157,7 +158,7 @@ class Collate:
             raise SystemExit
 
     def save_files(self, path, tosave):
-
+        print(tosave)
         tosave.to_csv(path)
 
     def collate(self):
@@ -169,14 +170,16 @@ class Collate:
             reftab = reftab.fillna("-")
             # print(reftab.head())
             p = pathlib.Path.cwd()
+            # print(p)
             amr_output = self.get_amr_output(path=p)
+            # print(amr_output)
             summary_drugs = pandas.DataFrame()
             summary_partial = pandas.DataFrame()
             for a in amr_output:
                 isolate = f"{a.parts[-2]}"
-                
+                print(a)
                 df = pandas.read_csv(a, sep="\t")
-                
+                # print(df)
                 drug, partial = self.get_per_isolate(
                     reftab=reftab, df=df, isolate=isolate
                 )
