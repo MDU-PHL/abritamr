@@ -12,6 +12,7 @@ class Setupamr(object):
         # some variables to be use
         # create file handler which logs even debug messages
         # print(logging.__file__)
+        self.species_list = ['Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"]
         self.db = db
         self.logger =logging.getLogger(__name__) 
         self.logger.setLevel(logging.INFO)
@@ -27,25 +28,23 @@ class Setupamr(object):
         # self.logger = logger
         self.workdir = pathlib.Path(args.workdir)
         self.resources = pathlib.Path(args.resources)
-        self.snakefile = self.resources / "templates" / "Snakefile.smk"
         self.jobs = args.jobs
         self.mduqc = args.mduqc
-        self.positive_control = args.positive_control
+        self.positive_control = True if self.mduqc else args.positive_control
         # self.drugs = pathlib.Path(args.drug_classes)
         self.contigs = args.contigs
-        self.amrfinder_output = args.amrfinder_output
         self.from_contigs = True if args.contigs != '' else False
         self.prefix = args.prefix
         self.keep = args.keep
-        self.run_singulairty = args.Singularity
-        self.singularity_path = f"shub://phgenomics-singularity/amrfinderplus" if args.singularity_path == '' else args.singularity_path # this needs to addressed before formal release.
+        # self.run_singulairty = args.Singularity
+        # self.singularity_path = f"shub://phgenomics-singularity/amrfinderplus" if args.singularity_path == '' else args.singularity_path # this needs to addressed before formal release.
         self.finaloutput = (
             ['MMS118.xlsx']
             if self.mduqc
             else ['summary_matches.csv', 'summary_partials.csv']
         )
         self.qc = args.qc
-        self.species_detect = args.species_detect
+        self.species = args.species if args.species in self.species_list else ""
 
 
 
@@ -102,7 +101,7 @@ class Setupamr(object):
             self.from_contigs = True
         elif self.file_present(self.amrfinder_output):
             self.from_contigs = False
-        print(self.from_contigs)
+        # print(self.from_contigs)
         self.logger.info(f"All files seem to be present and accounted for. Well done.")
         return True
 
@@ -146,82 +145,51 @@ class Setupamr(object):
         """
         Ensure that the files (either contigs or amrfinder output) exist and generate structure for links
         """
-        input_file = (
-            pathlib.Path(self.contigs)
-            if self.from_contigs
-            else pathlib.Path(self.amrfinder_output)
-        )
+        input_file = pathlib.Path(self.contigs)
         tab = pandas.read_csv(input_file, engine="python", header=None, sep = '\t')
         running_type = self.check_input_tab(tab)
         # print(running_type)
         if running_type == 'batch':
-            isos = list(tab[0])
             self.logger.info(f"Checking that the input data is present. If present will link to {self.workdir}")
             for row in tab.iterrows():
                 if self.file_present(row[1][1]):
                     self.make_links(first_column=row[1][0], second_column=row[1][1])
-            if self.positive_control != "":
+            if self.positive_control:
                 self.logger.info(f"You have provided a path the a positive control. Checking if path exists, if present will link to {self.workdir}")
                 if self.file_present(self.positive_control):
-                    self.make_links(first_column = "9999-99888", second_column = self.positive_control)
-                    isos.append("9999-99888")
-        elif running_type == 'amrfinder_output':
-            self.prefix = self.prefix if self.prefix != '' else f'abritamr'
-            self.from_contigs = False
-            self.make_links(first_column=self.prefix, second_column=input_file)
-        elif running_type == 'assembly':
-            self.prefix = self.prefix if self.prefix != '' else f'abritamr'
-            self.from_contigs = True
-            self.make_links(first_column=self.prefix, second_column=input_file)
+                    self.make_links(first_column = "9999-99888", second_column = self.resources / 'control' / 'contigs.fa')
+        else:
+            self.make_links(first_column = self.prefix, second_column = input_file)     
+        
+        
 
-        return [self.prefix] if running_type != 'batch' else isos
-
-    def check_singularity(self):
-        '''
-        if singularity path check it exists.
-        '''
-        self.logger.info(f"Checking singularity.")
-        if self.singularity_path != f"shub://phgenomics-singularity/amrfinderplus":
-            return self.file_present(self.singularity_path)
-
-    def generate_workflow_files(self, samples):
+    def generate_workflow_files(self):
         # varaiables for config.yaml
         self.logger.info(f"Setting up workflow files. ")
-        script_path = self.resources / "utils"
-        amrfinder = " " if not self.from_contigs else "run_amrfinder"
+        print(self.species)
         mduqc = "mduqc" if self.mduqc else ""
-        species = "species" if self.species_detect else ""
-        singularity_path = (
-            f"singularity:'{self.singularity_path}'"
-            if self.run_singulairty
-            else " ")
         if self.mduqc:
             self.file_present(self.qc)
         # if running singleton put summary files in prefix dir
-        config_source = self.resources / "templates" / "config.j2"
+        config_source = self.resources / "templates" / "nextflow.config.j2"
         self.logger.info(f"Writing config file")
         config_template = jinja2.Template(config_source.read_text())
-        config_target = self.workdir / "config.yaml"
+        config_target = self.workdir / "nextflow.config"
         config_target.write_text(
             config_template.render(
-                script_path=script_path,
-                amrfinder=amrfinder,
-                mduqc=mduqc,
-                samples=' '.join(samples),
-                qc=self.qc,
-                final_output=self.finaloutput,
-                workdir=self.workdir,
-                singularity_path=singularity_path,
-                database_version = self.db,
-                species_detect = species
+                mduqc=mduqc, # true or false if true MUST have provided a qc result table
+                qc=self.qc, # name of qc result table
+                db = self.db, # version of DB
+                outdir = f"{self.workdir}", # the directory where all things should be saved to
+                species = self.species if self.species != "" else "none" # if this is not an empty string then run amrfinder plus - for MDU this should not be needed.
             )
         )
-        self.logger.info(f"Written config.yaml to {self.workdir}")
+        self.logger.info(f"Written nextflow.config to {self.workdir}")
 
-    def run_snakemake(self):
+    def run_wflw(self):
 
-        singularity = "--use-singularity --singularity-args '--bind /home'" if self.run_singulairty else ""
-        cmd = f"snakemake -s \"{self.snakefile}\" -j {self.jobs} -d {self.workdir} {singularity} 2>&1"
+        
+        cmd = f"nextflow {self.resources / 'main.nf'} -resume 2>&1"
         self.logger.info(f"Running pipeline using command {cmd}. This may take some time.")
         wkfl = subprocess.run(cmd, shell=True)
         while True:
@@ -238,48 +206,48 @@ class Setupamr(object):
         else:
             return False
 
-    def clean(self):
+    # def clean(self):
 
-        logs = self.workdir / ".snakemake" / "log"
-        if logs.exists():
-            rmlog = subprocess.run(f"rm -rf {logs}", shell=True, capture_output=True)
-            if rmlog.returncode == 0:
-                self.logger.info("Removed old log files")
-        conda = self.workdir / ".snakemake" / "conda"
-        if conda.exists():
-            cleanconda = subprocess.run(
-                f"snakemake --cleanup-conda", shell=True, capture_output=True
-            )
-            if cleanconda.returncode == 0:
-                self.logger.info("Cleaned unused conda environments")
+    #     logs = self.workdir / ".snakemake" / "log"
+    #     if logs.exists():
+    #         rmlog = subprocess.run(f"rm -rf {logs}", shell=True, capture_output=True)
+    #         if rmlog.returncode == 0:
+    #             self.logger.info("Removed old log files")
+    #     conda = self.workdir / ".snakemake" / "conda"
+    #     if conda.exists():
+    #         cleanconda = subprocess.run(
+    #             f"snakemake --cleanup-conda", shell=True, capture_output=True
+    #         )
+    #         if cleanconda.returncode == 0:
+    #             self.logger.info("Cleaned unused conda environments")
 
     def run_amr(self):
         # setup the pipeline
-        samples = self.link_input_files()
+        self.link_input_files()
         # write snakefile
-        self.generate_workflow_files(samples)
+        self.generate_workflow_files()
         # run snakefile
-        wkflow = self.run_snakemake()
-        if wkflow:
-            self.logger.info(f"Pipeline completed")
-            if self.mduqc:
-                outfile = self.workdir / "MMS118.xlsx"
-                if outfile.exists():
-                    self.logger.info(f"MMS118.xlsx found, pipeline successfully completed. Come again soon.")
-                else:
-                    self.logger.warning(f"MMS118.xlsx is not present. Please check logs and try again.")
-                    raise SystemExit
-            else:
-                outfile_matches = self.workdir / "summary_matches.csv"
-                outfile_partials = self.workdir / "summary_partials.csv"
-                if outfile_matches.exists() and outfile_partials.exists():
-                    self.logger.info(f"'summary_matches.csv' and 'summary_partials.csv' found, pipeline successfully completed. Come again soon.")
-                else:
-                    self.logger.warning(f"'summary_matches.csv' and 'summary_partials.csv' are not present. Please check logs and try again.")
-                    raise SystemExit
-            if not self.keep:
-                self.logger.info(f"Cleaning up the working directory.")
-                self.clean()
-            self.logger.info("Thank you and come again!")
-        else:
-            self.logger.info(f"Pipeline did not complete successfully. Check logs and try again")
+        wkflow = self.run_wflw()
+        # if wkflow:
+        #     self.logger.info(f"Pipeline completed")
+        #     if self.mduqc:
+        #         outfile = self.workdir / "MMS118.xlsx"
+        #         if outfile.exists():
+        #             self.logger.info(f"MMS118.xlsx found, pipeline successfully completed. Come again soon.")
+        #         else:
+        #             self.logger.warning(f"MMS118.xlsx is not present. Please check logs and try again.")
+        #             raise SystemExit
+        #     else:
+        #         outfile_matches = self.workdir / "summary_matches.csv"
+        #         outfile_partials = self.workdir / "summary_partials.csv"
+        #         if outfile_matches.exists() and outfile_partials.exists():
+        #             self.logger.info(f"'summary_matches.csv' and 'summary_partials.csv' found, pipeline successfully completed. Come again soon.")
+        #         else:
+        #             self.logger.warning(f"'summary_matches.csv' and 'summary_partials.csv' are not present. Please check logs and try again.")
+        #             raise SystemExit
+        #     if not self.keep:
+        #         self.logger.info(f"Cleaning up the working directory.")
+        #         self.clean()
+        #     self.logger.info("Thank you and come again!")
+        # else:
+        #     self.logger.info(f"Pipeline did not complete successfully. Check logs and try again")

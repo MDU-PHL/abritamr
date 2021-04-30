@@ -40,20 +40,8 @@ def set_parsers():
     parser.add_argument(
         "--positive_control",
         "-p",
-        help = "Path to positive control sequence - must be set if using -m",
-        default= ""
-    )
-    parser.add_argument(
-        "--Singularity",
-        "-S",
-        action="store_true",
-        help="If using singularity container for AMRfinderplus"
-    )
-    parser.add_argument(
-        "--singularity_path",
-        "-s",
-        default="",
-        help="Path to the singularity container for AMRfinderplus, if empty will defualt to shub://phgenomics-singularity/amrfinderplus"
+        action = "store_true",
+        help= "If you would like to include positive control. If running for MDU this will be included by default"
     )
     parser.add_argument(
         "--contigs",
@@ -62,15 +50,12 @@ def set_parsers():
         help="Tab-delimited file with sample ID as column 1 and path to assemblies as column 2 OR path to a contig file (used if only doing a single sample - should provide value for -pfx). ",
     )
     parser.add_argument(
-        "--amrfinder_output",
-        "-o",
-        default="",
-        help="Tab-delimited file with sample ID as column 1 and path to amr_finder output files as column 2 OR path to a amrfinder ouptu file (used if only doing a single sample - should provide value for -pfx).",
+        "--prefix",
+        "-px",
+        default="abritamr",
+        help="If running on a single sample, please provide a prefix for output directory",
     )
-    parser.add_argument('-pfx',
-        '--prefix',
-        help = 'If using abriTAMR on single file please provide a prefix',
-        default= '')
+    
     parser.add_argument(
         "--workdir",
         "-w",
@@ -83,11 +68,13 @@ def set_parsers():
         default=f"{pathlib.Path(__file__).parent }",
         help="Directory where templates are stored",
     )
+
     parser.add_argument(
-        "--species_detect",
-        "-sd",
-        action="store_true",
-        help="Set if you would like to use point mutations.",
+        "--species",
+        "-sp",
+        default="",
+        help="Set if you would like to use point mutations, please provide a valid species.",
+        choices= ['Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"]
     )
     parser.add_argument(
         "--jobs", "-j", default=16, help="Number of AMR finder jobs to run in parallel."
