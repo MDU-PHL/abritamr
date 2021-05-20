@@ -25,6 +25,7 @@ def set_parsers():
         description="MDU AMR gene detection pipeline", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
+
     parser.add_argument(
         "--mduqc",
         "-m",
@@ -55,7 +56,6 @@ def set_parsers():
         default="abritamr",
         help="If running on a single sample, please provide a prefix for output directory",
     )
-    
     parser.add_argument(
         "--workdir",
         "-w",
