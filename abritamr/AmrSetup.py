@@ -23,13 +23,6 @@ class Setup(object):
         self.logger.addHandler(fh)
 
         
-        # self.mduqc = args.mduqc # if this is a MDU collation
-        
-        
-        # self.keep = args.keep
-        # mdu
-        self.qc = args.qc
-        
     def file_present(self, name):
         """
         check file is present
@@ -109,7 +102,7 @@ class SetupAMR(Setup):
         """
         Get the type of run return type and object for checking - either a path or a df
         """
-        input_file = pandas.read_csv(pathlib.Path(self.contigs))
+        input_file = pandas.read_csv(pathlib.Path(self.contigs), header = None)
         running_type = self._check_run_type(input_file)
         return running_type, input_file
 

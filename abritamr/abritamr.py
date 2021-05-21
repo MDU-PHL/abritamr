@@ -1,6 +1,7 @@
 import pathlib, argparse, sys, os, logging
 
 from abritamr.AmrSetup import Setup, SetupAMR, SetupMDU
+from abritamr.RunFinder import RunFinder
 from abritamr.version import __version__
 
 """
@@ -15,6 +16,9 @@ Input types:
 def run_pipeline(args):
     P = SetupAMR(args)
     input_data = P.setup()
+    A = RunFinder(input_data)
+    amr_data = A.run()
+    
 
 def mdu(args):
     M = SetupMDU(args)
