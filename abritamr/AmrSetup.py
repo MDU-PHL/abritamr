@@ -81,47 +81,46 @@ class SetupAMR(Setup):
         else:
             return True
 
-    def _check_run_type(self, tab):
+            
+    
+    def _get_input_shape(self):
         """
-        Establish the input is a table of ids and contigs or if it is a single path etc - return batch or assembly;
+        determine shape of file
         """
-        self.logger.info(f"Checking the structure of your input file.")
-        if tab.shape[1] == 2:
-            self.logger.info(f"The input file seems to be in the correct format. Thank you.")
-            return 'batch'
-        elif tab.shape[1] == 1:
-            self.logger.info(f"It seems you might be trying to run abriTAMR directly from an assembly file")
-            return 'assembly'
-        else:
-            logging.critical(
-                "Your input file should either be a tab delimited file with two columns or the path to contigs. Please check your input and try again."
-            )
-            raise SystemExit
-
-    def _get_run_type(self):
-        """
-        Get the type of run return type and object for checking - either a path or a df
-        """
-        input_file = pandas.read_csv(pathlib.Path(self.contigs), header = None)
-        running_type = self._check_run_type(input_file)
-        return running_type, input_file
+        run_type = 'assembly'
+        with open(self.contigs, 'r') as c:
+            data = c.read().strip().split('\n')
+            firstline = data[0]
+            if not firstline.startswith('>'):
+                for line in data:
+                    if len(line.split('\t')) != 2:
+                        self.logger.critical("Your input file should either be a tab delimited file with two columns or the path to contigs. Please check your input and try again.")
+                        raise SystemExit
+                run_type = 'batch'
+        self.logger.info(f"The input file seems to be in the correct format. Thank you.")
+        return run_type
+    
 
     def _input_files(self):
         """
         Ensure that the files (either contigs or amrfinder output) exist and return running type
         """
         
-        running_type,tab = self._get_run_type()
+        running_type = self._get_input_shape()
         if running_type == 'batch':
             self.logger.info(f"Checking that the input data is present.")
-            for row in tab.iterrows():
-                if not self.file_present(row[1][1]):
-                    self.logging.critical(f"{row[1][1]} is not a valid file path. Please check your input and try again.")
-                    raise SystemExit
+            with open(self.contigs, 'r') as c:
+                data = c.read().strip().split('\n')
+                for line in data:
+                    row = line.split('\t')
+                    if not self.file_present(row[1]):
+                        self.logger.critical(f"{row[1]} is not a valid file path. Please check your input and try again.")
+                        raise SystemExit
         elif running_type == 'assembly' and self.file_present(self.contigs):
-            self.logging.info(f"{self.contigs} is present. abritamr can proceed.")
+            self.logger.info(f"{self.contigs} is present. abritamr can proceed.")
         else:
-            self.logging.critical(f"Something has gone wrong with your inputs. Please try again.")
+            self.logger.critical(f"Something has gone wrong with your inputs. Please try again.")
+            raise SystemExit
         
         return running_type
    
@@ -159,8 +158,8 @@ class SetupMDU(Setup):
         self.db = db
         self.qc = args.qc
         self.runid = args.runid
-        # self.matches = args.matches
-        # self.partials = args.matches   
+        self.matches = args.matches
+        self.partials = args.matches   
 
     def _check_runid(self):
         if self.runid == '':

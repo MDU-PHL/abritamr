@@ -133,7 +133,7 @@ class Collate:
 
         return drugclass_dict
 
-    def virulence_dict(self, virulence_dict, row):
+    def _virulence_dict(self, virulence_dict, row):
         """
         report virulence factors
         """
@@ -160,7 +160,7 @@ class Collate:
             elif row[1]["Method"] not in self.MATCH and row[1]["Scope"] == "core" and row[1]["Element type"] == "AMR":
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
             elif row[1]["Method"] in self.MATCH and row[1]['Element type'] == 'VIRULENCE':
-        
+                virulence = self._virulence_dict(virulence_dict = virulence, row = row)
         drugclass_dict = self.joins(dict_for_joining=drugclass_dict)
         partials = self.joins(dict_for_joining=partials)
         virulence = self.joins(dict_for_joining = virulence)

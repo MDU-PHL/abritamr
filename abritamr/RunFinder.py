@@ -23,7 +23,7 @@ class RunFinder(object):
         self.db = db
         self.organism = args.organism
         self.input = args.input
-        self.run_type = args.run
+        self.run_type = args.run_type
         self.jobs = args.jobs
         self.prefix = args.prefix
     
@@ -95,8 +95,9 @@ class RunFinder(object):
         else:
             tab = pandas.read_csv(self.input, sep = '\t', header = None)
             for row in tab.iterrows():
-                self._check_output_file(f"{row[1][0]}/amrfinder.out"):
-
+                self._check_output_file(f"{row[1][0]}/amrfinder.out")
+        return True
+        
     def run(self):
         """
         run amrfinder

@@ -1,0 +1,2 @@
+sample1	tests/summary_matches.txt
+tests/summary_partials.txt
