@@ -110,6 +110,6 @@ class RunFinder(object):
             self.logger.critical(f"It seems that amrfinder is not properly configured. Please check amrfinder documentation (https://github.com/ncbi/amr/wiki/AMRFinderPlus-database) and try again.")
             raise SystemExit
         Data = collections.namedtuple('Data', ['run_type', 'input', 'prefix'])
-        amr_data = Data(self.run_type, self.contigs, self.prefix)
+        amr_data = Data(self.run_type, self.input, self.prefix)
 
         return amr_data
