@@ -158,16 +158,27 @@ class SetupMDU(Setup):
         self.logger.addHandler(fh)
         self.db = db
         self.qc = args.qc
-        self.matches = args.matches
-        self.partials = args.matches
-        
+        self.runid = args.runid
+        # self.matches = args.matches
+        # self.partials = args.matches   
+
+    def _check_runid(self):
+        if self.runid == '':
+            self.logger.critical(f"Run ID can not be empty, please try again.")
+            raise SystemExit
+        else:
+            return True
+
     def setup(self):
         """
         Check the inputs for MDU - ensure all files are present for collation.
         """
-        Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db'])
-        if self.file_present(self.qc) and self.file_present(self.matches) and self.file_present(self.partials):
-            return Data(self.qc, self.matches, self.partials, self.db)
+        self._check_runid()
+
+        Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid'])
+
+        if self.file_present(self.qc) and self.file_present(self.matches) and self.file_present(self.partials) and self._check_runid():
+            return Data(self.qc, self.matches, self.partials, self.db, self.runid)
         else:
             self.logger.critical(f"Something has gone wrong with your inputs. Please try again!")
             raise SystemExit

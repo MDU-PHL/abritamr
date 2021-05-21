@@ -244,16 +244,12 @@ class Collate:
 
 
 class MduCollate(Collate):
-    def __init__(self, qc, db, runid, matches, partials):
-        self.workdir = pathlib.Path.cwd()
-        self.mduqc = self.workdir / f"{qc}"
-        self.db = db
-        self.check_for_mduqc()
-        self.mduqctab = self.mdu_qc_tab()
-        self.passed_partials = partials
-        self.passed_match = matches
-        self.runid = runid
-
+    def __init__(self, args):
+        self.mduqc = args.qc
+        self.db = args.db
+        self.partials = args.partials
+        self.match = args.matches
+        self.runid = args.runid
         self.NONE_CODES = {
             "Salmonella":"CPase_ESBL_AmpC_16S_NEG",
             "Shigella":"CPase_ESBL_AmpC_16S_NEG",
@@ -270,16 +266,6 @@ class MduCollate(Collate):
         
         return tab.append(pos)
 
-    def check_for_mduqc(self):
-
-        if self.mduqc.exists():
-            return True
-        else:
-            print(
-                f"It appears you are running mdu-amr in the context of MDU QC, the {self.mduqc} file is not present in {self.workdir}. Please check your settings and try again."
-            )
-            raise SystemExit
-
     def strip_bla(self, gene):
         '''
         strip bla from front of genes except
@@ -290,20 +276,17 @@ class MduCollate(Collate):
             gene = gene.replace("bla", "")
         return gene
 
-    def get_passed_isolates(self, qc_name):
+    def get_passed_isolates(self, qc_tab):
         """
         generate lists of isolates that passed QC and need AMR, failed QC and should have AMR and all other isolates
-        """
-        
-        # print(self.mdu_qc_tab)
-        
+        """        
         failed = list(
-            self.mduqctab[self.mduqctab["TEST_QC"] == False]["ISOLATE"]
+            qc_tab[qc_tab["TEST_QC"] == False]["ISOLATE"]
         )  # isolates that failed qc and should have amr
         passed = list(
-            self.mduqctab[self.mduqctab["TEST_QC"] == True]["ISOLATE"]
-        )  # isolates that failed qc and should have amr
-        # print(passed)
+            qc_tab[qc_tab["TEST_QC"] == True]["ISOLATE"]
+        )  
+
         return (passed, failed)
 
 
@@ -340,11 +323,9 @@ class MduCollate(Collate):
     def reporting_logic(self, row, species, neg_code = True):
         # get all genes found
         all_genes = self.get_all_genes(row)
-        # print(row)
         isodict = row[1].to_dict()
         # determine the genus EXPECTED
         genus = species.split()[0]
-         # A list of reportable genes - TODO move to a class variable
         reportable = [
             "Carbapenemase",
             "Carbapenemase (MBL)",
@@ -357,7 +338,6 @@ class MduCollate(Collate):
             "Vancomycin",
             "Methicillin"
         ]
-        # print(reportable)
         non_caveat_reportable = [
             "Carbapenemase",
             "Aminoglycosides (Ribosomal methyltransferase)",
@@ -379,18 +359,11 @@ class MduCollate(Collate):
         genes_reported = []  # genes for reporting
         genes_not_reported = []  # genes found but not reportable
         for i in isodict:
-            # print(i)
-                        
             genes = []
             if not isinstance(isodict[i], float):
                 genes = isodict[i].split(',')
-                # print(genes)
-            # print(isodict[i])
             if genes != []: # for each bin we do things to genes
-                
                 if i in reportable:
-                    
-                    # print(isodict[i])
                     if i in non_caveat_reportable:
                         genes_reported.extend(genes)
                     elif i == "Carbapenemase (MBL)" and species != "Stenotrophomonas maltophilia":
@@ -422,17 +395,17 @@ class MduCollate(Collate):
 
                 else:
                     genes_not_reported.extend(genes)
-            # print(genes_reported)
         if genes_reported == []:
             genes_reported = [self.none_replacement_code(genus= genus)] if neg_code else ''
         if genes_not_reported == []:
             genes_not_reported = ["No non-reportable genes found."] if neg_code else ''
             # break
-    
+        self.logger(f"{row[1]['ISOLATE']} has {len(genes_reported)} reportable genes.")
         return genes_reported, genes_not_reported
 
 
     def assign_itemcode(self,mduid, reg):
+        self.logger.info(f"Checking for item code")
         m = reg.match(mduid)
         try:
             itemcode = m.group('itemcode') if m.group('itemcode') else ''
@@ -441,6 +414,7 @@ class MduCollate(Collate):
         return itemcode
 
     def assign_mduid(self, mduid, reg):
+        self.logger.info(f"Extracting MDU sample ID")
         m = reg.match(mduid)
         try:
             mduid = m.group('id')
@@ -450,9 +424,10 @@ class MduCollate(Collate):
 
     def mdu_reporting(self, match, neg_code = True):
 
+        self.logger(f"Applying MDU business logic {'matches' if neg_code else 'partials'}.")
         mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
         reporting_df = pandas.DataFrame()
-        qc = pandas.read_csv(self.mduqc, sep=None, engine="python")
+        qc = self.mdu_qc_tab()
         qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
         match_df = pandas.read_csv(match, sep = '\t')
         for row in match_df.iterrows():
@@ -460,7 +435,7 @@ class MduCollate(Collate):
             item_code = self.assign_itemcode(isolate, mduidreg)
             md = self.assign_mduid(isolate, mduidreg)
             d = {"MDU sample ID": md, "Item code" : item_code}
-            qcdf = self.mduqctab[self.mduqctab["ISOLATE"].str.contains(isolate)]
+            qcdf = qc[qc["ISOLATE"].str.contains(isolate)]
             exp_species = qcdf["SPECIES_EXP"].values[0]
             obs_species = qcdf["SPECIES_OBS"].values[0]
            
@@ -488,65 +463,25 @@ class MduCollate(Collate):
         
         return reporting_df.reindex(labels = ['Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs', 'Species_exp', 'db_version'], axis = 'columns')
 
-    def mdu_partials(self, partials):
-        '''
-        split the partial matches into reportable/nonreportable
-        input is a dataframe with partial type as colnames 
-        '''
-        partial_names = ['PARTIALX', 'PARTIAL_CONTIG_ENDX']
-        partial_df = pandas.DataFrame()
-        for row in partials.iterrows:
-            qc = pandas.read_csv(self.mduqc, sep=None, engine="python")
-            qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
-            exp_species = self.mduqctab["SPECIES_EXP"].values[0]
-            obs_species = self.mduqctab["SPECIES_OBS"].values[0]
-            species = obs_species if obs_species == exp_species else exp_species
-            d = {"MDU sample ID": row[0]}
-            
+    
     def save_spreadsheet(
         self,
         passed_match,
         passed_partials,
         
     ):
-        print(self.runid)
         writer = pandas.ExcelWriter(f"{self.runid}_MMS118.xlsx", engine="xlsxwriter")
-
-        
         passed_match.to_excel(writer, sheet_name="MMS118")
         passed_partials.to_excel(writer, sheet_name="Passed QC partial")
-        
-
         writer.close()
-
-
-    def get_single_amr(self, amr_file):
-        '''
-        get a single amr output
-        '''
-        if len(amr_file) > 0:
-            data = pandas.read_csv(amr_file[0], sep = "\t")
-            return data
-        
-   
 
     def run(self):
 
-        passed_match_df = self.mdu_reporting(match=self.passed_match)
-        passed_partials_df = self.mdu_reporting(match = self.passed_partials, neg_code=False)
-        # failed_match_df = self.mdu_reporting(match = failed_match)
-        # failed_partials_df = self.mdu_reporting(match = failed_partials, neg_code=False)
+        passed_match_df = self.mdu_reporting(match=self.match)
+        passed_partials_df = self.mdu_reporting(match = self.partials, neg_code=False)
         self.save_spreadsheet(
             passed_match_df,
             passed_partials_df,
 
         )
-
-# if __name__ == "__main__":
-# # $params.qc $params.db $params.runid $abritamr_matches $abritamr_partials
-#     if len(sys.argv) > 4:
-#         c = MduCollate(qc = f"{sys.argv[1]}", db = f"{sys.argv[2]}", runid = f"{sys.argv[3]}", matches = f"{sys.argv[4]}", partials = f"{sys.argv[5]}")
-#     else:
-#         c = Collate(isolate = f"{sys.argv[1]}", amr_output = f"{sys.argv[2]}")
-#     c.run()
 

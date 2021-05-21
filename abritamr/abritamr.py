@@ -64,18 +64,23 @@ def set_parsers():
         default="",
         help="Name of checked MDU QC file."
     )
-    
+    parser_mdu.add_argument(
+        "--runid",
+        "-r",
+        default=f"Run ID",
+        help="MDU RunID",
+    )
     parser_mdu.add_argument(
         "--matches",
         "-m",
         default=f"summary_matches.txt",
-        help="Path to matches, output of abritamr ",
+        help="Path to matches, concatentated output of abritamr",
     )
     parser_mdu.add_argument(
         "--partials",
         "-p",
         default=f"summary_partials.txt",
-        help="Path to partial matches, output of abritamr",
+        help="Path to partial matches, concatentated output of abritamr",
     )
 
     
