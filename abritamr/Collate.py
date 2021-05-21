@@ -54,8 +54,6 @@ class Collate:
         fh.setFormatter(formatter)
         self.logger.addHandler(ch) 
         self.logger.addHandler(fh)
-
-        self.workdir = pathlib.Path.cwd()
         self.prefix = args.prefix
         self.run_type = args.run_type
         self.input = args.input
