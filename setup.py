@@ -19,7 +19,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="abritamr",
-    version="0.2.2",
+    version="1.0.0",
     description="Running AMRFinderPlus for MDU",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -31,8 +31,7 @@ setup(
     python_requires=">=3.7, <4",
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
     zip_safe=False,
-    install_requires=["snakemake", "pandas",
-                      "click", "jinja2", "toml", "xlsxwriter"],
+    install_requires=["pandas","toml", "xlsxwriter"],
     test_suite="nose.collector",
     tests_require=["nose", "pytest"],
     entry_points={

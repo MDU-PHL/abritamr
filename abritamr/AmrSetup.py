@@ -49,12 +49,12 @@ class SetupAMR(Setup):
         self.species_list = ['Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"]
         
         self.logger =logging.getLogger(__name__) 
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging.INFO)
         ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
+        ch.setLevel(logging.INFO)
         ch.setFormatter(CustomFormatter())
         fh = logging.FileHandler('abritamr.log')
-        fh.setLevel(logging.DEBUG)
+        fh.setLevel(logging.INFO)
         formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p') 
         fh.setFormatter(formatter)
         self.logger.addHandler(ch) 
@@ -62,8 +62,6 @@ class SetupAMR(Setup):
 
         
         self.jobs = args.jobs # number of amrfinderplus to run at a time
-        
-        self.positive_control = True if self.mduqc else args.positive_control 
         self.contigs = args.contigs
         self.from_contigs = True if args.contigs != '' else False
         self.prefix = args.prefix

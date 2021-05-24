@@ -87,7 +87,7 @@ def set_parsers():
     
     
     parser_sub_run.set_defaults(func=run_pipeline)
-    parser_mdu.set_defaults(func = mdu_finish)
+    parser_mdu.set_defaults(func = mdu)
     args = parser.parse_args()
     return args
 

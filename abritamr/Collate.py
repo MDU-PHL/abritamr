@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import pathlib, pandas, math, sys,  re
+import pathlib, pandas, math, sys,  re, logging
 from abritamr.CustomLog import CustomFormatter
 
 class Collate:
@@ -44,12 +44,12 @@ class Collate:
 
     def __init__(self, args):
         self.logger =logging.getLogger(__name__) 
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging.INFO)
         ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
+        ch.setLevel(logging.INFO)
         ch.setFormatter(CustomFormatter())
         fh = logging.FileHandler('abritamr.log')
-        fh.setLevel(logging.DEBUG)
+        fh.setLevel(logging.INFO)
         formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p') 
         fh.setFormatter(formatter)
         self.logger.addHandler(ch) 
@@ -75,6 +75,7 @@ class Collate:
         if the enhanced subclass is in either NONRTM or MACROLIDES then then use the groups specified by Norelle. If it is empty (-) then fall back on the AMRFinder subclass, else report the extended subclass
         """
         gene_id_col = "Gene symbol" if colname != "refseq_protein_accession" else "Accession of closest sequence"
+        
         d = reftab[reftab[colname] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
         if d in self.NONRTM:
             return self.RTM
@@ -151,7 +152,7 @@ class Collate:
         partials = {"Isolate": isolate}
         virulence = {"Isolate": isolate}
         for row in df.iterrows():
-            # print(row[1]["Gene symbol"])
+            # print(row)
             # if the match is good then generate a drugclass dict
             if row[1]["Gene symbol"] == "aac(6')-Ib-cr" and row[1]["Method"] in ["EXACTX", "ALLELEX"]: # This is always a partial - unclear
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
@@ -167,36 +168,44 @@ class Collate:
         return drugclass_dict, partials, virulence
 
     
-    def save_files(self, path, tosave):
-        # print(tosave)
-        if tosave.shape[0] > 1:
-            self.logger.info(f"Saving {path}.")
-            tosave.to_csv(path, sep = '\t')
-        else:
-            self.logger.warning(f"{path} would give you an empty file - not saving this!!")
+    def save_files(self, path, match, partial, virulence):
+        
+        files = {'summary_matches.txt': match, 'summary_partials.txt': partial, 'summary_virulence.txt':virulence}
+        for f in files:
+            self.logger.info(f"Saving {path}/{f}.txt")
+            files[f].to_csv(f"{path}/{f}.txt", sep = '\t')
+        return True
+        
+
+    def _get_reftab(self):
+        """
+        get reftab
+        """
+
+        reftab = pandas.read_csv(self.REFGENES)
+        reftab = reftab.fillna("-")
+
+        return reftab
 
     def collate(self, prefix = ''):
         """
         if the refgenes.csv is present then proceed to collate data and save the csv files.
         """
 
-        if self.REFGENES.exists():
-            reftab = pandas.read_csv(self.REFGENES)
-            reftab = reftab.fillna("-")
-            
-            df = pandas.read_csv(f"{prefix}/amrfinder.out", sep="\t")
-            self.logger.info(f"Opened amrfinder outoptu for {prefix}")
-            drug, partial, virulence = self.get_per_isolate(
-                reftab=reftab, df=df, isolate=self.isolate
-            )
-            summary_drugs = pandas.DataFrame(drug, index=["Isolate"])
-            summary_partial = pandas.DataFrame(partial, index=["Isolate"])
-            summary_virulence = pandas.DataFrame(virulence, index=["Isolate"])
-                        
-            return summary_drugs, summary_partial,summary_virulence
-        else:
-            print(f"The refgenes DB ({self.REFGENES}) seems to be missing.")
-            raise SystemExit
+        
+        reftab = self._get_reftab()
+        
+        df = pandas.read_csv(f"{prefix}/amrfinder.out", sep="\t")
+        self.logger.info(f"Opened amrfinder output for {prefix}")
+        drug, partial, virulence = self.get_per_isolate(
+            reftab=reftab, df=df, isolate=prefix
+        )
+        
+        summary_drugs = pandas.DataFrame(drug, index = [0])
+        summary_partial = pandas.DataFrame(partial, index = [0])
+        summary_virulence = pandas.DataFrame(virulence, index = [0])
+        return summary_drugs, summary_partial,summary_virulence
+        
     
     def _combine_df(self, existing, temp):
         """
@@ -229,18 +238,20 @@ class Collate:
 
     def run(self):
 
+
+        if not pathlib.Path(self.REFGENES).exists():
+            self.logger.critical(f"The refgenes DB ({self.REFGENES}) seems to be missing.")
+            raise SystemExit
+
         if self.run_type != 'batch':
             self.logger.info(f"This is a single sample run.")
-            summary_drugs, summary_partial, viurlence = self.collate(prefix = self.prefix)
+            summary_drugs, summary_partial, virulence = self.collate(prefix = self.prefix)
         else:
             self.logger.info(f"You are running abritamr in batch mode. Your collated results will be saved.")
-            summary_drugs, summary_partial, viurlence = self._batch_collate(input_file = self.input)
+            summary_drugs, summary_partial, virulence = self._batch_collate(input_file = self.input)
         self.logger.info(f"Saving files now.")
-        self.save_files(path="summary_matches.txt", tosave=summary_drugs)
-        self.save_files(path="summary_partials.txt", tosave=summary_partial)
-        self.save_files(path="summary_virulence.txt", tosave=virulence)
-
-
+        self.save_files(path='' if self.run_type == 'batch' else f"{self.prefix}", match = summary_drugs,partial=summary_partial, virulence = virulence)
+        
 class MduCollate(Collate):
     def __init__(self, args):
         self.mduqc = args.qc

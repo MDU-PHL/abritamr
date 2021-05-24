@@ -10,12 +10,12 @@ class RunFinder(object):
     def __init__(self, args):
         
         self.logger =logging.getLogger(__name__) 
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging.INFO)
         ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
+        ch.setLevel(logging.INFO)
         ch.setFormatter(CustomFormatter())
         fh = logging.FileHandler('abritamr.log')
-        fh.setLevel(logging.DEBUG)
+        fh.setLevel(logging.INFO)
         formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p') 
         fh.setFormatter(formatter)
         self.logger.addHandler(ch) 
@@ -32,7 +32,7 @@ class RunFinder(object):
         generate cmd with parallel
         """
         org = f"--plus --organism {self.organism}" if self.organism != '' else ''
-        cmd = f"parallel -j {self.jobs} --colsep '\t' mkdir {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out {org} :::: {self.input}"
+        cmd = f"parallel -j {self.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out {org}' :::: {self.input}"
         return cmd
     
     def _single_cmd(self):
@@ -40,16 +40,17 @@ class RunFinder(object):
         generate a single amrfinder command
         """
         org = f"--plus --organism {self.organism}" if self.organism != '' else ''
-        cmd = f"mkdir {self.prefix} && amrfinder -n {self.input} -o {self.prefix}/amrfinder.out {org}"
+        cmd = f"mkdir -p {self.prefix} && amrfinder -n {self.input} -o {self.prefix}/amrfinder.out {org}"
         return cmd
     
     def _check_amrfinder(self):
         """
         Check that amrfinder is installed and db setup properly.
         """
+        self.logger.info(f"Now checking AMRfinder setup.")
         cmd = f"amrfinder --debug"
         pat = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
-        p = subprocess.run("amrfinder --debug", shell = True, encoding = "utf-8")
+        p = subprocess.run("amrfinder --debug", shell = True, encoding = "utf-8", capture_output = True)
         m = re.search(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', p.stderr)
         if m:
             return True
@@ -97,13 +98,15 @@ class RunFinder(object):
             for row in tab.iterrows():
                 self._check_output_file(f"{row[1][0]}/amrfinder.out")
         return True
-        
+
     def run(self):
         """
         run amrfinder
         """
         if self._check_amrfinder():
+            self.logger.info(f"All check complete now running AMRFinder")
             cmd = self._generate_cmd()
+            self.logger.info(f"You are running abritamr in {self.run_type} mode. Now executing : {cmd}")
             self._run_cmd(cmd)
             self._check_outputs()
             

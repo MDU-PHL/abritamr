@@ -7,7 +7,7 @@ from abritamr.RunFinder import RunFinder
 from abritamr.Collate import Collate, MduCollate
 
 test_folder = pathlib.Path(__file__).parent
-
+REFGENES = f"{pathlib.Path(__file__).parent.parent / 'refgenes_latest.csv'}"
 
 def test_file_present():
     """
@@ -166,17 +166,23 @@ def test_mdu_setup_fail():
         with pytest.raises(SystemExit):
             amr_obj.setup()
 
-# test RunFInder
+# test RunFinder
 
 Data = collections.namedtuple('Data', ['run_type', 'input', 'prefix', 'jobs', 'organism'])
 def test_batch_cmd_no_org():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
+        
         args = Data("batch", 'tests/batch.txt', '', 9, '')
-        amr_obj = RunFinder(args)
-        cmd = f"parallel -j {args.jobs} --colsep '\t' mkdir {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out  :::: {args.input}"
+        amr_obj = RunFinder()
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
+        cmd = f"parallel -j {args.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out ' :::: {args.input}"
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._batch_cmd() == cmd
 
@@ -184,10 +190,15 @@ def test_batch_cmd_with_org():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("batch", 'tests/batch.txt', '', 9, 'Salmonella')
-        amr_obj = RunFinder(args)
-        cmd = f"parallel -j {args.jobs} --colsep '\t' mkdir {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out --plus --organism {args.organism} :::: {args.input}"
+        amr_obj = RunFinder()
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
+        cmd = f"parallel -j {args.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out --plus --organism {args.organism}' :::: {args.input}"
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._batch_cmd() == cmd
 
@@ -195,11 +206,16 @@ def test_single_cmd_with_org():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("batch", 'tests/contigs.fa', 'somename', 9, 'Salmonella')
-        amr_obj = RunFinder(args)
-        cmd = f"mkdir {args.prefix} && amrfinder -n {args.input} -o {args.prefix}/amrfinder.out --plus --organism {args.organism}"
-        amr_obj.logger = logging.getLogger(__name__)
+        amr_obj = RunFinder()
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
+        cmd = f"mkdir -p {args.prefix} && amrfinder -n {args.input} -o {args.prefix}/amrfinder.out --plus --organism {args.organism}"
+        amr_obj.logger = logging.getLogger()
         assert amr_obj._single_cmd() == cmd
 
 
@@ -207,10 +223,15 @@ def test_single_cmd_no_org():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("batch", 'tests/contigs.fa', 'somename', 9, '')
-        amr_obj = RunFinder(args)
-        cmd = f"mkdir {args.prefix} && amrfinder -n {args.input} -o {args.prefix}/amrfinder.out "
+        amr_obj = RunFinder()
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
+        cmd = f"mkdir -p {args.prefix} && amrfinder -n {args.input} -o {args.prefix}/amrfinder.out "
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._single_cmd() == cmd
 
@@ -219,10 +240,15 @@ def test_generate_cmd_single():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("assembly", 'tests/contigs.fa', 'somename', 9, '')
-        amr_obj = RunFinder(args)
-        cmd = f"mkdir {args.prefix} && amrfinder -n {args.input} -o {args.prefix}/amrfinder.out "
+        amr_obj = RunFinder()
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
+        cmd = f"mkdir -p {args.prefix} && amrfinder -n {args.input} -o {args.prefix}/amrfinder.out "
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._generate_cmd() == cmd
 
@@ -231,10 +257,15 @@ def test_generate_cmd_single_fail():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("batch", 'tests/contigs.fa', 'somename', 9, '')
-        amr_obj = RunFinder(args)
-        cmd = f"mkdir {args.prefix} && amrfinder -n {args.input} -o {args.prefix}/amrfinder.out "
+        amr_obj = RunFinder()
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
+        cmd = f"mkdir -p {args.prefix} && amrfinder -n {args.input} -o {args.prefix}/amrfinder.out "
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._generate_cmd() != cmd
 
@@ -242,10 +273,15 @@ def test_generate_cmd_batch():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("batch", 'tests/batch.txt', '', 9, '')
-        amr_obj = RunFinder(args)
-        cmd = f"parallel -j {args.jobs} --colsep '\t' mkdir {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out  :::: {args.input}"
+        amr_obj = RunFinder()
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
+        cmd = f"parallel -j {args.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out ' :::: {args.input}"
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._generate_cmd() == cmd
 
@@ -254,10 +290,15 @@ def test_generate_cmd_batch_fail():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("assembly", 'tests/batch.txt', '', 9, '')
-        amr_obj = RunFinder(args)
-        cmd = f"parallel -j {args.jobs} --colsep '\t' mkdir {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out  :::: {args.input}"
+        amr_obj = RunFinder()
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
+        cmd = f"parallel -j {args.jobs} --colsep '\t' mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out  :::: {args.input}"
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._generate_cmd() != cmd
 
@@ -266,10 +307,15 @@ def test_check_output_file():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("assembly", 'tests/contigs.fa', 'tests', 9, '')
-        amr_obj = RunFinder(args)
+        amr_obj = RunFinder()
         p = 'tests/amrfinder.out'
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._check_output_file(p)
 
@@ -278,10 +324,15 @@ def test_check_output_file_fail():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("assembly", 'tests/contigs.fa', 'tests', 9, '')
-        amr_obj = RunFinder(args)
+        amr_obj = RunFinder()
         p = 'tests/amrfinders.out'
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
         amr_obj.logger = logging.getLogger(__name__)
         with pytest.raises(SystemExit):
             amr_obj._check_output_file(p)
@@ -291,9 +342,14 @@ def test_check_outputs_single():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("assembly", 'tests/contigs.fa', 'tests', 9, '')
-        amr_obj = RunFinder(args)
+        amr_obj = RunFinder()
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._check_outputs()
 
@@ -303,54 +359,175 @@ def test_check_outputs_batch():
     """
     assert True when non-empty string is given
     """
-    with patch.object(SetupAMR, "__init__", lambda x: None):
+    with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("batch", 'tests/batch.txt', 'tests', 9, '')
-        amr_obj = RunFinder(args)
+        amr_obj = RunFinder()
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._check_outputs()
 
-# # def test_input_exists_amrfinder():
+# test Collate
+# 
+Colls = collections.namedtuple('Data', ['run_type', 'input', 'prefix'])
+def test_get_drugclass_allele_1():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        reftab = pandas.read_csv(REFGENES)
+        df= pandas.read_csv('tests/amrfinder.out', sep = '\t')
+        for i in df.iterrows():
+            if i[1]['Gene symbol'] == 'blaSHV-11':
+                row = i
+        colname = 'allele'
+        amr_obj.logger = logging.getLogger(__name__)
+        assert amr_obj.get_drugclass(reftab, row, colname) == "Beta-lactamase (not ESBL or carbapenemase)"
 
-# #     with patch.object(Setupamr, "__init__", lambda x: None):
-# #         amr_obj = Setupamr()
-# #         amr_obj.contigs = ""
-# #         amr_obj.mduqc = False
-# #         amr_obj.amrfinder_output = test_folder / "amrfinder_input_file.txt"
-# #         amr_obj.logger = logging.getLogger(__name__)
-# #         assert amr_obj.check_input_exists() == True
+def test_extract_gene_name_1():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        reftab = pandas.read_csv(REFGENES)
+        protein = 'WP_004176269.1'
+        amr_obj.logger = logging.getLogger(__name__)
+        assert amr_obj.extract_gene_name(protein, reftab) == 'blaSHV-11'
+
+def test_extract_gene_name_2():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        reftab = pandas.read_csv(REFGENES)
+        reftab = reftab.fillna('-')
+        protein = 'WP_063839881.1'
+        amr_obj.logger = logging.getLogger(__name__)
+        assert amr_obj.extract_gene_name(protein, reftab) == "aac(2')-IIa"
+
+def test_setup_dict():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        reftab = pandas.read_csv(REFGENES)
+        reftab = reftab.fillna('-')
+        drugclass_dict = {}
+        df= pandas.read_csv('tests/amrfinder.out', sep = '\t')
+        for i in df.iterrows():
+            if i[1]['Gene symbol'] == 'blaSHV-11':
+                row = i
+        amr_obj.logger = logging.getLogger(__name__)
+        assert amr_obj.setup_dict(drugclass_dict, reftab, row) == {"Beta-lactamase (not ESBL or carbapenemase)":['blaSHV-11']}
 
 
-# # def test_input_exists_amrfinder_contigs_fail():
-
-# #     with patch.object(Setupamr, "__init__", lambda x: None):
-# #         amr_obj = Setupamr()
-# #         amr_obj.contigs = test_folder / "contigs_input_file.txt"
-# #         amr_obj.mduqc = False
-# #         amr_obj.amrfinder_output = test_folder / "amrfinder_input_file.txt"
-# #         amr_obj.logger = logging.getLogger(__name__)
-# #         with pytest.raises(SystemExit):
-# #             amr_obj.check_input_exists()
-
-
-# # def test_input_exists_fail():
-
-# #     with patch.object(Setupamr, "__init__", lambda x: None):
-# #         amr_obj = Setupamr()
-# #         amr_obj.contigs = f""
-# #         amr_obj.mduqc = False
-# #         amr_obj.amrfinder_output = f""
-# #         amr_obj.logger = logging.getLogger(__name__)
-# #         with pytest.raises(SystemExit):
-# #             amr_obj.check_input_exists()
+def test_get_per_isolate():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        reftab = pandas.read_csv(REFGENES)
+        reftab = reftab.fillna('-')
+        
+        df= pandas.read_csv('tests/amrfinder.out', sep = '\t')
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        assert amr_obj.get_per_isolate(reftab=reftab, df=df, isolate=isolate) == ({"Isolate":isolate, "Beta-lactamase (not ESBL or carbapenemase)":'blaSHV-11'},{"Isolate":isolate,'ESBL':'blaCTX-M-15'},{"Isolate":isolate,'METAL':'qnrB1'})
 
 
-# # def test_input_exists_mduqc_fail():
 
-# #     with patch.object(Setupamr, "__init__", lambda x: None):
-# #         amr_obj = Setupamr()
-# #         amr_obj.contigs = ""
-# #         amr_obj.mduqc = True
-# #         amr_obj.amrfinder_output = test_folder / "amrfinder_input_file.txt"
-# #         amr_obj.logger = logging.getLogger(__name__)
-# #         with pytest.raises(SystemExit):
-# #             amr_obj.check_input_exists()
+def test_collate():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        reftab = pandas.read_csv(REFGENES)
+        reftab = reftab.fillna('-')
+        isolate = 'tests'
+        drugs = pandas.DataFrame({"Isolate":isolate, "Beta-lactamase (not ESBL or carbapenemase)":'blaSHV-11'}, index = [0])
+        partial = pandas.DataFrame({"Isolate":isolate,'ESBL':'blaCTX-M-15'}, index = [0])
+        virulence = pandas.DataFrame({"Isolate":isolate,'METAL':'qnrB1'}, index = [0])
+        print(drugs)
+        
+        amr_obj.logger = logging.getLogger(__name__)
+        assert amr_obj.collate(isolate)[0].equals(drugs)
+        assert amr_obj.collate(isolate)[1].equals(partial)
+        assert amr_obj.collate(isolate)[2].equals(virulence)
+
+
+def test_save():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        reftab = pandas.read_csv(REFGENES)
+        reftab = reftab.fillna('-')
+        
+        df= pandas.read_csv('tests/amrfinder.out', sep = '\t')
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        summary_drugs = pandas.DataFrame({"Isolate":isolate}, index = [isolate])
+        assert amr_obj.save_files('tests/summary_matches.txt',summary_drugs)
+
+# # # def test_input_exists_amrfinder():
+
+# # #     with patch.object(Setupamr, "__init__", lambda x: None):
+# # #         amr_obj = Setupamr()
+# # #         amr_obj.contigs = ""
+# # #         amr_obj.mduqc = False
+# # #         amr_obj.amrfinder_output = test_folder / "amrfinder_input_file.txt"
+# # #         amr_obj.logger = logging.getLogger(__name__)
+# # #         assert amr_obj.check_input_exists() == True
+
+
+# # # def test_input_exists_amrfinder_contigs_fail():
+
+# # #     with patch.object(Setupamr, "__init__", lambda x: None):
+# # #         amr_obj = Setupamr()
+# # #         amr_obj.contigs = test_folder / "contigs_input_file.txt"
+# # #         amr_obj.mduqc = False
+# # #         amr_obj.amrfinder_output = test_folder / "amrfinder_input_file.txt"
+# # #         amr_obj.logger = logging.getLogger(__name__)
+# # #         with pytest.raises(SystemExit):
+# # #             amr_obj.check_input_exists()
+
+
+# # # def test_input_exists_fail():
+
+# # #     with patch.object(Setupamr, "__init__", lambda x: None):
+# # #         amr_obj = Setupamr()
+# # #         amr_obj.contigs = f""
+# # #         amr_obj.mduqc = False
+# # #         amr_obj.amrfinder_output = f""
+# # #         amr_obj.logger = logging.getLogger(__name__)
+# # #         with pytest.raises(SystemExit):
+# # #             amr_obj.check_input_exists()
+
+
+# # # def test_input_exists_mduqc_fail():
+
+# # #     with patch.object(Setupamr, "__init__", lambda x: None):
+# # #         amr_obj = Setupamr()
+# # #         amr_obj.contigs = ""
+# # #         amr_obj.mduqc = True
+# # #         amr_obj.amrfinder_output = test_folder / "amrfinder_input_file.txt"
+# # #         amr_obj.logger = logging.getLogger(__name__)
+# # #         with pytest.raises(SystemExit):
+# # #             amr_obj.check_input_exists()
