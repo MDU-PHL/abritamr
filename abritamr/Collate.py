@@ -172,7 +172,7 @@ class Collate:
         
         files = {'summary_matches.txt': match, 'summary_partials.txt': partial, 'summary_virulence.txt':virulence}
         for f in files:
-            out = f"{path}/{f}.txt" if path != '' else f"{f}.txt"
+            out = f"{path}/{f}" if path != '' else f"{f}"
             self.logger.info(f"Saving {out}")
             files[f].set_index('Isolate').to_csv(f"{out}", sep = '\t')
         return True
