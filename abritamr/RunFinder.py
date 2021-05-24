@@ -71,14 +71,6 @@ class RunFinder(object):
         """
 
         p = subprocess.run(cmd, shell = True, capture_output = True, encoding = "utf-8")
-        while True:
-            if p.stdout != None:
-                line = p.stdout.readline().strip()
-                if not line:
-                    break
-                line = ''
-                break
-                self.logger.info(f"{line}")
         if p.returncode == 0:
             self.logger.info(f"AMRfinder completed successfully. Will now move on to collation.")
             return True

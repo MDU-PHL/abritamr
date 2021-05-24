@@ -174,7 +174,7 @@ class Collate:
         for f in files:
             out = f"{path}/{f}.txt" if path != '' else f"{f}.txt"
             self.logger.info(f"Saving {out}")
-            files[f].to_csv(f"{out}", sep = '\t')
+            files[f].set_index('Isolate').to_csv(f"{out}", sep = '\t')
         return True
         
 
