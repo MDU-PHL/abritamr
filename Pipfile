@@ -6,12 +6,7 @@ name = "pypi"
 [packages]
 e1839a8 = {editable = true,path = "."}
 abritamr = {editable = true,path = "."}
-jinja2 = "*"
-toml = "*"
 xlsxwriter = "*"
 
 [dev-packages]
 pytest = "*"
-
-[requires]
-python_version = "3.7"
