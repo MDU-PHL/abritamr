@@ -484,50 +484,6 @@ def test_save():
         isolate = 'tests'
         amr_obj.logger = logging.getLogger(__name__)
         summary_drugs = pandas.DataFrame({"Isolate":isolate}, index = [isolate])
-        assert amr_obj.save_files('tests/summary_matches.txt',summary_drugs)
-
-# # # def test_input_exists_amrfinder():
-
-# # #     with patch.object(Setupamr, "__init__", lambda x: None):
-# # #         amr_obj = Setupamr()
-# # #         amr_obj.contigs = ""
-# # #         amr_obj.mduqc = False
-# # #         amr_obj.amrfinder_output = test_folder / "amrfinder_input_file.txt"
-# # #         amr_obj.logger = logging.getLogger(__name__)
-# # #         assert amr_obj.check_input_exists() == True
-
-
-# # # def test_input_exists_amrfinder_contigs_fail():
-
-# # #     with patch.object(Setupamr, "__init__", lambda x: None):
-# # #         amr_obj = Setupamr()
-# # #         amr_obj.contigs = test_folder / "contigs_input_file.txt"
-# # #         amr_obj.mduqc = False
-# # #         amr_obj.amrfinder_output = test_folder / "amrfinder_input_file.txt"
-# # #         amr_obj.logger = logging.getLogger(__name__)
-# # #         with pytest.raises(SystemExit):
-# # #             amr_obj.check_input_exists()
-
-
-# # # def test_input_exists_fail():
-
-# # #     with patch.object(Setupamr, "__init__", lambda x: None):
-# # #         amr_obj = Setupamr()
-# # #         amr_obj.contigs = f""
-# # #         amr_obj.mduqc = False
-# # #         amr_obj.amrfinder_output = f""
-# # #         amr_obj.logger = logging.getLogger(__name__)
-# # #         with pytest.raises(SystemExit):
-# # #             amr_obj.check_input_exists()
-
-
-# # # def test_input_exists_mduqc_fail():
-
-# # #     with patch.object(Setupamr, "__init__", lambda x: None):
-# # #         amr_obj = Setupamr()
-# # #         amr_obj.contigs = ""
-# # #         amr_obj.mduqc = True
-# # #         amr_obj.amrfinder_output = test_folder / "amrfinder_input_file.txt"
-# # #         amr_obj.logger = logging.getLogger(__name__)
-# # #         with pytest.raises(SystemExit):
-# # #             amr_obj.check_input_exists()
+        summary_partial = pandas.DataFrame({"Isolate":isolate}, index = [isolate])
+        virulence = pandas.DataFrame({"Isolate":isolate}, index = [isolate])
+        assert amr_obj.save_files('batch',summary_drugs,summary_partial, virulence)
