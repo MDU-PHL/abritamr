@@ -17,8 +17,8 @@
     },
     "default": {
         "abritamr": {
-            "path": "/home/khhor/dev/abritamr",
-            "version": "==1.0.0"
+            "path": ".",
+            "editable": true
         },
         "numpy": {
             "hashes": [
