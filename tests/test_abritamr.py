@@ -477,13 +477,9 @@ def test_save():
     with patch.object(Collate, "__init__", lambda x: None):
         args = Colls("assembly", 'tests/contigs.fa', '')
         amr_obj = Collate()
-        reftab = pandas.read_csv(REFGENES)
-        reftab = reftab.fillna('-')
-        
-        df= pandas.read_csv('tests/amrfinder.out', sep = '\t')
         isolate = 'tests'
         amr_obj.logger = logging.getLogger(__name__)
         summary_drugs = pandas.DataFrame({"Isolate":isolate}, index = [isolate])
         summary_partial = pandas.DataFrame({"Isolate":isolate}, index = [isolate])
         virulence = pandas.DataFrame({"Isolate":isolate}, index = [isolate])
-        assert amr_obj.save_files('batch',summary_drugs,summary_partial, virulence)
+        assert amr_obj.save_files('',summary_drugs,summary_partial, virulence)
