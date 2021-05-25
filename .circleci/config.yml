@@ -15,7 +15,7 @@ jobs: # A basic unit of work in a run
           command: 'apt-get update && apt-get install -y gcc g++'
       - run: conda config --add channels conda-forge
       - run: conda config --add channels bioconda 
-      - run: conda install -c bioconda ncbi-amrfinderplus
+      - run: conda install -c bioconda ncbi-amrfinderplus python=3.7
       - restore_cache:
       # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
