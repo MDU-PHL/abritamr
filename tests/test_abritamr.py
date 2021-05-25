@@ -7,7 +7,7 @@ from abritamr.RunFinder import RunFinder
 from abritamr.Collate import Collate, MduCollate
 
 test_folder = pathlib.Path(__file__).parent
-REFGENES = f"{pathlib.Path(__file__).parent.parent / 'refgenes_latest.csv'}"
+REFGENES = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'refgenes_latest.csv'}"
 
 def test_file_present():
     """
