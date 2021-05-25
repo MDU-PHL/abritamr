@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import pathlib, pandas, math, sys,  re
-
+import pathlib, pandas, math, sys,  re, logging
+from abritamr.CustomLog import CustomFormatter
 
 class Collate:
 
@@ -40,11 +40,23 @@ class Collate:
     RTM = "Other aminoglycoside resistance (non-RMT)"
     MAC = "Macrolide, lincosamide and/or streptogramin resistance"
     
-    
-    def __init__(self, isolate, amr_output):
-        self.workdir = pathlib.Path.cwd()
-        self.isolate = isolate
-        self.amr_output = amr_output
+    # amr_data = Data(self.run_type, self.contigs, self.prefix)
+
+    def __init__(self, args):
+        self.logger =logging.getLogger(__name__) 
+        self.logger.setLevel(logging.INFO)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        ch.setFormatter(CustomFormatter())
+        fh = logging.FileHandler('abritamr.log')
+        fh.setLevel(logging.INFO)
+        formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p') 
+        fh.setFormatter(formatter)
+        self.logger.addHandler(ch) 
+        self.logger.addHandler(fh)
+        self.prefix = args.prefix
+        self.run_type = args.run_type
+        self.input = args.input
 
     def joins(self, dict_for_joining):
         """
@@ -62,12 +74,9 @@ class Collate:
         """
         if the enhanced subclass is in either NONRTM or MACROLIDES then then use the groups specified by Norelle. If it is empty (-) then fall back on the AMRFinder subclass, else report the extended subclass
         """
-        # print(row)
         gene_id_col = "Gene symbol" if colname != "refseq_protein_accession" else "Accession of closest sequence"
-        # print(gene_id_col)
-        # print(reftab[reftab[colname] == row[1][gene_id_col]])
+        
         d = reftab[reftab[colname] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
-        # print(d)
         if d in self.NONRTM:
             return self.RTM
         elif d in self.MACROLIDES:
@@ -96,10 +105,8 @@ class Collate:
         """
         return the dictionary for collation
         """
-        # drugname = 'x'
-        # print(row[1])
+        
         if row[1]["Gene symbol"] in list(reftab["allele"]):
-            # print('gene symbol is an allele')
             drugclass = self.get_drugclass(
                     reftab=reftab, row=row, colname="allele"
                     )
@@ -109,7 +116,7 @@ class Collate:
             drugclass = self.get_drugclass(
                 reftab=reftab, row=row, colname="refseq_protein_accession"
             )
-            drugname = f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}*" if not row[1]["Method"] in ["EXACTX", "ALLELEX"] else f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}"
+            drugname = f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}*" if not row[1]["Method"] in ["EXACTX", "ALLELEX", "POINTX"] else f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}"
             
         elif row[1]["Accession of closest sequence"] in list(reftab["refseq_protein_accession"]):
             drugclass = self.get_drugclass(
@@ -127,115 +134,144 @@ class Collate:
 
         return drugclass_dict
 
+    def _virulence_dict(self, virulence_dict, row):
+        """
+        report virulence factors
+        """
+        if row[1]['Element subtype'] in virulence_dict:
+            virulence_dict[row[1]['Element subtype']].append(row[1]['Gene symbol'])
+        else:
+            virulence_dict[row[1]['Element subtype']] = [row[1]['Gene symbol']]
+        return virulence_dict
+
     def get_per_isolate(self, reftab, df, isolate):
         """
-        make two dictionaries for each isolate that contain the drug class assignments for each match that is one of ALLELEX, EXACTX or BLASTX and then another dictionary which lists all partial mathces
+        make three dictionaries for each isolate that contain the drug class assignments for each match that is one of ALLELEX,POINTX, EXACTX or BLASTX, another dictionary which lists all partial mathces and a dictionary of virulence factors
         """
         drugclass_dict = {"Isolate": isolate}
         partials = {"Isolate": isolate}
-        
+        virulence = {"Isolate": isolate}
         for row in df.iterrows():
-            # print(row[1]["Gene symbol"])
+            # print(row)
             # if the match is good then generate a drugclass dict
-            if row[1]["Gene symbol"] == "aac(6')-Ib-cr" and row[1]["Method"] in ["EXACTX", "ALLELEX"]: # restrict the calling of quinolone resistance - if not an exact match then is should be considered a partial match
+            if row[1]["Gene symbol"] == "aac(6')-Ib-cr" and row[1]["Method"] in ["EXACTX", "ALLELEX"]: # This is always a partial - unclear
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
             elif row[1]["Method"] in self.MATCH and row[1]["Scope"] == "core" and row[1]["Element type"] == "AMR":
                 drugclass_dict = self.setup_dict(drugclass_dict = drugclass_dict, reftab = reftab, row = row)
             elif row[1]["Method"] not in self.MATCH and row[1]["Scope"] == "core" and row[1]["Element type"] == "AMR":
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
-        
+            elif row[1]["Method"] in self.MATCH and row[1]['Element type'] == 'VIRULENCE':
+                virulence = self._virulence_dict(virulence_dict = virulence, row = row)
         drugclass_dict = self.joins(dict_for_joining=drugclass_dict)
         partials = self.joins(dict_for_joining=partials)
+        virulence = self.joins(dict_for_joining = virulence)
+        return drugclass_dict, partials, virulence
+
+    
+    def save_files(self, path, match, partial, virulence):
         
-        return drugclass_dict, partials
-
-    def get_amr_output(self, path):
-        """
-        check that AMR finder output is present in the correct format.
-        """
-        amr_output = sorted(path.glob("*.out"))
+        files = {'summary_matches.txt': match, 'summary_partials.txt': partial, 'summary_virulence.txt':virulence}
+        for f in files:
+            out = f"{path}/{f}" if path != '' else f"{f}"
+            self.logger.info(f"Saving {out}")
+            files[f].set_index('Isolate').to_csv(f"{out}", sep = '\t')
+        return True
         
-        if amr_output != []:
-            return amr_output
-        else:
-            print(
-                "You do not have any AMR finder output. Please check your settings and try again."
-            )
-            raise SystemExit
 
-    def save_files(self, path, tosave):
-        # print(tosave)
-        tosave.to_csv(path, sep = '\t')
+    def _get_reftab(self):
+        """
+        get reftab
+        """
 
-    def collate(self):
+        reftab = pandas.read_csv(self.REFGENES)
+        reftab = reftab.fillna("-")
+
+        return reftab
+
+    def collate(self, prefix = ''):
         """
         if the refgenes.csv is present then proceed to collate data and save the csv files.
         """
+
+        
+        reftab = self._get_reftab()
+        
+        df = pandas.read_csv(f"{prefix}/amrfinder.out", sep="\t")
+        self.logger.info(f"Opened amrfinder output for {prefix}")
+        drug, partial, virulence = self.get_per_isolate(
+            reftab=reftab, df=df, isolate=prefix
+        )
+        
+        summary_drugs = pandas.DataFrame(drug, index = [0])
+        summary_partial = pandas.DataFrame(partial, index = [0])
+        summary_virulence = pandas.DataFrame(virulence, index = [0])
+        return summary_drugs, summary_partial,summary_virulence
         
     
-    
-        if self.REFGENES.exists():
-            reftab = pandas.read_csv(self.REFGENES)
-            reftab = reftab.fillna("-")
-            header = list(reftab['enhanced_subclass'].unique())
-            # print(reftab.head())
-            # p = pathlib.Path.cwd()
-            # print(p)
-            # amr_output = self.get_amr_output(path=p)
-            # print(amr_output)
-            summary_drugs = pandas.DataFrame()
-
-            summary_partial = pandas.DataFrame()
-            # print(summary_drugs)
-            # for a in amr_output:
-            
-            # print(a)
-            # print(isolate)
-            df = pandas.read_csv(self.amr_output, sep="\t")
-            # print(df)
-            drug, partial = self.get_per_isolate(
-                reftab=reftab, df=df, isolate=self.isolate
-            )
-            temp_drug = pandas.DataFrame(drug, index=[0])
-            # print(temp_drug)
-            temp_partial = pandas.DataFrame(partial, index=[0])
-            # if summary_drugs.empty:
-            #     summary_drugs = temp_drug
-            # else:
-            summary_drugs = summary_drugs.append(temp_drug)
-
-            # if summary_partial.empty:
-            #     summary_partial = temp_partial
-            # else:
-            summary_partial = summary_partial.append(temp_partial)
-            summary_drugs = summary_drugs.set_index("Isolate")
-            summary_partial = summary_partial.set_index("Isolate")
-            
-            
-            return summary_drugs, summary_partial
+    def _combine_df(self, existing, temp):
+        """
+        combine result dataframes for batch
+        """
+        if existing.empty:
+            existing = temp
         else:
-            print(f"The refgenes DB ({self.REFGENES}) seems to be missing.")
-            raise SystemExit
+            existing = existing.append(temp)
+        
+        return existing
+
+    def _batch_collate(self,input_file):
+
+
+        summary_matches = pandas.DataFrame()
+        summary_partial = pandas.DataFrame()
+        summary_virulence = pandas.DataFrame()
+
+        df = pandas.read_csv(input_file, sep = '\t', header = None)
+        for row in df.iterrows():
+            prefix = f"{row[1][0]}"
+            self.logger.info(f"Collating results for {prefix}")
+            temp_match, temp_partial, temp_virulence = self.collate(prefix = prefix)
+            summary_matches = self._combine_df(existing = summary_matches, temp = temp_match)
+            summary_partial = self._combine_df(existing = summary_partial, temp = temp_partial)
+            summary_virulence = self._combine_df(existing = summary_virulence, temp = temp_virulence)
+        
+        return summary_matches, summary_partial, summary_virulence
 
     def run(self):
 
-        summary_drugs, summary_partial = self.collate( )
 
-        self.save_files(path="summary_matches.txt", tosave=summary_drugs)
-        self.save_files(path="summary_partials.txt", tosave=summary_partial)
+        if not pathlib.Path(self.REFGENES).exists():
+            self.logger.critical(f"The refgenes DB ({self.REFGENES}) seems to be missing.")
+            raise SystemExit
 
-
+        if self.run_type != 'batch':
+            self.logger.info(f"This is a single sample run.")
+            summary_drugs, summary_partial, virulence = self.collate(prefix = self.prefix)
+        else:
+            self.logger.info(f"You are running abritamr in batch mode. Your collated results will be saved.")
+            summary_drugs, summary_partial, virulence = self._batch_collate(input_file = self.input)
+        self.logger.info(f"Saving files now.")
+        self.save_files(path='' if self.run_type == 'batch' else f"{self.prefix}", match = summary_drugs,partial=summary_partial, virulence = virulence)
+        
 class MduCollate(Collate):
-    def __init__(self, qc, db, runid, matches, partials):
-        self.workdir = pathlib.Path.cwd()
-        self.mduqc = self.workdir / f"{qc}"
-        self.db = db
-        self.check_for_mduqc()
-        self.mduqctab = self.mdu_qc_tab()
-        self.passed_partials = partials
-        self.passed_match = matches
-        self.runid = runid
+    def __init__(self, args):
+        self.logger =logging.getLogger(__name__) 
+        self.logger.setLevel(logging.INFO)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        ch.setFormatter(CustomFormatter())
+        fh = logging.FileHandler('abritamr.log')
+        fh.setLevel(logging.INFO)
+        formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p') 
+        fh.setFormatter(formatter)
+        self.logger.addHandler(ch) 
+        self.logger.addHandler(fh)
 
+        self.mduqc = args.qc
+        self.db = args.db
+        self.partials = args.partials
+        self.match = args.matches
+        self.runid = args.runid
         self.NONE_CODES = {
             "Salmonella":"CPase_ESBL_AmpC_16S_NEG",
             "Shigella":"CPase_ESBL_AmpC_16S_NEG",
@@ -245,22 +281,18 @@ class MduCollate(Collate):
         }
 
     def mdu_qc_tab(self):
-        
+        self.logger.info(f"Checking the format of the QC file")
+        cols = ["ISOLATE", 'SPECIES_EXP', 'SPECIES_OBS', 'TEST_QC']
         tab = pandas.read_csv(self.mduqc)
-        
+        tab = tab.rename(columns = {tab.columns[0]: 'ISOLATE'})
+        for c in cols:
+            if c not in list(tab.columns):
+                self.logger.critical(f"There seems to be a problem with your QC file. This file must have {','.join(cols)}. Please check your input and try again.")
+                raise SystemExit
+
         pos = pandas.DataFrame(data = {"ISOLATE": "9999-99888", "TEST_QC" : "PASS", "SPECIES_EXP":"Staphylococcus aureus", "SPECIES_OBS":"Staphylococcus aureus" }, index = [0])
         
         return tab.append(pos)
-
-    def check_for_mduqc(self):
-
-        if self.mduqc.exists():
-            return True
-        else:
-            print(
-                f"It appears you are running mdu-amr in the context of MDU QC, the {self.mduqc} file is not present in {self.workdir}. Please check your settings and try again."
-            )
-            raise SystemExit
 
     def strip_bla(self, gene):
         '''
@@ -272,20 +304,17 @@ class MduCollate(Collate):
             gene = gene.replace("bla", "")
         return gene
 
-    def get_passed_isolates(self, qc_name):
+    def get_passed_isolates(self, qc_tab):
         """
         generate lists of isolates that passed QC and need AMR, failed QC and should have AMR and all other isolates
-        """
-        
-        # print(self.mdu_qc_tab)
-        
+        """        
         failed = list(
-            self.mduqctab[self.mduqctab["TEST_QC"] == False]["ISOLATE"]
+            qc_tab[qc_tab["TEST_QC"] == False]["ISOLATE"]
         )  # isolates that failed qc and should have amr
         passed = list(
-            self.mduqctab[self.mduqctab["TEST_QC"] == True]["ISOLATE"]
-        )  # isolates that failed qc and should have amr
-        # print(passed)
+            qc_tab[qc_tab["TEST_QC"] == True]["ISOLATE"]
+        )  
+
         return (passed, failed)
 
 
@@ -322,11 +351,9 @@ class MduCollate(Collate):
     def reporting_logic(self, row, species, neg_code = True):
         # get all genes found
         all_genes = self.get_all_genes(row)
-        # print(row)
         isodict = row[1].to_dict()
         # determine the genus EXPECTED
         genus = species.split()[0]
-         # A list of reportable genes - TODO move to a class variable
         reportable = [
             "Carbapenemase",
             "Carbapenemase (MBL)",
@@ -339,7 +366,6 @@ class MduCollate(Collate):
             "Vancomycin",
             "Methicillin"
         ]
-        # print(reportable)
         non_caveat_reportable = [
             "Carbapenemase",
             "Aminoglycosides (Ribosomal methyltransferase)",
@@ -361,18 +387,11 @@ class MduCollate(Collate):
         genes_reported = []  # genes for reporting
         genes_not_reported = []  # genes found but not reportable
         for i in isodict:
-            # print(i)
-                        
             genes = []
-            if not isinstance(isodict[i], float):
+            if isinstance(isodict[i], str):
                 genes = isodict[i].split(',')
-                # print(genes)
-            # print(isodict[i])
             if genes != []: # for each bin we do things to genes
-                
                 if i in reportable:
-                    
-                    # print(isodict[i])
                     if i in non_caveat_reportable:
                         genes_reported.extend(genes)
                     elif i == "Carbapenemase (MBL)" and species != "Stenotrophomonas maltophilia":
@@ -404,17 +423,18 @@ class MduCollate(Collate):
 
                 else:
                     genes_not_reported.extend(genes)
-            # print(genes_reported)
         if genes_reported == []:
             genes_reported = [self.none_replacement_code(genus= genus)] if neg_code else ''
         if genes_not_reported == []:
             genes_not_reported = ["No non-reportable genes found."] if neg_code else ''
             # break
-    
+        
+        self.logger.info(f"{row[1]['Isolate']} has {len(genes_reported)} reportable genes.")
         return genes_reported, genes_not_reported
 
 
     def assign_itemcode(self,mduid, reg):
+        self.logger.info(f"Checking for item code")
         m = reg.match(mduid)
         try:
             itemcode = m.group('itemcode') if m.group('itemcode') else ''
@@ -423,6 +443,7 @@ class MduCollate(Collate):
         return itemcode
 
     def assign_mduid(self, mduid, reg):
+        self.logger.info(f"Extracting MDU sample ID")
         m = reg.match(mduid)
         try:
             mduid = m.group('id')
@@ -432,17 +453,17 @@ class MduCollate(Collate):
 
     def mdu_reporting(self, match, neg_code = True):
 
+        self.logger.info(f"Applying MDU business logic {'matches' if neg_code else 'partials'}.")
         mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
         reporting_df = pandas.DataFrame()
-        qc = pandas.read_csv(self.mduqc, sep=None, engine="python")
-        qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
+        qc = self.mdu_qc_tab()
         match_df = pandas.read_csv(match, sep = '\t')
         for row in match_df.iterrows():
             isolate = row[1]['Isolate']
             item_code = self.assign_itemcode(isolate, mduidreg)
             md = self.assign_mduid(isolate, mduidreg)
             d = {"MDU sample ID": md, "Item code" : item_code}
-            qcdf = self.mduqctab[self.mduqctab["ISOLATE"].str.contains(isolate)]
+            qcdf = qc[qc['ISOLATE'].str.contains(isolate)]
             exp_species = qcdf["SPECIES_EXP"].values[0]
             obs_species = qcdf["SPECIES_OBS"].values[0]
            
@@ -470,65 +491,25 @@ class MduCollate(Collate):
         
         return reporting_df.reindex(labels = ['Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs', 'Species_exp', 'db_version'], axis = 'columns')
 
-    def mdu_partials(self, partials):
-        '''
-        split the partial matches into reportable/nonreportable
-        input is a dataframe with partial type as colnames 
-        '''
-        partial_names = ['PARTIALX', 'PARTIAL_CONTIG_ENDX']
-        partial_df = pandas.DataFrame()
-        for row in partials.iterrows:
-            qc = pandas.read_csv(self.mduqc, sep=None, engine="python")
-            qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
-            exp_species = self.mduqctab["SPECIES_EXP"].values[0]
-            obs_species = self.mduqctab["SPECIES_OBS"].values[0]
-            species = obs_species if obs_species == exp_species else exp_species
-            d = {"MDU sample ID": row[0]}
-            
+    
     def save_spreadsheet(
         self,
         passed_match,
         passed_partials,
         
     ):
-        print(self.runid)
         writer = pandas.ExcelWriter(f"{self.runid}_MMS118.xlsx", engine="xlsxwriter")
-
-        
         passed_match.to_excel(writer, sheet_name="MMS118")
         passed_partials.to_excel(writer, sheet_name="Passed QC partial")
-        
-
         writer.close()
-
-
-    def get_single_amr(self, amr_file):
-        '''
-        get a single amr output
-        '''
-        if len(amr_file) > 0:
-            data = pandas.read_csv(amr_file[0], sep = "\t")
-            return data
-        
-   
 
     def run(self):
 
-        passed_match_df = self.mdu_reporting(match=self.passed_match)
-        passed_partials_df = self.mdu_reporting(match = self.passed_partials, neg_code=False)
-        # failed_match_df = self.mdu_reporting(match = failed_match)
-        # failed_partials_df = self.mdu_reporting(match = failed_partials, neg_code=False)
+        passed_match_df = self.mdu_reporting(match=self.match)
+        passed_partials_df = self.mdu_reporting(match = self.partials, neg_code=False)
         self.save_spreadsheet(
             passed_match_df,
             passed_partials_df,
 
         )
-
-if __name__ == "__main__":
-# $params.qc $params.db $params.runid $abritamr_matches $abritamr_partials
-    if len(sys.argv) > 4:
-        c = MduCollate(qc = f"{sys.argv[1]}", db = f"{sys.argv[2]}", runid = f"{sys.argv[3]}", matches = f"{sys.argv[4]}", partials = f"{sys.argv[5]}")
-    else:
-        c = Collate(isolate = f"{sys.argv[1]}", amr_output = f"{sys.argv[2]}")
-    c.run()
 
