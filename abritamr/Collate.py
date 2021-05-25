@@ -255,6 +255,18 @@ class Collate:
         
 class MduCollate(Collate):
     def __init__(self, args):
+        self.logger =logging.getLogger(__name__) 
+        self.logger.setLevel(logging.INFO)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        ch.setFormatter(CustomFormatter())
+        fh = logging.FileHandler('abritamr.log')
+        fh.setLevel(logging.INFO)
+        formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p') 
+        fh.setFormatter(formatter)
+        self.logger.addHandler(ch) 
+        self.logger.addHandler(fh)
+
         self.mduqc = args.qc
         self.db = args.db
         self.partials = args.partials
@@ -271,7 +283,7 @@ class MduCollate(Collate):
     def mdu_qc_tab(self):
         
         tab = pandas.read_csv(self.mduqc)
-        
+        tab = tab.rename(columns = {tab.columns[0]: 'ISOLATE'})
         pos = pandas.DataFrame(data = {"ISOLATE": "9999-99888", "TEST_QC" : "PASS", "SPECIES_EXP":"Staphylococcus aureus", "SPECIES_OBS":"Staphylococcus aureus" }, index = [0])
         
         return tab.append(pos)
@@ -370,7 +382,7 @@ class MduCollate(Collate):
         genes_not_reported = []  # genes found but not reportable
         for i in isodict:
             genes = []
-            if not isinstance(isodict[i], float):
+            if isinstance(isodict[i], str):
                 genes = isodict[i].split(',')
             if genes != []: # for each bin we do things to genes
                 if i in reportable:
@@ -410,7 +422,8 @@ class MduCollate(Collate):
         if genes_not_reported == []:
             genes_not_reported = ["No non-reportable genes found."] if neg_code else ''
             # break
-        self.logger(f"{row[1]['ISOLATE']} has {len(genes_reported)} reportable genes.")
+        
+        self.logger.info(f"{row[1]['Isolate']} has {len(genes_reported)} reportable genes.")
         return genes_reported, genes_not_reported
 
 
@@ -434,18 +447,17 @@ class MduCollate(Collate):
 
     def mdu_reporting(self, match, neg_code = True):
 
-        self.logger(f"Applying MDU business logic {'matches' if neg_code else 'partials'}.")
+        self.logger.info(f"Applying MDU business logic {'matches' if neg_code else 'partials'}.")
         mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
         reporting_df = pandas.DataFrame()
         qc = self.mdu_qc_tab()
-        qc = qc.rename(columns={qc.columns[0]: "ISOLATE"})
         match_df = pandas.read_csv(match, sep = '\t')
         for row in match_df.iterrows():
             isolate = row[1]['Isolate']
             item_code = self.assign_itemcode(isolate, mduidreg)
             md = self.assign_mduid(isolate, mduidreg)
             d = {"MDU sample ID": md, "Item code" : item_code}
-            qcdf = qc[qc["ISOLATE"].str.contains(isolate)]
+            qcdf = qc[qc['ISOLATE'].str.contains(isolate)]
             exp_species = qcdf["SPECIES_EXP"].values[0]
             obs_species = qcdf["SPECIES_OBS"].values[0]
            
