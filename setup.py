@@ -31,7 +31,7 @@ setup(
     python_requires=">=3.7, <4",
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
     zip_safe=False,
-    install_requires=["pandas","toml", "xlsxwriter"],
+    install_requires=["pandas","xlsxwriter"],
     test_suite="nose.collector",
     tests_require=["nose", "pytest"],
     entry_points={
@@ -52,5 +52,5 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
-    package_data={"abritamr": ["templates/*", "db/*", "utils/*", "test/*"]}
+    package_data={"abritamr": ["db/*"]}
 )
