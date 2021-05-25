@@ -281,9 +281,15 @@ class MduCollate(Collate):
         }
 
     def mdu_qc_tab(self):
-        
+        self.logger.info(f"Checking the format of the QC file")
+        cols = ["ISOLATE", 'SPECIES_EXP', 'SPECIES_OBS', 'TEST_QC']
         tab = pandas.read_csv(self.mduqc)
         tab = tab.rename(columns = {tab.columns[0]: 'ISOLATE'})
+        for c in cols:
+            if c not in list(tab.columns):
+                self.logger.critical(f"There seems to be a problem with your QC file. This file must have {','.join(cols)}. Please check your input and try again.")
+                raise SystemExit
+
         pos = pandas.DataFrame(data = {"ISOLATE": "9999-99888", "TEST_QC" : "PASS", "SPECIES_EXP":"Staphylococcus aureus", "SPECIES_OBS":"Staphylococcus aureus" }, index = [0])
         
         return tab.append(pos)
