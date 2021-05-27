@@ -32,7 +32,7 @@ class RunFinder(object):
         generate cmd with parallel
         """
         org = f"--plus --organism {self.organism}" if self.organism != '' else ''
-        cmd = f"parallel -j {self.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out {org}' :::: {self.input}"
+        cmd = f"parallel -j {self.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out {org} --threads 1' :::: {self.input}"
         return cmd
     
     def _single_cmd(self):
@@ -40,7 +40,7 @@ class RunFinder(object):
         generate a single amrfinder command
         """
         org = f"--plus --organism {self.organism}" if self.organism != '' else ''
-        cmd = f"mkdir -p {self.prefix} && amrfinder -n {self.input} -o {self.prefix}/amrfinder.out {org}"
+        cmd = f"mkdir -p {self.prefix} && amrfinder -n {self.input} -o {self.prefix}/amrfinder.out {org} --threads {self.jobs}"
         return cmd
     
     def _check_amrfinder(self):
