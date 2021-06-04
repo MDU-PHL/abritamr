@@ -21,7 +21,7 @@ def deploy(ctx):
     ctx.run("python3 -m twine check dist/*")
     ctx.run("python3 -m twine upload dist/*")
     ctx.run("git push origin --tags")
-    # ctx.run("git push kristy --tags")
+    ctx.run("git push kristy --tags")
 
 @invoke.task
 def gitpush(ctx, message):

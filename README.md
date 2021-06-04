@@ -31,6 +31,9 @@ amrfinder -U (to download and install recent DB)
 If you install using `PyPi` you will need to ensure that AMRFinder plus is installed and DB downloaded properly
 
 ```
+conda create -n abritamr -c bioconda ncbi-amrfinderplus
+conda activate abritamr
+amrfinder -U
 pip3 install abritamr
 ```
 
