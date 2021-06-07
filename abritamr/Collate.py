@@ -77,6 +77,7 @@ class Collate:
         gene_id_col = "Gene symbol" if colname != "refseq_protein_accession" else "Accession of closest sequence"
         
         d = reftab[reftab[colname] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
+        
         if d in self.NONRTM:
             return self.RTM
         elif d in self.MACROLIDES:

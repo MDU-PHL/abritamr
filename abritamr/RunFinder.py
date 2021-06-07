@@ -26,13 +26,14 @@ class RunFinder(object):
         self.run_type = args.run_type
         self.jobs = args.jobs
         self.prefix = args.prefix
-    
+        self.amrfinder_db = os.environ.get('AMRFINDER_DB')
     def _batch_cmd(self):
         """
         generate cmd with parallel
         """
         org = f"--plus --organism {self.organism}" if self.organism != '' else ''
-        cmd = f"parallel -j {self.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out {org} --threads 1' :::: {self.input}"
+        d = f" -d {self.amrfinder_db}" if self.amrfinder_db != '' else ''
+        cmd = f"parallel -j {self.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out {org} --threads 1{d}' :::: {self.input}"
         return cmd
     
     def _single_cmd(self):
@@ -40,22 +41,32 @@ class RunFinder(object):
         generate a single amrfinder command
         """
         org = f"--plus --organism {self.organism}" if self.organism != '' else ''
-        cmd = f"mkdir -p {self.prefix} && amrfinder -n {self.input} -o {self.prefix}/amrfinder.out {org} --threads {self.jobs}"
+        d = f" -d {self.amrfinder_db}" if self.amrfinder_db != '' else ''
+        cmd = f"mkdir -p {self.prefix} && amrfinder -n {self.input} -o {self.prefix}/amrfinder.out {org} --threads {self.jobs}{d}"
         return cmd
     
     def _check_amrfinder(self):
         """
         Check that amrfinder is installed and db setup properly.
         """
-        self.logger.info(f"Now checking AMRfinder setup.")
-        cmd = f"amrfinder --debug"
-        pat = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
-        p = subprocess.run("amrfinder --debug", shell = True, encoding = "utf-8", capture_output = True)
-        m = re.search(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', p.stderr)
-        if m:
-            return True
-        else:
-            return False
+        ok = False
+        if self.amrfinder_db == '':
+            self.logger.warning(f"It seems you don't have the AMRFINDER_DB variable set. Now checking AMRfinder setup. Please note if the AMRFinder DB is not v {self.db} this may cause errors")
+            cmd = f"amrfinder --debug"
+            pat = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
+            p = subprocess.run("amrfinder --debug", shell = True, encoding = "utf-8", capture_output = True)
+            m = re.search(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', p.stderr)
+            if m:
+                ok = True
+            else:
+                ok = False
+        elif self.db in self.amrfinder_db:
+            self.logger.info(f"You seem to have the correct AMRfinder DB setup. Well done!")
+            ok = True
+        
+        return ok
+
+            
 
 
     def _generate_cmd(self):
