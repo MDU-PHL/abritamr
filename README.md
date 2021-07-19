@@ -22,7 +22,7 @@ abriTAMR requires [AMRFinder Plus](https://github.com/ncbi/amr), this can be ins
 ### Conda (recommended)
 
 ```
-conda create -n <name> -c bioconda abritamr 
+conda create -n <name> -c bioconda abritamr=1.0.0
 amrfinder -U (to download and install recent DB)
 ```
 
