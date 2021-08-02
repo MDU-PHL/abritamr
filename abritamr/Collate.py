@@ -474,7 +474,9 @@ class MduCollate(Collate):
             )
             # strip bla
             genes_not_reported = [self.strip_bla(g) for g in genes_not_reported]
+            genes_not_reported = [g for g in genes_not_reported if g != isolate]
             genes_reported = [self.strip_bla(g) for g in genes_reported]
+            genes_reported = [g for g in genes_reported if g != isolate]
             d["Resistance genes (alleles) detected"] = ",".join(genes_reported)
             d["Resistance genes (alleles) det (non-rpt)"] = ",".join(genes_not_reported)
             if qcdf["TEST_QC"].values[0] == 'FAIL': # species not needed for MDU LIMS upload

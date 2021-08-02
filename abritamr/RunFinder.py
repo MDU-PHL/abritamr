@@ -27,6 +27,7 @@ class RunFinder(object):
         self.jobs = args.jobs
         self.prefix = args.prefix
         self.amrfinder_db = os.environ.get('AMRFINDER_DB')
+
     def _batch_cmd(self):
         """
         generate cmd with parallel
@@ -41,7 +42,7 @@ class RunFinder(object):
         generate a single amrfinder command
         """
         org = f"--plus --organism {self.organism}" if self.organism != '' else ''
-        d = f" -d {self.amrfinder_db}" if self.amrfinder_db != '' else ''
+        d = f" -d {self.amrfinder_db}" if self.amrfinder_db else ''
         cmd = f"mkdir -p {self.prefix} && amrfinder -n {self.input} -o {self.prefix}/amrfinder.out {org} --threads {self.jobs}{d}"
         return cmd
     
@@ -50,7 +51,7 @@ class RunFinder(object):
         Check that amrfinder is installed and db setup properly.
         """
         ok = False
-        if self.amrfinder_db == '':
+        if self.amrfinder_db == '' or self.amrfinder_db == None:
             self.logger.warning(f"It seems you don't have the AMRFINDER_DB variable set. Now checking AMRfinder setup. Please note if the AMRFinder DB is not v {self.db} this may cause errors")
             cmd = f"amrfinder --debug"
             pat = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
