@@ -83,6 +83,12 @@ def set_parsers():
         default=f"summary_partials.txt",
         help="Path to partial matches, concatentated output of abritamr",
     )
+    parser_mdu.add_argument(
+        "--sop",
+        default=f"general",
+        choices = ['general', 'salmonella'],
+        help="The MDU pipeline for reporting results."
+    )
 
     
     

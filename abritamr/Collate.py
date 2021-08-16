@@ -305,19 +305,6 @@ class MduCollate(Collate):
             gene = gene.replace("bla", "")
         return gene
 
-    def get_passed_isolates(self, qc_tab):
-        """
-        generate lists of isolates that passed QC and need AMR, failed QC and should have AMR and all other isolates
-        """        
-        failed = list(
-            qc_tab[qc_tab["TEST_QC"] == False]["ISOLATE"]
-        )  # isolates that failed qc and should have amr
-        passed = list(
-            qc_tab[qc_tab["TEST_QC"] == True]["ISOLATE"]
-        )  
-
-        return (passed, failed)
-
 
     # Carbapenemase to be reported for all cases
     # Carbapenemase (MBL) all in all HOWEVER if blaL1 should  not be reported in Stenotrophomonas maltophilia
@@ -348,8 +335,36 @@ class MduCollate(Collate):
         else:
             return "GENRL_AMR_NEG1"
 
+    # def reporting_logic_salmonella(self, row, species):
 
-    def reporting_logic(self, row, species, neg_code = True):
+    #     # Ampicillin - ResMech	Ampicillin - Interpretation	
+    #     # Cefotaxime (ESBL) - ResMech	Cefotaxime (ESBL) - Interpretation	
+    #     # Cefotaxime (AmpC) - ResMech	Cefotaxime (AmpC) - Interpretation	
+    #     # Tetracycline - ResMech	Tetracycline - Interpretation	
+    #     # Gentamycin - ResMech	Gentamycin - Interpretation	
+    #     # Sulfathiazole - ResMech	Sulfathiazole - Interpretation	
+    #     # Trimethoprim - ResMech	Trimethoprim - Interpretation	
+    #     # Ciprofloxacin - ResMech	Ciprofloxacin - Interpretation	
+    #     # Azithromycin - ResMech	Azithromycin - Interpretation
+
+    
+    #     classes_with_interpretation = {
+    #         "Ampicillin": [ 'Beta-lactamase (not ESBL or carbapenemase)', 'Beta-lactamase (narrow-spectrum)'],
+    #         "Cefotaxime (ESBL)": [ "ESBL"],
+    #         "Cefotaxime (AmpC)": ["ESBL (AmpC type)"],
+    #         "Carbapenem" : ["Carbapenemase", "Carbapenemase (MBL)", "Carbapenemase OXA-51 family"]
+    #         "Azithromycin":['Macrolide, lincosamide and/or streptogramin resistance'],
+    #         "Gentamicin":["Other aminoglycoside resistance (non-RMT)"],
+    #         "Tetracycline":["Tetracycline"],
+    #         "Ciprofloxacin":["Quinolone", "Phenicol/Quinolone", "Amikacin/Quinolone"],
+    #         "Sulfathiazole":["Sulfonamide"],
+    #         "Trimethoprim":["Trimethoprim"]
+    #     }
+    #     classes_other = ["Aminoglycosides (Ribosomal methyltransferase)","Colistin"]
+
+
+
+    def reporting_logic_general(self, row, species, neg_code = True):
         # get all genes found
         all_genes = self.get_all_genes(row)
         isodict = row[1].to_dict()
@@ -389,38 +404,39 @@ class MduCollate(Collate):
         genes_not_reported = []  # genes found but not reportable
         for i in isodict:
             genes = []
-            if isinstance(isodict[i], str):
-                genes = isodict[i].split(',')
-            if genes != []: # for each bin we do things to genes
-                if i in reportable:
-                    if i in non_caveat_reportable:
-                        genes_reported.extend(genes)
-                    elif i == "Carbapenemase (MBL)" and species != "Stenotrophomonas maltophilia":
-                        genes_reported.extend(genes)
-                    elif i == "Carbapenemase (MBL)" and species == "Stenotrophomonas maltophilia":
-                         # if species is "Stenotrophomonas maltophilia" don't report blaL1
-                        genes_reported.extend([g for g in genes if not g.startswith("blaL1")])
-                        genes_not_reported.extend([g for g in genes if g.startswith("blaL1")])
-                    elif i == "Carbapenemase (OXA-51 family)" and species not in abacter_excluded:
-                        genes_reported.extend(genes)
-                    elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Salmonella"]: 
-                        genes_reported.extend(genes)
-                    elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Shigella"]: 
-                        genes_reported.extend([g for g in genes if "blaEC" not in g])
-                        genes_not_reported.extend([g for g in genes if "blaEC" in g]) # don't report blaEC for shigella
-                    elif i == "Oxazolidinone & phenicol resistance":
-                        if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
+            if i != 'Isolate':
+                if isinstance(isodict[i], str):
+                    genes = isodict[i].split(',')
+                if genes != []: # for each bin we do things to genes
+                    if i in reportable:
+                        if i in non_caveat_reportable:
                             genes_reported.extend(genes)
+                        elif i == "Carbapenemase (MBL)" and species != "Stenotrophomonas maltophilia":
+                            genes_reported.extend(genes)
+                        elif i == "Carbapenemase (MBL)" and species == "Stenotrophomonas maltophilia":
+                            # if species is "Stenotrophomonas maltophilia" don't report blaL1
+                            genes_reported.extend([g for g in genes if not g.startswith("blaL1")])
+                            genes_not_reported.extend([g for g in genes if g.startswith("blaL1")])
+                        elif i == "Carbapenemase (OXA-51 family)" and species not in abacter_excluded:
+                            genes_reported.extend(genes)
+                        elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Salmonella"]: 
+                            genes_reported.extend(genes)
+                        elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Shigella"]: 
+                            genes_reported.extend([g for g in genes if "blaEC" not in g])
+                            genes_not_reported.extend([g for g in genes if "blaEC" in g]) # don't report blaEC for shigella
+                        elif i == "Oxazolidinone & phenicol resistance":
+                            if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
+                                genes_reported.extend(genes)
+                            else:
+                                genes_not_reported.extend(genes)
+                        elif i == "Vancomycin":
+                            genes_reported.extend([g for g in genes if van_match.match(g)])
+                            genes_not_reported.extend([g for g in genes if not van_match.match(g)])
+                        elif i == "Methicillin":
+                            genes_reported.extend([g for g in genes if mec_match.match(g)])
+                            genes_not_reported.extend([g for g in genes if not mec_match.match(g)])
                         else:
                             genes_not_reported.extend(genes)
-                    elif i == "Vancomycin":
-                        genes_reported.extend([g for g in genes if van_match.match(g)])
-                        genes_not_reported.extend([g for g in genes if not van_match.match(g)])
-                    elif i == "Methicillin":
-                        genes_reported.extend([g for g in genes if mec_match.match(g)])
-                        genes_not_reported.extend([g for g in genes if not mec_match.match(g)])
-                    else:
-                        genes_not_reported.extend(genes)
 
                 else:
                     genes_not_reported.extend(genes)
@@ -452,7 +468,9 @@ class MduCollate(Collate):
             mduid = mduid.split('/')[-1]
         return mduid
 
-    def mdu_reporting(self, match, neg_code = True):
+    
+
+    def mdu_reporting_general(self, match, neg_code = True):
 
         self.logger.info(f"Applying MDU business logic {'matches' if neg_code else 'partials'}.")
         mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
@@ -469,9 +487,10 @@ class MduCollate(Collate):
             obs_species = qcdf["SPECIES_OBS"].values[0]
            
             species = obs_species if obs_species == exp_species else exp_species
-            genes_reported, genes_not_reported = self.reporting_logic(
+            genes_reported, genes_not_reported = self.reporting_logic_general(
                 row=row, species=species, neg_code=neg_code
             )
+            
             # strip bla
             genes_not_reported = [self.strip_bla(g) for g in genes_not_reported]
             genes_not_reported = [g for g in genes_not_reported if g != isolate]
@@ -508,8 +527,8 @@ class MduCollate(Collate):
 
     def run(self):
 
-        passed_match_df = self.mdu_reporting(match=self.match)
-        passed_partials_df = self.mdu_reporting(match = self.partials, neg_code=False)
+        passed_match_df = self.mdu_reporting_general(match=self.match)
+        passed_partials_df = self.mdu_reporting_general(match = self.partials)
         self.save_spreadsheet(
             passed_match_df,
             passed_partials_df,

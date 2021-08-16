@@ -158,6 +158,7 @@ class SetupMDU(Setup):
         self.runid = args.runid
         self.matches = args.matches
         self.partials = args.partials   
+        self.sop = args.sop
 
     def _check_runid(self):
         if self.runid == '':
@@ -172,10 +173,10 @@ class SetupMDU(Setup):
         """
         self._check_runid()
 
-        Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid'])
+        Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid', 'sop'])
 
         if self.file_present(self.qc) and self.file_present(self.matches) and self.file_present(self.partials) and self._check_runid():
-            return Data(self.qc, self.matches, self.partials, self.db, self.runid)
+            return Data(self.qc, self.matches, self.partials, self.db, self.runid, self.sop)
         else:
             self.logger.critical(f"Something has gone wrong with your inputs. Please try again!")
             raise SystemExit
