@@ -376,7 +376,7 @@ class MduCollate(Collate):
             "Ampicillin": [ 'Beta-lactamase (not ESBL or carbapenemase)', 'Beta-lactamase (narrow-spectrum)'],
             "Cefotaxime (ESBL)": [ "ESBL"],
             "Cefotaxime (AmpC)": ["ESBL (AmpC type)"],
-            "Carbapenem" : ["Carbapenemase", "Carbapenemase (MBL)", "Carbapenemase OXA-51 family"]
+            "Carbapenem" : ["Carbapenemase", "Carbapenemase (MBL)", "Carbapenemase OXA-51 family"],
             "Azithromycin":['Macrolide, lincosamide and/or streptogramin resistance'],
             "Gentamicin":["Other aminoglycoside resistance (non-RMT)"],
             "Tetracycline":["Tetracycline"],
@@ -601,7 +601,7 @@ class MduCollate(Collate):
         passed_match.to_excel(writer, sheet_name="MMS118")
         passed_partials.to_excel(writer, sheet_name="Passed QC partial")
         writer.close()
-        
+
     def save_spreadsheet_interpreted(self, results):
         self.logger(f"Saving MMS184")
         writer = pandas.ExcelWriter(f"{self.runid}_MMS184.xlsx", engine = "xlsxwriter")
