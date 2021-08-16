@@ -267,7 +267,7 @@ class MduCollate(Collate):
         fh.setFormatter(formatter)
         self.logger.addHandler(ch) 
         self.logger.addHandler(fh)
-
+        self.sop = args.sop
         self.mduqc = args.qc
         self.db = args.db
         self.partials = args.partials
@@ -335,33 +335,107 @@ class MduCollate(Collate):
         else:
             return "GENRL_AMR_NEG1"
 
-    # def reporting_logic_salmonella(self, row, species):
+    def assign_itemcode(self,mduid, reg):
+        self.logger.info(f"Checking for item code")
+        m = reg.match(mduid)
+        try:
+            itemcode = m.group('itemcode') if m.group('itemcode') else ''
+        except AttributeError:
+            itemcode = ''
+        return itemcode
 
-    #     # Ampicillin - ResMech	Ampicillin - Interpretation	
-    #     # Cefotaxime (ESBL) - ResMech	Cefotaxime (ESBL) - Interpretation	
-    #     # Cefotaxime (AmpC) - ResMech	Cefotaxime (AmpC) - Interpretation	
-    #     # Tetracycline - ResMech	Tetracycline - Interpretation	
-    #     # Gentamycin - ResMech	Gentamycin - Interpretation	
-    #     # Sulfathiazole - ResMech	Sulfathiazole - Interpretation	
-    #     # Trimethoprim - ResMech	Trimethoprim - Interpretation	
-    #     # Ciprofloxacin - ResMech	Ciprofloxacin - Interpretation	
-    #     # Azithromycin - ResMech	Azithromycin - Interpretation
+    def assign_mduid(self, mduid, reg):
+        self.logger.info(f"Extracting MDU sample ID")
+        m = reg.match(mduid)
+        try:
+            mduid = m.group('id')
+        except AttributeError:
+            mduid = mduid.split('/')[-1]
+        return mduid
 
+
+    def reporting_logic_salmonella(self, row):
+
+        # Ampicillin - ResMech	Ampicillin - Interpretation	
+        # Cefotaxime (ESBL) - ResMech	Cefotaxime (ESBL) - Interpretation	
+        # Cefotaxime (AmpC) - ResMech	Cefotaxime (AmpC) - Interpretation	
+        # Tetracycline - ResMech	Tetracycline - Interpretation	
+        # Gentamycin - ResMech	Gentamycin - Interpretation	
+        # Sulfathiazole - ResMech	Sulfathiazole - Interpretation	
+        # Trimethoprim - ResMech	Trimethoprim - Interpretation	
+        # Ciprofloxacin - ResMech	Ciprofloxacin - Interpretation	
+        # Azithromycin - ResMech	Azithromycin - Interpretation
+
+        mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
+        all_genes = self.get_all_genes(row)
+        isodict = row[1].to_dict()
+        item_code = self.assign_itemcode(row[1]['Isolate'], mduidreg)
+        md = self.assign_mduid(row[1]['Isolate'], mduidreg)
+
+        abx_with_interpretation = {
+            "Ampicillin": [ 'Beta-lactamase (not ESBL or carbapenemase)', 'Beta-lactamase (narrow-spectrum)'],
+            "Cefotaxime (ESBL)": [ "ESBL"],
+            "Cefotaxime (AmpC)": ["ESBL (AmpC type)"],
+            "Carbapenem" : ["Carbapenemase", "Carbapenemase (MBL)", "Carbapenemase OXA-51 family"]
+            "Azithromycin":['Macrolide, lincosamide and/or streptogramin resistance'],
+            "Gentamicin":["Other aminoglycoside resistance (non-RMT)"],
+            "Tetracycline":["Tetracycline"],
+            "Ciprofloxacin":["Quinolone", "Phenicol/Quinolone", "Amikacin/Quinolone"],
+            "Sulfathiazole":["Sulfonamide"],
+            "Trimethoprim":["Trimethoprim"]
+        }
+        classes_other = ["Aminoglycosides (Ribosomal methyltransferase)","Colistin"]
+        
+        results = {
+            "Ampicillin - ResMech":[],	
+            "Cefotaxime (ESBL) - ResMech":[],
+            "Cefotaxime (AmpC) - ResMech":[],
+            "Tetracycline - ResMech":[],
+            "Gentamycin - ResMech":[],
+            "Sulfathiazole - ResMech":[],
+            "Trimethoprim - ResMech":[],
+            "Ciprofloxacin - ResMech":[],
+            "Azithromycin - ResMech":[],
+            "Aminoglycosides (Ribosomal methyltransferase)":[],"Colistin":[], "Other":[]
+        }
+        # for drug classes with an interpretation
+        for ab in abx_with_interpretation:
+            for cl in abx_with_interpretation[ab]:
+                if cl in isodict:
+                    for d in isodict[cl].split(','):
+                        results[f"{cl} - ResMech"].append(d)
+                del isodict[cl] # remove anything that has been assigned.
     
-    #     classes_with_interpretation = {
-    #         "Ampicillin": [ 'Beta-lactamase (not ESBL or carbapenemase)', 'Beta-lactamase (narrow-spectrum)'],
-    #         "Cefotaxime (ESBL)": [ "ESBL"],
-    #         "Cefotaxime (AmpC)": ["ESBL (AmpC type)"],
-    #         "Carbapenem" : ["Carbapenemase", "Carbapenemase (MBL)", "Carbapenemase OXA-51 family"]
-    #         "Azithromycin":['Macrolide, lincosamide and/or streptogramin resistance'],
-    #         "Gentamicin":["Other aminoglycoside resistance (non-RMT)"],
-    #         "Tetracycline":["Tetracycline"],
-    #         "Ciprofloxacin":["Quinolone", "Phenicol/Quinolone", "Amikacin/Quinolone"],
-    #         "Sulfathiazole":["Sulfonamide"],
-    #         "Trimethoprim":["Trimethoprim"]
-    #     }
-    #     classes_other = ["Aminoglycosides (Ribosomal methyltransferase)","Colistin"]
+        
+        for ab in abx_with_interpretation:
+            if 'Ciprofloxacin' == ab:
+                if results[f"{ab} - ResMech"] == []:
+                    results[f"{ab} - Interpretation"] = 'Susceptible'
+                elif len(results[f"{ab} - ResMech"]) == 1:
+                    results[f"{ab} - Interpretation"] = 'Intermediate'
+                else:
+                    results[f"{ab} - Interpretation"] = 'Resistant'
+            else:
+                if results[f"{ab} - ResMech"] == []:
+                    results[f"{ab} - Interpretation"] = 'Susceptible'
+                else:
+                    results[f"{ab} - Interpretation"] = 'Resistant'
+            results[f"{ab} - ResMech"] = ','.join(results[f"{ab} - ResMech"])
+        # for drugs which have no interpretation
+        for i in isodict:
+            if i in classes_other:
+                results[i] = isodict[i]
+            else:
+                for d in isodict[i].split(','):
+                    results['Other'].append(d)
+        results['Other'] = ','.join(results['Other'])
+        results['MDU Sample ID'] = md
+        results['Item code'] = item_code
+        results['Isolate'] = row[1]['Isolate']
 
+        return results
+
+            
 
 
     def reporting_logic_general(self, row, species, neg_code = True):
@@ -449,26 +523,28 @@ class MduCollate(Collate):
         self.logger.info(f"{row[1]['Isolate']} has {len(genes_reported)} reportable genes.")
         return genes_reported, genes_not_reported
 
+    def mdu_reporting_salmonella(self, match):
 
-    def assign_itemcode(self,mduid, reg):
-        self.logger.info(f"Checking for item code")
-        m = reg.match(mduid)
-        try:
-            itemcode = m.group('itemcode') if m.group('itemcode') else ''
-        except AttributeError:
-            itemcode = ''
-        return itemcode
+        self.logger.info(f"Applying MDU business logic for interpretation of  Salmonella AST")
+        cols = ["Isolate", "MDU Sample ID", "Item code", "Ampicillin - ResMech", "Ampicillin - Interpretation","Cefotaxime (ESBL) - ResMech","Cefotaxime (ESBL) - Interpretation","Cefotaxime (AmpC) - ResMech","Cefotaxime (AmpC) - Interpretation",
+            "Tetracycline - ResMech","Tetracycline - Interpretation","Gentamycin - ResMech","Gentamycin - Interpretation","Sulfathiazole - ResMech","Sulfathiazole - Interpretation","Trimethoprim - ResMech","Trimethoprim - Interpretation",
+            "Ciprofloxacin - ResMech","Ciprofloxacin - Interpretation","Azithromycin - ResMech","Azithromycin - Interpretation","Aminoglycosides (Ribosomal methyltransferase)","Colistin", "Other"]
+        # select passed Salmonella
+        qc = self.mdu_qc_tab()
+        qc = qc[(qc['SPECIES_OBS'] == 'Salmonella enterica') & (qc['TEST_QC'] == 'PASS')]
 
-    def assign_mduid(self, mduid, reg):
-        self.logger.info(f"Extracting MDU sample ID")
-        m = reg.match(mduid)
-        try:
-            mduid = m.group('id')
-        except AttributeError:
-            mduid = mduid.split('/')[-1]
-        return mduid
+        df = pandas.read_csv(match, sep = '\t')
+        df = df[df['Isolate'].isin(list(qc['ISOLATE']))]
+        result_df = pandas.DataFrame()
 
-    
+        for row in df.iterrows():
+            isolate_results = self.reporting_logic_salmonella(row = row)
+            tmpdf = pandas.DataFrame(isolate_results, index = [0])
+            if result_df.empty:
+                result_df = tmpdf
+            else:
+                result_df = result_df.append(tmpdf)
+        return result_df[cols]
 
     def mdu_reporting_general(self, match, neg_code = True):
 
@@ -514,24 +590,33 @@ class MduCollate(Collate):
         return reporting_df.reindex(labels = ['Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs', 'Species_exp', 'db_version'], axis = 'columns')
 
     
-    def save_spreadsheet(
+    def save_spreadsheet_general(
         self,
         passed_match,
         passed_partials,
         
     ):
+        self.logger.info(f"Saving MMS118.")
         writer = pandas.ExcelWriter(f"{self.runid}_MMS118.xlsx", engine="xlsxwriter")
         passed_match.to_excel(writer, sheet_name="MMS118")
         passed_partials.to_excel(writer, sheet_name="Passed QC partial")
         writer.close()
+        
+    def save_spreadsheet_interpreted(self, results):
+        self.logger(f"Saving MMS184")
+        writer = pandas.ExcelWriter(f"{self.runid}_MMS184.xlsx", engine = "xlsxwriter")
+        results.to_excel(writer, sheet_name = "MMS184")
+        writer.close()
 
     def run(self):
+        if self.sop == 'general':
+            passed_match_df = self.mdu_reporting_general(match=self.match)
+            passed_partials_df = self.mdu_reporting_general(match = self.partials)
+            self.save_spreadsheet_general(
+                passed_match_df,
+                passed_partials_df
+            )
+        elif self.sop == 'salmonella':
 
-        passed_match_df = self.mdu_reporting_general(match=self.match)
-        passed_partials_df = self.mdu_reporting_general(match = self.partials)
-        self.save_spreadsheet(
-            passed_match_df,
-            passed_partials_df,
-
-        )
-
+            salmo_df = self.mdu_reporting_salmonella(match = self.match)
+            self.save_spreadsheet_interpreted(results = salmo_df)
