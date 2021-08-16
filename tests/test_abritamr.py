@@ -116,13 +116,13 @@ def test_setup_fail():
             amr_obj.setup()
 
 # Test SetupMDU
-MDU = collections.namedtuple('MDU', ['runid', 'matches', 'partial', 'qc'])
+MDU = collections.namedtuple('MDU', ['runid', 'matches', 'partials', 'qc', 'sop'])
 def test_prefix_string():
     """
     assert True when non-empty string is given
     """
     with patch.object(SetupAMR, "__init__", lambda x: None):
-        args = MDU("RUNID", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv')
+        args = MDU("RUNID", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general')
         amr_obj = SetupMDU(args)
         # amr_obj.runid= 
         amr_obj.logger = logging.getLogger(__name__)
@@ -133,7 +133,7 @@ def test_prefix_empty():
     assert True when non-empty string is given
     """
     with patch.object(SetupAMR, "__init__", lambda x: None):
-        args = MDU("", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv')
+        args = MDU("", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general')
         amr_obj = SetupMDU(args)
         amr_obj.logger = logging.getLogger(__name__)
         with pytest.raises(SystemExit):
@@ -145,10 +145,10 @@ def test_mdu_setup_success():
     assert True when non-empty string is given
     """
     with patch.object(SetupAMR, "__init__", lambda x: None):
-        args = MDU("RUNID", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv')
+        args = MDU("RUNID", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general')
         amr_obj = SetupMDU(args)
-        Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid'])
-        d = Data(args.qc, args.matches, args.partial, amr_obj.db, args.runid)
+        Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid','sop'])
+        d = Data(args.qc, args.matches, args.partials, amr_obj.db, args.runid, args.sop)
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj.setup() == d
 
@@ -158,10 +158,10 @@ def test_mdu_setup_fail():
     assert True when non-empty string is given
     """
     with patch.object(SetupAMR, "__init__", lambda x: None):
-        args = MDU("RUNID", 'tests/summarymatches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv')
+        args = MDU("RUNID", 'tests/summarymatches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general')
         amr_obj = SetupMDU(args)
         Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid'])
-        d = Data(args.qc, args.matches, args.partial, amr_obj.db, args.runid)
+        d = Data(args.qc, args.matches, args.partials, amr_obj.db, args.runid)
         amr_obj.logger = logging.getLogger(__name__)
         with pytest.raises(SystemExit):
             amr_obj.setup()
