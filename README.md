@@ -19,30 +19,18 @@ _abriTAMR is accredited by NATA for use in reporting the presence of reportable 
 
 abriTAMR requires [AMRFinder Plus](https://github.com/ncbi/amr), this can be installed with `conda` alone or as part of the abriTAMR `conda` installation (see below).
 
-### Conda (recommended)
-
 ```
-conda create -n <name> -c bioconda abritamr=1.0.0
-amrfinder -U (to download and install recent DB)
-```
-
-### PyPi
-
-If you install using `PyPi` you will need to ensure that AMRFinder plus is installed and DB downloaded properly
-
-```
-conda create -n abritamr -c bioconda ncbi-amrfinderplus
+conda create -n abritamr -c bioconda ncbi-amrfinder
 conda activate abritamr
-amrfinder -U
+amrfinder -U (to download and install recent DB)
 pip3 install abritamr
 ```
+
 
 ## Command-line tool
 
 ```bash
-abritamr run [-h] [--contigs CONTIGS] [--prefix PREFIX]
-                    [--species {Acinetobacter_baumannii,Campylobacter,Enterococcus_faecalis,Enterococcus_faecium,Escherichia,Klebsiella,Salmonella,Staphylococcus_aureus,Staphylococcus_pseudintermedius,Streptococcus_agalactiae,Streptococcus_pneumoniae,Streptococcus_pyogenes,Vibrio_cholerae}]
-                    [--jobs JOBS]
+abritamr run --help
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -61,18 +49,20 @@ optional arguments:
                         (default: 16)
 ```
 
-You can also run abriTAMR in `mdu` mode, this will output a spreadsheet which is based on reportable/not-reportable requirements in Victoria. You will need to supply a quality control file (comma separated), with the following columns:
+You can also run abriTAMR in `mdu` mode, this will output a spreadsheet which is based on reportable/not-reportable requirements in Victoria. You will need to supply a quality control file (comma separated) (`-q`), with the following columns:
 
 * ISOLATE
 * SPECIES_EXP (the species that was expected)
 * SPECIES_OBS (the species that was observed during the quality control analysis)
 * TEST_QC (PASS or FAIL)
 
-```abritamr mdu [-h] [--qc QC] [--runid RUNID] [--matches MATCHES]
-                    [--partials PARTIALS]
+`--sop` refers to the type of collation and reporting pipeline
+* general
+  * standard reporting structure for aquired genes, output as reportable and non-reportable
+* salmonella
+  * Inferred AST based on validation undertaken at MDU
 
-optional arguments:
-  -h, --help            show this help message and exit
+```abritamr mdu --help            
   --qc QC, -q QC        Name of checked MDU QC file. (default: )
   --runid RUNID, -r RUNID
                         MDU RunID (default: Run ID)
@@ -82,4 +72,8 @@ optional arguments:
   --partials PARTIALS, -p PARTIALS
                         Path to partial matches, concatentated output of
                         abritamr (default: summary_partials.txt)
+  --sop {general,salmonella}
+                        The MDU pipeline for reporting results. (default:
+                        general)
+
 ```
