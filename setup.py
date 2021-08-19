@@ -1,5 +1,5 @@
 """
-abriTAMR --- AMR Gene Detection for MDU
+abriTAMR --- AMR Gene Detection for Public Health
 """
 from sys import exit, version_info
 from setuptools import setup, find_packages
@@ -19,7 +19,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="abritamr",
-    version="1.0.0",
+    version="1.0.1",
     description="Running AMRFinderPlus for MDU",
     long_description=long_description,
     long_description_content_type="text/markdown",

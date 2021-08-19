@@ -353,7 +353,76 @@ class MduCollate(Collate):
             mduid = mduid.split('/')[-1]
         return mduid
 
+    def _ampicillin_res_sal(self, col, gene):
 
+        if col in [ 'Beta-lactamase (not ESBL or carbapenemase)', 'Beta-lactamase (narrow-spectrum)']:
+            return gene
+        return ''
+    
+    def _cefo_esbl_res_sal(self, col, gene):
+
+        if col == 'ESBL':
+            return gene
+        return ''
+
+    def _cefo_ampc_res_sal(self, col, gene):
+
+        if col == 'ESBL (AmpC type)':
+            return gene
+        return ''
+    
+    def _carbapenem_res_salmo(self, col, gene):
+
+        if col in ["Carbapenemase", "Carbapenemase (MBL)", "Carbapenemase OXA-51 family"]:
+            return gene
+        return ''
+
+    def _azi_res_salmo(self, col, gene):
+
+        if col == 'Macrolide, lincosamide & streptogramin resistance':
+            return gene
+        return ''
+
+    def _gentamicin_res_salm(self, col, gene):
+        if 'Gentamicin' in col or col == "Other aminoglycoside resistance (non-RMT)":
+            return gene
+        return ''
+    
+    def _tetra_res_salmo(self, col, gene):
+
+        if col == 'Tetracycline':
+            return gene
+        return ''
+
+    def _cipro_res_salmo(self, col, gene):
+
+        if 'Quinolone' in col:
+            return gene
+        return ''
+
+    def _sulf_res_salmo(self, col, gene):
+        
+        if col == "Sulfonamide":
+            return gene
+        return ''
+    
+    def _trimet_res_salmo(self, col, gene):
+
+        if col == "Trimethoprim":
+            return gene
+        return ''
+
+    def _rmt_res_salmo(self, col, gene):
+
+        if col == "Aminoglycosides (Ribosomal methyltransferase)":
+            return gene
+        return ''
+
+    def _colistin_res_salmo(self, col, gene):
+        if col == 'Colistin':
+            return gene
+        return ''
+    
     def reporting_logic_salmonella(self, row):
 
         # Ampicillin - ResMech	Ampicillin - Interpretation	
@@ -367,77 +436,78 @@ class MduCollate(Collate):
         # Azithromycin - ResMech	Azithromycin - Interpretation
 
         mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
+        
         all_genes = self.get_all_genes(row)
+        all_genes = [a for a in all_genes if a != row[1]['Isolate'] and a != '']
+        # print(all_genes)
+        
         isodict = row[1].to_dict()
         item_code = self.assign_itemcode(row[1]['Isolate'], mduidreg)
         md = self.assign_mduid(row[1]['Isolate'], mduidreg)
 
-        abx_with_interpretation = {
-            "Ampicillin": [ 'Beta-lactamase (not ESBL or carbapenemase)', 'Beta-lactamase (narrow-spectrum)'],
-            "Cefotaxime (ESBL)": [ "ESBL"],
-            "Cefotaxime (AmpC)": ["ESBL (AmpC type)"],
-            "Carbapenem" : ["Carbapenemase", "Carbapenemase (MBL)", "Carbapenemase OXA-51 family"],
-            "Azithromycin":['Macrolide, lincosamide and/or streptogramin resistance'],
-            "Gentamicin":["Other aminoglycoside resistance (non-RMT)"],
-            "Tetracycline":["Tetracycline"],
-            "Ciprofloxacin":["Quinolone", "Phenicol/Quinolone", "Amikacin/Quinolone"],
-            "Sulfathiazole":["Sulfonamide"],
-            "Trimethoprim":["Trimethoprim"]
+        abx = {
+            "Ampicillin" : self._ampicillin_res_sal,
+            "Cefotaxime (ESBL)":self._cefo_esbl_res_sal,
+            "Cefotaxime (AmpC)":self._cefo_ampc_res_sal,
+            "Carbapenem" :self._carbapenem_res_salmo,
+            "Azithromycin":self._azi_res_salmo,
+            "Gentamicin":self._gentamicin_res_salm,
+            "Tetracycline":self._tetra_res_salmo,
+            "Ciprofloxacin":self._cipro_res_salmo,
+            "Sulfathiazole":self._sulf_res_salmo,
+            "Trimethoprim":self._trimet_res_salmo,
+            "Aminoglycosides (Ribosomal methyltransferase)": self._rmt_res_salmo,
+            "Colistin":self._colistin_res_salmo
         }
-        classes_other = ["Aminoglycosides (Ribosomal methyltransferase)","Colistin"]
+
         
-        results = {
-            "Ampicillin - ResMech":[],	
-            "Cefotaxime (ESBL) - ResMech":[],
-            "Cefotaxime (AmpC) - ResMech":[],
-            "Tetracycline - ResMech":[],
-            "Gentamycin - ResMech":[],
-            "Sulfathiazole - ResMech":[],
-            "Trimethoprim - ResMech":[],
-            "Ciprofloxacin - ResMech":[],
-            "Azithromycin - ResMech":[],
+        tmp_results = {
+            "Ampicillin":[],	
+            "Cefotaxime (ESBL)":[],
+            "Cefotaxime (AmpC)":[],
+            "Tetracycline":[],
+            "Gentamicin":[],
+            "Sulfathiazole":[],
+            "Trimethoprim":[],
+            "Ciprofloxacin":[],
+            "Azithromycin":[],
+            "Carbapenem":[],
             "Aminoglycosides (Ribosomal methyltransferase)":[],"Colistin":[], "Other":[]
         }
-        # for drug classes with an interpretation
-        for ab in abx_with_interpretation:
-            for cl in abx_with_interpretation[ab]:
-                if cl in isodict:
-                    for d in isodict[cl].split(','):
-                        results[f"{cl} - ResMech"].append(d)
-                del isodict[cl] # remove anything that has been assigned.
-    
-        
-        for ab in abx_with_interpretation:
-            if 'Ciprofloxacin' == ab:
-                if results[f"{ab} - ResMech"] == []:
-                    results[f"{ab} - Interpretation"] = 'Susceptible'
-                elif len(results[f"{ab} - ResMech"]) == 1:
-                    results[f"{ab} - Interpretation"] = 'Intermediate'
-                else:
-                    results[f"{ab} - Interpretation"] = 'Resistant'
-            else:
-                if results[f"{ab} - ResMech"] == []:
-                    results[f"{ab} - Interpretation"] = 'Susceptible'
-                else:
-                    results[f"{ab} - Interpretation"] = 'Resistant'
-            results[f"{ab} - ResMech"] = ','.join(results[f"{ab} - ResMech"])
-        # for drugs which have no interpretation
-        for i in isodict:
-            if i in classes_other:
-                results[i] = isodict[i]
-            else:
-                for d in isodict[i].split(','):
-                    results['Other'].append(d)
-        results['Other'] = ','.join(results['Other'])
-        results['MDU Sample ID'] = md
-        results['Item code'] = item_code
-        results['Isolate'] = row[1]['Isolate']
+        # group drugs
+        for ab in abx:
+            for i in isodict:
+                if i != "Isolate":
+                    # print(isodict[i])
+                    g = abx[ab](col = i, gene = isodict[i])
+                    # print(g)
+                    if g != '':
+                        gene_list = g.split(',')
+                        for gene in gene_list:
+                            tmp_results[ab].append(gene)
+                            all_genes.remove(gene)
+        # interprete results
+        tmp_results['Other'] = all_genes
+        results = {'Isolate': row[1]['Isolate'], 'MDU Sample ID':md, 'Item code': item_code}
 
+        for res in tmp_results:
+            results[f"{res} - ResMech"] = ';'.join(tmp_results[res])                
+            if res == 'Ciprofloxacin':
+                if tmp_results[res] == []:
+                    results[f"{res} - Interpretation"] = 'Susceptible'
+                elif len(tmp_results[res]) == 1:
+                    results[f"{res} - Interpretation"] = 'Intermediate'
+                else:
+                    results[f"{res} - Interpretation"] = 'Resistant'
+            elif res not in ["Aminoglycosides (Ribosomal methyltransferase)","Colistin", "Other"]:
+                if tmp_results[res] == []:
+                    results[f"{res} - Interpretation"] = 'Susceptible'
+                else:
+                    results[f"{res} - Interpretation"] = 'Resistant'
+        
         return results
 
             
-
-
     def reporting_logic_general(self, row, species, neg_code = True):
         # get all genes found
         all_genes = self.get_all_genes(row)
@@ -527,8 +597,8 @@ class MduCollate(Collate):
 
         self.logger.info(f"Applying MDU business logic for interpretation of  Salmonella AST")
         cols = ["Isolate", "MDU Sample ID", "Item code", "Ampicillin - ResMech", "Ampicillin - Interpretation","Cefotaxime (ESBL) - ResMech","Cefotaxime (ESBL) - Interpretation","Cefotaxime (AmpC) - ResMech","Cefotaxime (AmpC) - Interpretation",
-            "Tetracycline - ResMech","Tetracycline - Interpretation","Gentamycin - ResMech","Gentamycin - Interpretation","Sulfathiazole - ResMech","Sulfathiazole - Interpretation","Trimethoprim - ResMech","Trimethoprim - Interpretation",
-            "Ciprofloxacin - ResMech","Ciprofloxacin - Interpretation","Azithromycin - ResMech","Azithromycin - Interpretation","Aminoglycosides (Ribosomal methyltransferase)","Colistin", "Other"]
+            "Tetracycline - ResMech","Tetracycline - Interpretation","Gentamicin - ResMech","Gentamicin - Interpretation","Sulfathiazole - ResMech","Sulfathiazole - Interpretation","Trimethoprim - ResMech","Trimethoprim - Interpretation",
+            "Ciprofloxacin - ResMech","Ciprofloxacin - Interpretation","Azithromycin - ResMech","Azithromycin - Interpretation","Aminoglycosides (Ribosomal methyltransferase) - ResMech","Colistin - ResMech", "Other - ResMech"]
         # select passed Salmonella
         qc = self.mdu_qc_tab()
         qc = qc[(qc['SPECIES_OBS'] == 'Salmonella enterica') & (qc['TEST_QC'] == 'PASS')]
@@ -536,7 +606,7 @@ class MduCollate(Collate):
         df = pandas.read_csv(match, sep = '\t')
         df = df[df['Isolate'].isin(list(qc['ISOLATE']))]
         result_df = pandas.DataFrame()
-
+        df = df.fillna('')
         for row in df.iterrows():
             isolate_results = self.reporting_logic_salmonella(row = row)
             tmpdf = pandas.DataFrame(isolate_results, index = [0])
@@ -603,7 +673,7 @@ class MduCollate(Collate):
         writer.close()
 
     def save_spreadsheet_interpreted(self, results):
-        self.logger(f"Saving MMS184")
+        self.logger.info(f"Saving MMS184")
         writer = pandas.ExcelWriter(f"{self.runid}_MMS184.xlsx", engine = "xlsxwriter")
         results.to_excel(writer, sheet_name = "MMS184")
         writer.close()
