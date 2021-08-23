@@ -64,7 +64,7 @@ class Collate:
         """
         for i in dict_for_joining:
             if i != "Isolate":
-                dict_for_joining[i] = list(set(dict_for_joining[i]))
+                dict_for_joining[i] = sorted(list(set(dict_for_joining[i])))
                 dict_for_joining[i] = ",".join(dict_for_joining[i])
 
         return dict_for_joining
