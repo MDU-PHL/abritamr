@@ -51,12 +51,14 @@ class RunFinder(object):
         Check that amrfinder is installed and db setup properly.
         """
         ok = False
+        self.logger.info(f"Checking for amrfinder DB: {self.amrfinder_db} and comparing it to {self.db}")
         if self.amrfinder_db == '' or self.amrfinder_db == None:
             self.logger.warning(f"It seems you don't have the AMRFINDER_DB variable set. Now checking AMRfinder setup. Please note if the AMRFinder DB is not v {self.db} this may cause errors")
-            cmd = f"amrfinder --debug"
+            cmd = f"amrfinder --help"
             pat = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
-            p = subprocess.run("amrfinder --debug", shell = True, encoding = "utf-8", capture_output = True)
+            p = subprocess.run(cmd, shell = True, encoding = "utf-8", capture_output = True)
             m = re.search(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', p.stderr)
+            
             if m:
                 ok = True
             else:
