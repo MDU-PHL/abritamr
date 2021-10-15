@@ -125,8 +125,8 @@ class RunFinder(object):
             self._check_outputs()
             
         else:
-            self.logger.critical(f"It seems that amrfinder is not properly configured. Please check amrfinder documentation (https://github.com/ncbi/amr/wiki/AMRFinderPlus-database) and try again.")
-            raise SystemExit
+            self.logger.critical(f"Your amrfinder database version is NOT {self.db}. abriTAMR will still run but behaviour may not be as expected in terms of binnig genes into the appropriate drug classes.")
+            # raise SystemExit
         Data = collections.namedtuple('Data', ['run_type', 'input', 'prefix'])
         amr_data = Data(self.run_type, self.input, self.prefix)
 
