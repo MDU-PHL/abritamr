@@ -421,7 +421,13 @@ class MduCollate(Collate):
         if col in [ 'Beta-lactamase (not ESBL or carbapenemase)', 'Beta-lactamase (narrow-spectrum)']:
             return gene
         return ''
-    
+
+    def _chloramphenicol_res_sal(self, col, gene):
+
+        if 'phenicol' in col:
+            return gene
+        return ''
+
     def _cefo_esbl_res_sal(self, col, gene):
 
         if col == 'ESBL':
@@ -519,6 +525,7 @@ class MduCollate(Collate):
             "Ciprofloxacin":self._cipro_res_salmo,
             "Sulfathiazole":self._sulf_res_salmo,
             "Trimethoprim":self._trimet_res_salmo,
+            "Chloramphenicol":self._chloramphenicol_res_sal,
             "Aminoglycosides (Ribosomal methyltransferase)": self._rmt_res_salmo,
             "Colistin":self._colistin_res_salmo
         }
@@ -535,6 +542,7 @@ class MduCollate(Collate):
             "Ciprofloxacin":[],
             "Azithromycin":[],
             "Carbapenem":[],
+            "Chloramphenicol":[],
             "Aminoglycosides (Ribosomal methyltransferase)":[],"Colistin":[], "Other":[]
         }
         # group drugs
