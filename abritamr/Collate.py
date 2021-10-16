@@ -185,16 +185,28 @@ class Collate:
             df[c] = df[c].apply(lambda x:f"{x}^")
         return df
 
-    def _merge(self, match, partial, pcols, mcols,shared_cols):
+    def _merge(self, match, partial, pcols, mcols):
 
-
+        df = pandas.DataFrame()
+        tmp = match.merge(partial, on = 'Isolate', how = 'outer')
+        tmp_cols = self._get_cols(df = tmp)
+        for t in tmp_cols:
+            if t.endswith('_x') or t.endswith('_y'):
+                if df.empty:
+                    df = tmp[['Isolate']]
+                c = t.split('_')[0]
+                if c not in list(df.columns):
+                    df[c] = tmp[[f"{c}_x", f"{c}_y"]].apply(lambda x: ','.join(x), axis = 1)
+            else:
+                if df.empty:
+                    df = tmp[['Isolate', t]]
+                else:
+                    df = df.merge(tmp[['Isolate', t]], on = 'Isolate',how = 'outer') 
         
-            
-        pass
-
-
+        return df
 
     def _combine_dfs(self, match, partial, virulence):
+        
         
         pcols = self._get_cols(df = partial)
         mcols = self._get_cols(df = match)
@@ -206,22 +218,10 @@ class Collate:
         if pcols != []:
             partial = self._add_caret(df = partial, cols = pcols)      
         
-        # merge partial and matches
-        shared_cols = list(set(mcols).intersection(pcols))
-        if shared_cols == []:
-            if isinstance(partial, pandas.DataFrame) and isinstance(match, pandas.DataFrame):
-                df = pandas.merge(match, partial)
-            elif isinstance(partial, pandas.DataFrame):
-                df = match
-            else:
-                df = partial
-        else:
-            df = self._merge(match = match, partial = partial, mcols = mcols, pcols = pcols, shared_cols = shared_cols)
+        df = self._merge(match = match, partial = partial, mcols = mcols, pcols = pcols)
 
-
-
-        
-
+        if isinstance(virulence, pandas.DataFrame):
+            df = df.merge(virulence, on = 'Isolate', how = 'outer')      
 
         return df
 
@@ -234,8 +234,9 @@ class Collate:
             self.logger.info(f"Saving {out}")
             files[f].set_index('Isolate').to_csv(f"{out}", sep = '\t')
         combd = self._combine_dfs(match = match, partial = partial, virulence = virulence)
-        combd_out = f"{path}/abritamr.tx" if path != '' else f"abritamr.tx"
+        combd_out = f"{path}/abritamr.txt" if path != '' else f"abritamr.txt"
         self.logger.info(f"Saving combined file : {combd_out}")
+
         combd.set_index('Isolate').to_csv(f"{combd_out}", sep = '\t')
         
         return True
