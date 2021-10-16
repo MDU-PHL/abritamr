@@ -47,16 +47,19 @@ def set_parsers():
         help="If running on a single sample, please provide a prefix for output directory",
     )
     parser_sub_run.add_argument(
+        "--jobs", "-j", default=16, help="Number of AMR finder jobs to run in parallel."
+    )
+    parser_sub_run.add_argument(
+        "--identity", "-i", default='', 
+        help="Set the minimum identity of matches with amrfinder (0 - 1.0). Defaults to amrfinder preset, which is 0.9 unless a curated threshold is present for the gene."
+    )
+    parser_sub_run.add_argument(
         "--species",
         "-sp",
         default="",
         help="Set if you would like to use point mutations, please provide a valid species.",
         choices= ['Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"]
     )
-    parser_sub_run.add_argument(
-        "--jobs", "-j", default=16, help="Number of AMR finder jobs to run in parallel."
-    )
-    
     parser_mdu = subparsers.add_parser('mdu', help='Finalise abritamr results for MDU service', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     
     parser_mdu.add_argument(

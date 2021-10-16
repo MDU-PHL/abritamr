@@ -84,9 +84,10 @@ def test_setup_contigs():
         amr_obj.prefix = 'somename'
         amr_obj.jobs  = 16
         amr_obj.species = ''
+        amr_obj.identity = ''
         amr_obj.logger = logging.getLogger(__name__)
-        T = collections.namedtuple('T', ['run_type', 'input', 'prefix', 'jobs', 'organism'])
-        input_data = T('assembly', amr_obj.contigs, amr_obj.prefix, amr_obj.jobs, amr_obj.species)
+        T = collections.namedtuple('T', ['run_type', 'input', 'prefix', 'jobs', 'organism', 'identity'])
+        input_data = T('assembly', amr_obj.contigs, amr_obj.prefix, amr_obj.jobs, amr_obj.species, amr_obj.identity)
         assert amr_obj.setup() == input_data
 
 
@@ -183,6 +184,7 @@ def test_batch_cmd_no_org():
         amr_obj.jobs = args.jobs
         amr_obj.input = args.input
         amr_obj.amrfinder_db = "2021-06-01.1"
+        amr_obj.identity = ''
         cmd = f"parallel -j {args.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out --plus  --threads 1 -d {amr_obj.amrfinder_db}' :::: {args.input}"
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._batch_cmd() == cmd
@@ -200,6 +202,7 @@ def test_batch_cmd_with_org():
         amr_obj.jobs = args.jobs
         amr_obj.input = args.input
         amr_obj.amrfinder_db = "2021-06-01.1"
+        amr_obj.identity = ''
         cmd = f"parallel -j {args.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out --plus --organism {args.organism} --threads 1 -d {amr_obj.amrfinder_db}' :::: {args.input}"
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._batch_cmd() == cmd
@@ -217,6 +220,7 @@ def test_single_cmd_with_org():
         amr_obj.jobs = args.jobs
         amr_obj.input = args.input
         amr_obj.amrfinder_db = "2021-06-01.1"
+        amr_obj.identity = ''
         cmd = f"mkdir -p {args.prefix} && amrfinder -n {args.input} -o {args.prefix}/amrfinder.out --plus --organism {args.organism} --threads {args.jobs} -d {amr_obj.amrfinder_db}"
         amr_obj.logger = logging.getLogger()
         assert amr_obj._single_cmd() == cmd
@@ -235,6 +239,7 @@ def test_single_cmd_no_org():
         amr_obj.jobs = args.jobs
         amr_obj.input = args.input
         amr_obj.amrfinder_db = "2021-06-01.1"
+        amr_obj.identity = ''
         cmd = f"mkdir -p {args.prefix} && amrfinder -n {args.input} -o {args.prefix}/amrfinder.out --plus  --threads {args.jobs} -d {amr_obj.amrfinder_db}"
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._single_cmd() == cmd
@@ -254,6 +259,7 @@ def test_generate_cmd_single_fail():
         amr_obj.jobs = args.jobs
         amr_obj.input = args.input
         amr_obj.amrfinder_db = "2021-06-01.1"
+        amr_obj.identity = ''
         cmd = f"mkdir -p {args.prefix} && amrfinder -n {args.input} -o {args.prefix}/amrfinder.out -d {amr_obj.amrfinder_db}"
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._generate_cmd() != cmd
@@ -272,6 +278,7 @@ def test_generate_cmd_batch_fail():
         amr_obj.jobs = args.jobs
         amr_obj.input = args.input
         amr_obj.amrfinder_db = "2021-06-01.1"
+        amr_obj.identity = ''
         cmd = f"parallel -j {args.jobs} --colsep '\t' mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out -d {amr_obj.amrfinder_db} :::: {args.input}"
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._generate_cmd() != cmd

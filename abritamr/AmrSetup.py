@@ -67,6 +67,7 @@ class SetupAMR(Setup):
         self.prefix = args.prefix
         # amr
         self.species = args.species if args.species in self.species_list else ""
+        self.identity = args.identity
 
     def _check_prefix(self):
         """
@@ -129,8 +130,9 @@ class SetupAMR(Setup):
         # check that prefix is present (if needed)
         if running_type == 'assembly':
             self._check_prefix()
-        Data = collections.namedtuple('Data', ['run_type', 'input', 'prefix', 'jobs', 'organism'])
-        input_data = Data(running_type, self.contigs, self.prefix, self.jobs, self.species)
+        
+        Data = collections.namedtuple('Data', ['run_type', 'input', 'prefix', 'jobs', 'organism', 'identity'])
+        input_data = Data(running_type, self.contigs, self.prefix, self.jobs, self.species, self.identity)
         
         return input_data
 

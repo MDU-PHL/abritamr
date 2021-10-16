@@ -26,6 +26,7 @@ class RunFinder(object):
         self.run_type = args.run_type
         self.jobs = args.jobs
         self.prefix = args.prefix
+        self.identity = args.identity
         self.amrfinder_db = os.environ.get('AMRFINDER_DB')
 
     def _batch_cmd(self):
@@ -34,7 +35,8 @@ class RunFinder(object):
         """
         org = f"--organism {self.organism}" if self.organism != '' else ''
         d = f" -d {self.amrfinder_db}" if self.amrfinder_db != '' else ''
-        cmd = f"parallel -j {self.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out --plus {org} --threads 1{d}' :::: {self.input}"
+        _id = f" --ident_min {self.identity} " if self.identity != '' else ''
+        cmd = f"parallel -j {self.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out --plus {org} --threads 1{d}{_id}' :::: {self.input}"
         return cmd
     
     def _single_cmd(self):
@@ -43,7 +45,8 @@ class RunFinder(object):
         """
         org = f"--organism {self.organism}" if self.organism != '' else ''
         d = f" -d {self.amrfinder_db}" if self.amrfinder_db else ''
-        cmd = f"mkdir -p {self.prefix} && amrfinder -n {self.input} -o {self.prefix}/amrfinder.out --plus {org} --threads {self.jobs}{d}"
+        _id = f" --ident_min {self.identity} " if self.identity != '' else ''
+        cmd = f"mkdir -p {self.prefix} && amrfinder -n {self.input} -o {self.prefix}/amrfinder.out --plus {org} --threads {self.jobs}{d}{_id}"
         return cmd
     
     def _check_amrfinder(self):
