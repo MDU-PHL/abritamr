@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import pathlib, pandas, math, sys,  re, logging
+
+from pandas.core.algorithms import isin
 from abritamr.CustomLog import CustomFormatter
 
 class Collate:
@@ -8,7 +10,7 @@ class Collate:
     a base class for collation of amrfinder results - to be used when not doing MDU QC
     """
     
-
+    ANNOTATIONS = {'blast':'*','partial':'^','exact':''}
     REFGENES = pathlib.Path(__file__).parent / "db" / "refgenes_latest.csv"
     MATCH = ["ALLELEX", "BLASTX", "EXACTX", "POINTX"]
     NONRTM = [
@@ -104,7 +106,7 @@ class Collate:
         else:
             return reftab[reftab["refseq_protein_accession"] == protein]["gene_family"].values[0]
             
-    def setup_dict(self, drugclass_dict, reftab, row):
+    def setup_dict(self, drugclass_dict, reftab, row, _type = 'exact'):
         """
         return the dictionary for collation
         """
@@ -137,15 +139,15 @@ class Collate:
 
         return drugclass_dict
 
-    def _virulence_dict(self, virulence_dict, row):
+    def _other_dict(self, other_dict, row):
         """
-        report virulence factors
+        report virulence and stress genes
         """
-        if row[1]['Element subtype'] in virulence_dict:
-            virulence_dict[row[1]['Element subtype']].append(row[1]['Gene symbol'])
+        if row[1]['Element subtype'] in other_dict:
+            other_dict[row[1]['Element subtype']].append(row[1]['Gene symbol'])
         else:
-            virulence_dict[row[1]['Element subtype']] = [row[1]['Gene symbol']]
-        return virulence_dict
+            other_dict[row[1]['Element subtype']] = [row[1]['Gene symbol']]
+        return other_dict
 
     def get_per_isolate(self, reftab, df, isolate):
         """
@@ -153,31 +155,89 @@ class Collate:
         """
         drugclass_dict = {"Isolate": isolate}
         partials = {"Isolate": isolate}
-        virulence = {"Isolate": isolate}
+        other = {"Isolate": isolate}
         for row in df.iterrows():
             # print(row)
             # if the match is good then generate a drugclass dict
             if row[1]["Gene symbol"] == "aac(6')-Ib-cr" and row[1]["Method"] in ["EXACTX", "ALLELEX"]: # This is always a partial - unclear
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
-            elif row[1]["Method"] in self.MATCH and row[1]["Scope"] == "core" and row[1]["Element type"] == "AMR":
+            elif row[1]["Method"] in self.MATCH and row[1]["Element type"] == "AMR":
                 drugclass_dict = self.setup_dict(drugclass_dict = drugclass_dict, reftab = reftab, row = row)
-            elif row[1]["Method"] not in self.MATCH and row[1]["Scope"] == "core" and row[1]["Element type"] == "AMR":
+            elif row[1]["Method"] not in self.MATCH and row[1]["Element type"] == "AMR":
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
-            elif row[1]["Method"] in self.MATCH and row[1]['Element type'] == 'VIRULENCE':
-                virulence = self._virulence_dict(virulence_dict = virulence, row = row)
+            else:
+                other = self._other_dict(other_dict = other, row = row)
+            
         drugclass_dict = self.joins(dict_for_joining=drugclass_dict)
         partials = self.joins(dict_for_joining=partials)
-        virulence = self.joins(dict_for_joining = virulence)
-        return drugclass_dict, partials, virulence
+        other = self.joins(dict_for_joining = other)
+        return drugclass_dict, partials, other
 
-    
+    def _get_cols(self, df, _not = 'Isolate'):
+        
+        cols = [c for c in df.columns if c != _not]
+
+        return cols
+
+    def _add_caret(self,df,cols):
+
+        for c in cols:
+            df[c] = df[c].apply(lambda x:f"{x}^")
+        return df
+
+    def _merge(self, match, partial, pcols, mcols,shared_cols):
+
+
+        
+            
+        pass
+
+
+
+    def _combine_dfs(self, match, partial, virulence):
+        
+        pcols = self._get_cols(df = partial)
+        mcols = self._get_cols(df = match)
+        vcols = self._get_cols(df = virulence)
+
+        if vcols == [] and pcols == [] and mcols == []:
+            return pandas.DataFrame()
+
+        if pcols != []:
+            partial = self._add_caret(df = partial, cols = pcols)      
+        
+        # merge partial and matches
+        shared_cols = list(set(mcols).intersection(pcols))
+        if shared_cols == []:
+            if isinstance(partial, pandas.DataFrame) and isinstance(match, pandas.DataFrame):
+                df = pandas.merge(match, partial)
+            elif isinstance(partial, pandas.DataFrame):
+                df = match
+            else:
+                df = partial
+        else:
+            df = self._merge(match = match, partial = partial, mcols = mcols, pcols = pcols, shared_cols = shared_cols)
+
+
+
+        
+
+
+        return df
+
     def save_files(self, path, match, partial, virulence):
         
         files = {'summary_matches.txt': match, 'summary_partials.txt': partial, 'summary_virulence.txt':virulence}
+        
         for f in files:
             out = f"{path}/{f}" if path != '' else f"{f}"
             self.logger.info(f"Saving {out}")
             files[f].set_index('Isolate').to_csv(f"{out}", sep = '\t')
+        combd = self._combine_dfs(match = match, partial = partial, virulence = virulence)
+        combd_out = f"{path}/abritamr.tx" if path != '' else f"abritamr.tx"
+        self.logger.info(f"Saving combined file : {combd_out}")
+        combd.set_index('Isolate').to_csv(f"{combd_out}", sep = '\t')
+        
         return True
         
 
