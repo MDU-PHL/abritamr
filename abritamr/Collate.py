@@ -80,7 +80,7 @@ class Collate:
         
         try:
             d = reftab[reftab[colname] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
-        except IndexError:
+        except:
             d = '-'
         if d in self.NONRTM:
             return self.RTM
@@ -143,10 +143,10 @@ class Collate:
         """
         report virulence and stress genes
         """
-        if row[1]['Element subtype'] in other_dict:
-            other_dict[row[1]['Element subtype']].append(row[1]['Gene symbol'])
+        if row[1]['Element subtype'].capitalize() in other_dict:
+            other_dict[row[1]['Element subtype'].capitalize()].append(row[1]['Gene symbol'])
         else:
-            other_dict[row[1]['Element subtype']] = [row[1]['Gene symbol']]
+            other_dict[row[1]['Element subtype'].capitalize()] = [row[1]['Gene symbol']]
         return other_dict
 
     def get_per_isolate(self, reftab, df, isolate):
@@ -161,9 +161,9 @@ class Collate:
             # if the match is good then generate a drugclass dict
             if row[1]["Gene symbol"] == "aac(6')-Ib-cr" and row[1]["Method"] in ["EXACTX", "ALLELEX"]: # This is always a partial - unclear
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
-            elif row[1]["Method"] in self.MATCH and row[1]["Element type"] == "AMR":
+            elif row[1]["Method"] in self.MATCH and row[1]["Element type"] == "AMR" and row[1]['Element subtype'] != "AMR-SUSCEPTIBLE":
                 drugclass_dict = self.setup_dict(drugclass_dict = drugclass_dict, reftab = reftab, row = row)
-            elif row[1]["Method"] not in self.MATCH and row[1]["Element type"] == "AMR":
+            elif row[1]["Method"] not in self.MATCH and row[1]["Element type"] == "AMR" and row[1]['Element subtype'] != "AMR-SUSCEPTIBLE":
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
             else:
                 other = self._other_dict(other_dict = other, row = row)
@@ -442,7 +442,7 @@ class MduCollate(Collate):
     
     def _carbapenem_res_salmo(self, col, gene):
 
-        if col in ["Carbapenemase", "Carbapenemase (MBL)", "Carbapenemase OXA-51 family"]:
+        if "Carbapenemase" in col:
             return gene
         return ''
 
