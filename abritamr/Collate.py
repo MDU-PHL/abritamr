@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import pathlib, pandas, math, sys,  re, logging, numpy
-
+import warnings
+pandas.options.mode.chained_assignment = None
 # from pandas.core.algorithms import isin
 from abritamr.CustomLog import CustomFormatter
 
@@ -629,8 +630,8 @@ class MduCollate(Collate):
         ]
 
         
-        van_match = re.compile("van[A,B,C,D,E,G,L,M,N][\S]*")
-        mec_match = re.compile("mec[^IR]")
+        van_match = re.compile(r"van[A,B,C,D,E,G,L,M,N][\S]*")
+        mec_match = re.compile(r"mec[^IR]")
         
         genes_reported = []  # genes for reporting
         genes_not_reported = []  # genes found but not reportable

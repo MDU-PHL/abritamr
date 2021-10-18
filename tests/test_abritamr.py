@@ -426,7 +426,7 @@ def test_get_per_isolate():
         df= pandas.read_csv('tests/amrfinder.out', sep = '\t')
         isolate = 'tests'
         amr_obj.logger = logging.getLogger(__name__)
-        assert amr_obj.get_per_isolate(reftab=reftab, df=df, isolate=isolate) == ({"Isolate":isolate, "Beta-lactamase (not ESBL or carbapenemase)":'blaSHV-11','ESBL':'blaCTX-M-15'},{"Isolate":isolate,'ESBL':'blaCTX-M-15'},{"Isolate":isolate,'METAL':'qnrB1'})
+        assert amr_obj.get_per_isolate(reftab=reftab, df=df, isolate=isolate) == ({"Isolate":isolate, "Beta-lactamase (not ESBL or carbapenemase)":'blaSHV-11','ESBL':'blaCTX-M-15'},{"Isolate":isolate,'ESBL':'blaCTX-M-15'},{"Isolate":isolate,'Metal':'qnrB1'})
 
 
 
@@ -442,7 +442,7 @@ def test_collate():
         isolate = 'tests'
         drugs = pandas.DataFrame({"Isolate":isolate,'ESBL': 'blaCTX-M-15', "Beta-lactamase (not ESBL or carbapenemase)":'blaSHV-11'}, index = [0])
         partial = pandas.DataFrame({"Isolate":isolate,'ESBL':'blaCTX-M-15'}, index = [0])
-        virulence = pandas.DataFrame({"Isolate":isolate,'METAL':'qnrB1'}, index = [0])
+        virulence = pandas.DataFrame({"Isolate":isolate,'Metal':'qnrB1'}, index = [0])
         # print(drugs)
         
         amr_obj.logger = logging.getLogger(__name__)
