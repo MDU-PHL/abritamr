@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import pathlib, pandas, math, sys,  re, logging
+import pathlib, pandas, math, sys,  re, logging, numpy
 
-from pandas.core.algorithms import isin
+# from pandas.core.algorithms import isin
 from abritamr.CustomLog import CustomFormatter
 
 class Collate:
@@ -87,9 +87,20 @@ class Collate:
         elif d in self.MACROLIDES:
             return self.MAC
         elif d == "-":
-            return reftab[reftab[colname] == row[1]["Gene symbol"]][
-                "subclass"
-            ].unique()[0]
+            try:
+                return reftab[reftab[colname] == row[1]["Gene symbol"]][
+                    "subclass"
+                ].unique()[0]
+            except:
+                # genbank_protein_accession
+                self.logger.warning(f"There appears to be no refseq accession for this so we will try genbank.")
+                to_return = 'Unknown'
+                for i in ['genbank_protein_accession','refseq_nucleotide_accession','genbank_nucleotide_accession']:
+                    if len(reftab[reftab[i] == row[1]["Gene symbol"]]["subclass"].unique()) >= 1:
+                        return reftab[reftab[i] == row[1]["Gene symbol"]]["subclass"].unique()[0]
+                return to_return
+            
+                
         else:
             return d
 
@@ -100,11 +111,16 @@ class Collate:
         return reftab[reftab["refseq_protein_accession"] == protein]["gene_family"].values[0]
 
     def extract_gene_name(self, protein, reftab):
-
-        if reftab[reftab["refseq_protein_accession"] == protein]["allele"].values[0] != '-':
-            return reftab[reftab["refseq_protein_accession"] == protein]["allele"].values[0]
-        else:
-            return reftab[reftab["refseq_protein_accession"] == protein]["gene_family"].values[0]
+        
+        try:
+            if reftab[reftab["refseq_protein_accession"] == protein]["allele"].values[0] != '-':
+                return reftab[reftab["refseq_protein_accession"] == protein]["allele"].values[0]
+            else:
+                return reftab[reftab["refseq_protein_accession"] == protein]["gene_family"].values[0]
+        except IndexError:
+            for i in ['genbank_protein_accession','refseq_nucleotide_accession','genbank_nucleotide_accession']:
+                if len(reftab[reftab[i] == protein]["gene_family"].unique()) >= 1:
+                    return reftab[reftab[i] == protein]["gene_family"].unique()[0]
             
     def setup_dict(self, drugclass_dict, reftab, row, _type = 'exact'):
         """
@@ -182,7 +198,7 @@ class Collate:
     def _add_caret(self,df,cols):
 
         for c in cols:
-            df[c] = df[c].apply(lambda x:f"{x}^")
+            df[c] = numpy.where(df[c]!="", df[c].str.strip("*") + "^", df[c])
         return df
 
     def _merge(self, match, partial, pcols, mcols):
@@ -207,7 +223,8 @@ class Collate:
 
     def _combine_dfs(self, match, partial, virulence):
         
-        
+        match = match.fillna('')
+        partial = partial.fillna('')
         pcols = self._get_cols(df = partial)
         mcols = self._get_cols(df = match)
         vcols = self._get_cols(df = virulence)

@@ -47,12 +47,23 @@ def set_parsers():
         help="If running on a single sample, please provide a prefix for output directory",
     )
     parser_sub_run.add_argument(
-        "--jobs", "-j", default=16, help="Number of AMR finder jobs to run in parallel."
+        "--jobs", 
+        "-j", 
+        default=16, 
+        help="Number of AMR finder jobs to run in parallel."
     )
     parser_sub_run.add_argument(
-        "--identity", "-i", default='', 
+        "--identity", 
+        "-i", 
+        default='', 
         help="Set the minimum identity of matches with amrfinder (0 - 1.0). Defaults to amrfinder preset, which is 0.9 unless a curated threshold is present for the gene."
     )
+    # parser_sub_run.add_argument(
+    #     "--amrfinder_db", 
+    #     "-d", 
+    #     default=f"{os.environ.get('AMRFINDER_DB')}", 
+    #     help="Path to amrfinder DB to use"
+    # )
     parser_sub_run.add_argument(
         "--species",
         "-sp",

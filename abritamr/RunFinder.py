@@ -122,14 +122,15 @@ class RunFinder(object):
         """
         if self._check_amrfinder():
             self.logger.info(f"All check complete now running AMRFinder")
-            cmd = self._generate_cmd()
-            self.logger.info(f"You are running abritamr in {self.run_type} mode. Now executing : {cmd}")
-            self._run_cmd(cmd)
-            self._check_outputs()
+            
             
         else:
             self.logger.critical(f"Your amrfinder database version is NOT {self.db}. abriTAMR will still run but behaviour may not be as expected in terms of binnig genes into the appropriate drug classes.")
             # raise SystemExit
+        cmd = self._generate_cmd()
+        self.logger.info(f"You are running abritamr in {self.run_type} mode. Now executing : {cmd}")
+        self._run_cmd(cmd)
+        self._check_outputs()
         Data = collections.namedtuple('Data', ['run_type', 'input', 'prefix'])
         amr_data = Data(self.run_type, self.input, self.prefix)
 
