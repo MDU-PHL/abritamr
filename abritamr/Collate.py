@@ -77,33 +77,46 @@ class Collate:
         """
         if the enhanced subclass is in either NONRTM or MACROLIDES then then use the groups specified by Norelle. If it is empty (-) then fall back on the AMRFinder subclass, else report the extended subclass
         """
-        gene_id_col = "Gene symbol" if colname != "refseq_protein_accession" else "Accession of closest sequence"
-        
-        try:
+        gene_id_col = "Gene symbol" if colname != "refseq_protein_accession" else "Accession of closest sequence" # to get the name of drug and the drugclass
+        # print(gene_id_col)
+        print(row[1]['Gene symbol'])
+        # print(colname)
+        # print(reftab[reftab[colname] == row[1][gene_id_col]])
+        if reftab[reftab[colname] == row[1][gene_id_col]].empty:
+            d = 'Unknown'
+            for i in ['genbank_protein_accession','refseq_nucleotide_accession','genbank_nucleotide_accession']:
+                
+                if not reftab[reftab[i] == row[1][gene_id_col]].empty:
+                    d= reftab[reftab[i] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
+                    break
+        else:
+        # try:s
             d = reftab[reftab[colname] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
-        except:
-            d = '-'
-        if d in self.NONRTM:
-            return self.RTM
-        elif d in self.MACROLIDES:
-            return self.MAC
-        elif d == "-":
-            try:
-                return reftab[reftab[colname] == row[1]["Gene symbol"]][
-                    "subclass"
-                ].unique()[0]
-            except:
-                # genbank_protein_accession
-                self.logger.warning(f"There appears to be no refseq accession for this so we will try genbank.")
-                to_return = 'Unknown'
-                for i in ['genbank_protein_accession','refseq_nucleotide_accession','genbank_nucleotide_accession']:
-                    if len(reftab[reftab[i] == row[1]["Gene symbol"]]["subclass"].unique()) >= 1:
-                        return reftab[reftab[i] == row[1]["Gene symbol"]]["subclass"].unique()[0]
-                return to_return
+        # except:
+        #     d = '-'
+        # if d in self.NONRTM:
+        #     return self.RTM
+        # elif d in self.MACROLIDES:
+        #     return self.MAC
+        # elif d == "-":
+        #     try:
+        #         return reftab[reftab[colname] == row[1]["Gene symbol"]][
+        #             "subclass"
+        #         ].unique()[0]
+        #     except:
+        #         # genbank_protein_accession
+        #         self.logger.warning(f"There appears to be no refseq accession for this so we will try genbank.")
+        #         to_return = 'Unknown'
+        #         # self.logger.info('Will now look for the enhanced subclass for ')
+        #         # print(reftab[reftab[colname] == row[1][gene_id_col]])
+        #         for i in ['genbank_protein_accession','refseq_nucleotide_accession','genbank_nucleotide_accession']:
+        #             if len(reftab[reftab[i] == row[1]["Gene symbol"]]["subclass"].unique()) >= 1:
+        #                 return reftab[reftab[i] == row[1]["Gene symbol"]]["subclass"].unique()[0]
+        #         return to_return
             
                 
-        else:
-            return d
+        # else:
+        return d
 
     def extract_bifunctional_name(self, protein, reftab):
         """
@@ -237,9 +250,11 @@ class Collate:
             partial = self._add_caret(df = partial, cols = pcols)      
         
         df = self._merge(match = match, partial = partial, mcols = mcols, pcols = pcols)
-
-        if isinstance(virulence, pandas.DataFrame):
-            df = df.merge(virulence, on = 'Isolate', how = 'outer')      
+        
+        if isinstance(virulence, pandas.DataFrame) and not df.empty:
+            df = df.merge(virulence, on = 'Isolate', how = 'outer') 
+        elif isinstance(virulence, pandas.DataFrame) and df.empty:
+            df = virulence
 
         return df
 
@@ -442,7 +457,7 @@ class MduCollate(Collate):
 
     def _chloramphenicol_res_sal(self, col, gene):
 
-        if 'phenicol' in col:
+        if 'phenicol' in col.lower():
             return gene
         return ''
 
@@ -466,12 +481,27 @@ class MduCollate(Collate):
 
     def _azi_res_salmo(self, col, gene):
 
-        if col == 'Macrolide, lincosamide & streptogramin resistance':
+        if 'Azithromycin' in  col:
             return gene
         return ''
 
     def _gentamicin_res_salm(self, col, gene):
-        if 'Gentamicin' in col or col == "Other aminoglycoside resistance (non-RMT)":
+        if 'Gentamicin' in col:
+            return gene
+        return ''
+    
+    def _kanamycin_res_salm(self, col, gene):
+        if 'Kanamycin' in col:
+            return gene
+        return ''
+    
+    def _streptomycin_res_salm(self, col, gene):
+        if 'Streptomycin' in col:
+            return gene
+        return ''
+    
+    def _spectinomycin_res_salm(self, col, gene):
+        if 'Streptomycin' in col:
             return gene
         return ''
     
@@ -498,6 +528,10 @@ class MduCollate(Collate):
         if col == "Trimethoprim":
             return gene
         return ''
+    
+    def _trim_sulpha_salmo(self, col, gene):
+
+        pass
 
     def _rmt_res_salmo(self, col, gene):
 
@@ -539,10 +573,14 @@ class MduCollate(Collate):
             "Carbapenem" :self._carbapenem_res_salmo,
             "Azithromycin":self._azi_res_salmo,
             "Gentamicin":self._gentamicin_res_salm,
+            "Kanamycin":self._kanamycin_res_salm,
+            "Streptomycin":self._streptomycin_res_salm,
+            "Spectinomycin":self._spectinomycin_res_salm,
             "Tetracycline":self._tetra_res_salmo,
             "Ciprofloxacin":self._cipro_res_salmo,
             "Sulfathiazole":self._sulf_res_salmo,
             "Trimethoprim":self._trimet_res_salmo,
+            "Trim-Sulpha":self._trim_sulpha_salmo,
             "Chloramphenicol":self._chloramphenicol_res_sal,
             "Aminoglycosides (Ribosomal methyltransferase)": self._rmt_res_salmo,
             "Colistin":self._colistin_res_salmo
@@ -557,6 +595,10 @@ class MduCollate(Collate):
             "Gentamicin":[],
             "Sulfathiazole":[],
             "Trimethoprim":[],
+            "Trim-Sulpha":[],
+            "Kanamycin":[],
+            "Streptomycin":[],
+            "Spectinomycin":[],
             "Ciprofloxacin":[],
             "Azithromycin":[],
             "Carbapenem":[],
@@ -564,9 +606,10 @@ class MduCollate(Collate):
             "Aminoglycosides (Ribosomal methyltransferase)":[],"Colistin":[], "Other":[]
         }
         # group drugs
+        # NEED TO ADD in TRIM-SULPHA combo
         for ab in abx:
             for i in isodict:
-                if i != "Isolate":
+                if i != "Isolate" and ab != 'Trim-Sulpha':
                     # print(isodict[i])
                     g = abx[ab](col = i, gene = isodict[i])
                     # print(g)
@@ -575,6 +618,7 @@ class MduCollate(Collate):
                         for gene in gene_list:
                             tmp_results[ab].append(gene)
                             all_genes.remove(gene)
+        
         # interprete results
         tmp_results['Other'] = all_genes
         results = {'Isolate': row[1]['Isolate'], 'MDU Sample ID':md, 'Item code': item_code}
@@ -583,16 +627,16 @@ class MduCollate(Collate):
             results[f"{res} - ResMech"] = ';'.join(tmp_results[res])                
             if res == 'Ciprofloxacin':
                 if tmp_results[res] == []:
-                    results[f"{res} - Interpretation"] = 'Susceptible'
+                    results[f"{res} - Interpret"] = 'Susceptible'
                 elif len(tmp_results[res]) == 1:
-                    results[f"{res} - Interpretation"] = 'Intermediate'
+                    results[f"{res} - Interpret"] = 'Intermediate'
                 else:
-                    results[f"{res} - Interpretation"] = 'Resistant'
+                    results[f"{res} - Interpret"] = 'Resistant'
             elif res not in ["Aminoglycosides (Ribosomal methyltransferase)","Colistin", "Other"]:
                 if tmp_results[res] == []:
-                    results[f"{res} - Interpretation"] = 'Susceptible'
+                    results[f"{res} - Interpret"] = 'Susceptible'
                 else:
-                    results[f"{res} - Interpretation"] = 'Resistant'
+                    results[f"{res} - Interpret"] = 'Resistant'
         
         return results
 
@@ -606,20 +650,25 @@ class MduCollate(Collate):
         reportable = [
             "Carbapenemase",
             "Carbapenemase (MBL)",
+            "Carbapenemase (KPC variant)"
             "Carbapenemase (OXA-51 family)",
             "ESBL",
             "ESBL (AmpC type)",
             "Aminoglycosides (Ribosomal methyltransferase)",
             "Colistin",
-            "Oxazolidinone & phenicol resistance",
+            "Oxazolidinone & phenicol resistance", # Oxazolidinone or linezolid = reportable
             "Vancomycin",
             "Methicillin"
         ]
         non_caveat_reportable = [
             "Carbapenemase",
+            "Carbapenemase (KPC variant)",
             "Aminoglycosides (Ribosomal methyltransferase)",
             "Colistin"
         ]
+        # Carbapenemase (KPC variant)
+# Carbapenemase (MBL)
+# Carbapenemase (OXA-51 family)
 
         abacter_excluded = [
             "Acinetobacter baumannii",
@@ -657,17 +706,17 @@ class MduCollate(Collate):
                         elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Shigella"]: 
                             genes_reported.extend([g for g in genes if "blaEC" not in g])
                             genes_not_reported.extend([g for g in genes if "blaEC" in g]) # don't report blaEC for shigella
-                        elif i == "Oxazolidinone & phenicol resistance":
-                            if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
-                                genes_reported.extend(genes)
-                            else:
-                                genes_not_reported.extend(genes)
                         elif i == "Vancomycin":
                             genes_reported.extend([g for g in genes if van_match.match(g)])
                             genes_not_reported.extend([g for g in genes if not van_match.match(g)])
                         elif i == "Methicillin":
                             genes_reported.extend([g for g in genes if mec_match.match(g)])
                             genes_not_reported.extend([g for g in genes if not mec_match.match(g)])
+                        else:
+                            genes_not_reported.extend(genes)
+                    elif "Oxazolidinone" in i or "Linezolid" in i:
+                        if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
+                            genes_reported.extend(genes)
                         else:
                             genes_not_reported.extend(genes)
 
@@ -685,9 +734,17 @@ class MduCollate(Collate):
     def mdu_reporting_salmonella(self, match):
 
         self.logger.info(f"Applying MDU business logic for interpretation of  Salmonella AST")
-        cols = ["Isolate", "MDU Sample ID", "Item code", "Ampicillin - ResMech", "Ampicillin - Interpretation","Cefotaxime (ESBL) - ResMech","Cefotaxime (ESBL) - Interpretation","Cefotaxime (AmpC) - ResMech","Cefotaxime (AmpC) - Interpretation",
-            "Tetracycline - ResMech","Tetracycline - Interpretation","Gentamicin - ResMech","Gentamicin - Interpretation","Sulfathiazole - ResMech","Sulfathiazole - Interpretation","Trimethoprim - ResMech","Trimethoprim - Interpretation",
-            "Ciprofloxacin - ResMech","Ciprofloxacin - Interpretation","Azithromycin - ResMech","Azithromycin - Interpretation","Aminoglycosides (Ribosomal methyltransferase) - ResMech","Colistin - ResMech", "Other - ResMech"]
+        cols = ["Isolate", "MDU Sample ID", "Item code", 
+        "Ampicillin - ResMech", "Ampicillin - Interpretation",
+        "Cefotaxime (ESBL) - ResMech","Cefotaxime (ESBL) - Interpretation",
+        "Cefotaxime (AmpC) - ResMech","Cefotaxime (AmpC) - Interpretation",
+        "Tetracycline - ResMech","Tetracycline - Interpretation",
+        "Gentamicin - ResMech","Gentamicin - Interpretation",
+        "Sulfathiazole - ResMech","Sulfathiazole - Interpretation",
+        "Trimethoprim - ResMech","Trimethoprim - Interpretation",
+        "Ciprofloxacin - ResMech","Ciprofloxacin - Interpretation",
+        "Azithromycin - ResMech","Azithromycin - Interpretation",
+        "Aminoglycosides (Ribosomal methyltransferase) - ResMech","Colistin - ResMech", "Other - ResMech"]
         # select passed Salmonella
         qc = self.mdu_qc_tab()
         qc = qc[(qc['SPECIES_OBS'] == 'Salmonella enterica') & (qc['TEST_QC'] == 'PASS')]
