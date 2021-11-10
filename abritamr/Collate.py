@@ -269,8 +269,8 @@ class Collate:
         combd = self._combine_dfs(match = match, partial = partial, virulence = virulence)
         combd_out = f"{path}/abritamr.txt" if path != '' else f"abritamr.txt"
         self.logger.info(f"Saving combined file : {combd_out}")
-
-        combd.set_index('Isolate').to_csv(f"{combd_out}", sep = '\t')
+        if not combd.empty:
+            combd.set_index('Isolate').to_csv(f"{combd_out}", sep = '\t')
         
         return True
         
