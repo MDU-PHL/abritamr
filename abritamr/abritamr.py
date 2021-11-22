@@ -119,7 +119,7 @@ def main():
 
     args = set_parsers()
     if vars(args) == {}:
-        parser.print_help(sys.stderr)
+        args.print_help(sys.stderr)
     else:
         args.func(args)
     
