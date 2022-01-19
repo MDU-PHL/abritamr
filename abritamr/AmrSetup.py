@@ -177,7 +177,7 @@ class SetupMDU(Setup):
 
         Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid', 'sop'])
 
-        if self.file_present(self.qc) and self.file_present(self.matches) and self.file_present(self.partials) and self._check_runid():
+        if self.file_present(self.qc) and self.file_present(self.matches) and self._check_runid():
             return Data(self.qc, self.matches, self.partials, self.db, self.runid, self.sop)
         else:
             self.logger.critical(f"Something has gone wrong with your inputs. Please try again!")

@@ -475,22 +475,24 @@ class MduCollate(Collate):
     
     def _carbapenem_res_salmo(self, col, gene):
 
-        if "Carbapenemase" in col:
+        if "Carbapenemase" in col: #not KPC
             return gene
         return ''
 
     def _azi_res_salmo(self, col, gene):
 
-        if 'Azithromycin' in  col:
+        if 'Azithromycin' in  col or col in ['Macrolide', 'Lincosamide/Macrolide/Streptogramin']:
             return gene
         return ''
 
     def _gentamicin_res_salm(self, col, gene):
-        if 'Gentamicin' in col:
+        if 'Gentamicin' in col: #change
             return gene
         return ''
     
     def _kanamycin_res_salm(self, col, gene):
+        # print(gene)
+        # print(col)
         if 'Kanamycin' in col:
             return gene
         return ''
@@ -529,9 +531,9 @@ class MduCollate(Collate):
             return gene
         return ''
     
-    def _trim_sulpha_salmo(self, col, gene):
+    def _trim_sulpha_salmo(self, trim_gene, sul_gene):
 
-        pass
+        return f"{trim_gene},{sul_gene}"
 
     def _rmt_res_salmo(self, col, gene):
 
@@ -560,7 +562,7 @@ class MduCollate(Collate):
         
         all_genes = self.get_all_genes(row)
         all_genes = [a for a in all_genes if a != row[1]['Isolate'] and a != '']
-        # print(all_genes)
+        print(all_genes)
         
         isodict = row[1].to_dict()
         item_code = self.assign_itemcode(row[1]['Isolate'], mduidreg)
@@ -570,7 +572,7 @@ class MduCollate(Collate):
             "Ampicillin" : self._ampicillin_res_sal,
             "Cefotaxime (ESBL)":self._cefo_esbl_res_sal,
             "Cefotaxime (AmpC)":self._cefo_ampc_res_sal,
-            "Carbapenem" :self._carbapenem_res_salmo,
+            "Meropenem" :self._carbapenem_res_salmo,
             "Azithromycin":self._azi_res_salmo,
             "Gentamicin":self._gentamicin_res_salm,
             "Kanamycin":self._kanamycin_res_salm,
@@ -601,42 +603,57 @@ class MduCollate(Collate):
             "Spectinomycin":[],
             "Ciprofloxacin":[],
             "Azithromycin":[],
-            "Carbapenem":[],
+            "Meropenem":[],
             "Chloramphenicol":[],
             "Aminoglycosides (Ribosomal methyltransferase)":[],"Colistin":[], "Other":[]
         }
         # group drugs
         # NEED TO ADD in TRIM-SULPHA combo
         for ab in abx:
-            for i in isodict:
-                if i != "Isolate" and ab != 'Trim-Sulpha':
-                    # print(isodict[i])
-                    g = abx[ab](col = i, gene = isodict[i])
-                    # print(g)
-                    if g != '':
-                        gene_list = g.split(',')
-                        for gene in gene_list:
-                            tmp_results[ab].append(gene)
-                            all_genes.remove(gene)
-        
+            # if ab == 'Trim-Sulpha':
+            #     if 'Trimethoprim' in isodict and 'Sulfathiazole' in isodict:
+            #         g = abx[ab](trim_col = isodict['Trimethoprim'], sul_col = isodict['Sulfathiazole'])
+            #         if g != '':
+            #             gene_list = g.split(',')
+            #             for gene in gene_list:
+            #                 tmp_results[ab].append(gene)
+            if ab != 'Trim-Sulpha':
+                for i in isodict:
+                    if i != "Isolate":
+                        # print(isodict[i])
+                        g = abx[ab](col = i, gene = isodict[i])
+                        # print(g)
+                        if g != '':
+                            gene_list = g.split(',')
+                            for gene in gene_list:
+                                tmp_results[ab].append(gene)
+                                if gene in all_genes:
+                                    all_genes.remove(gene)
+            
         # interprete results
         tmp_results['Other'] = all_genes
         results = {'Isolate': row[1]['Isolate'], 'MDU Sample ID':md, 'Item code': item_code}
-
+        # for Trim-Sulpha
+        
+        if tmp_results['Trimethoprim'] != [] and tmp_results['Sulfathiazole'] != []:
+            tmp_results['Trim-Sulpha'] = list(set(tmp_results['Trimethoprim']).union(tmp_results['Sulfathiazole']))
+        # print(tmp_results)
         for res in tmp_results:
             results[f"{res} - ResMech"] = ';'.join(tmp_results[res])                
-            if res == 'Ciprofloxacin':
+            if res in ["Aminoglycosides (Ribosomal methyltransferase)","Colistin", "Other"]:
+                results[f"{res} - Interpretation"] = ''
+            elif res == 'Ciprofloxacin':
                 if tmp_results[res] == []:
-                    results[f"{res} - Interpret"] = 'Susceptible'
+                    results[f"{res} - Interpretation"] = 'Susceptible'
                 elif len(tmp_results[res]) == 1:
-                    results[f"{res} - Interpret"] = 'Intermediate'
+                    results[f"{res} - Interpretation"] = 'Intermediate'
                 else:
-                    results[f"{res} - Interpret"] = 'Resistant'
+                    results[f"{res} - Interpretation"] = 'Resistant'
             elif res not in ["Aminoglycosides (Ribosomal methyltransferase)","Colistin", "Other"]:
                 if tmp_results[res] == []:
-                    results[f"{res} - Interpret"] = 'Susceptible'
+                    results[f"{res} - Interpretation"] = 'Susceptible'
                 else:
-                    results[f"{res} - Interpret"] = 'Resistant'
+                    results[f"{res} - Interpretation"] = 'Resistant'
         
         return results
 
@@ -734,17 +751,27 @@ class MduCollate(Collate):
     def mdu_reporting_salmonella(self, match):
 
         self.logger.info(f"Applying MDU business logic for interpretation of  Salmonella AST")
-        cols = ["Isolate", "MDU Sample ID", "Item code", 
+        cols = ["MDU Sample ID", "Item code", 
         "Ampicillin - ResMech", "Ampicillin - Interpretation",
         "Cefotaxime (ESBL) - ResMech","Cefotaxime (ESBL) - Interpretation",
         "Cefotaxime (AmpC) - ResMech","Cefotaxime (AmpC) - Interpretation",
         "Tetracycline - ResMech","Tetracycline - Interpretation",
         "Gentamicin - ResMech","Gentamicin - Interpretation",
+        "Kanamycin - ResMech",	"Kanamycin - Interpretation",
+        "Streptomycin - ResMech",	"Streptomycin - Interpretation",
         "Sulfathiazole - ResMech","Sulfathiazole - Interpretation",
         "Trimethoprim - ResMech","Trimethoprim - Interpretation",
+        "Trim-Sulpha - ResMech",	"Trim-Sulpha - Interpretation",
+        "Chloramphenicol - ResMech",	"Chloramphenicol - Interpretation",
         "Ciprofloxacin - ResMech","Ciprofloxacin - Interpretation",
+        "Meropenem - ResMech",	"Meropenem - Interpretation",
         "Azithromycin - ResMech","Azithromycin - Interpretation",
-        "Aminoglycosides (Ribosomal methyltransferase) - ResMech","Colistin - ResMech", "Other - ResMech"]
+        "Aminoglycosides (Ribosomal methyltransferase) - ResMech",
+        "Aminoglycosides (Ribosomal methyltransferase) - Interpretation",
+        "Colistin - ResMech",
+        "Colistin - Interpretation", 
+        "Other - ResMech",
+        "Other - Interpretation"]
         # select passed Salmonella
         qc = self.mdu_qc_tab()
         qc = qc[(qc['SPECIES_OBS'] == 'Salmonella enterica') & (qc['TEST_QC'] == 'PASS')]
@@ -821,11 +848,11 @@ class MduCollate(Collate):
     def save_spreadsheet_interpreted(self, results):
         self.logger.info(f"Saving MMS184")
         writer = pandas.ExcelWriter(f"{self.runid}_MMS184.xlsx", engine = "xlsxwriter")
-        results.to_excel(writer, sheet_name = "MMS184")
+        results.to_excel(writer, sheet_name = "MMS184", index = False)
         writer.close()
 
     def run(self):
-        if self.sop == 'general':
+        if self.sop == 'general' and pathlib.Path(self.partials).exists():
             passed_match_df = self.mdu_reporting_general(match=self.match)
             passed_partials_df = self.mdu_reporting_general(match = self.partials)
             self.save_spreadsheet_general(
