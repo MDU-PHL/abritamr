@@ -100,7 +100,7 @@ def set_parsers():
     parser_mdu.add_argument(
         "--sop",
         default=f"general",
-        choices = ['general', 'salmonella'],
+        choices = ['general', 'plus'],
         help="The MDU pipeline for reporting results."
     )
 

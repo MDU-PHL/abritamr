@@ -14,36 +14,6 @@ class Collate:
     ANNOTATIONS = {'blast':'*','partial':'^','exact':''}
     REFGENES = pathlib.Path(__file__).parent / "db" / "refgenes_latest.csv"
     MATCH = ["ALLELEX", "BLASTX", "EXACTX", "POINTX"]
-    NONRTM = [
-        "Amikacin/Gentamicin/Kanamycin/Tobramycin",
-        "Amikacin/Kanamycin",
-        "Amikacin/Kanamycin/Tobramycin",
-        "Amikacin/Quinolone",
-        "Amikacin/Tobramycin",
-        "Aminoglycosides",
-        "Gentamicin",
-        "Gentamicin/Kanamycin/Tobramycin",
-        "Gentamicin/Tobramcyin",
-        "Kanamycin",
-        "Kanamycin/Tobramycin",
-        "Spectinomycin",
-        "Streptogramin",
-        "Streptomycin",
-        "Streptomycin/Spectinomycin",
-        "Tobramycin",
-    ]
-    MACROLIDES = [
-        "Erythromycin",
-        "Erythromycin/Telithromycin",
-        "Lincosamides",
-        "Lincosamides/Streptogramin",
-        "Macrolides",
-        "Streptogramin",
-    ]
-    RTM = "Other aminoglycoside resistance (non-RMT)"
-    MAC = "Macrolide, lincosamide and/or streptogramin resistance"
-    
-    # amr_data = Data(self.run_type, self.contigs, self.prefix)
 
     def __init__(self, args):
         self.logger =logging.getLogger(__name__) 
@@ -78,10 +48,6 @@ class Collate:
         if the enhanced subclass is in either NONRTM or MACROLIDES then then use the groups specified by Norelle. If it is empty (-) then fall back on the AMRFinder subclass, else report the extended subclass
         """
         gene_id_col = "Gene symbol" if colname != "refseq_protein_accession" else "Accession of closest sequence" # to get the name of drug and the drugclass
-        # print(gene_id_col)
-        print(row[1]['Gene symbol'])
-        # print(colname)
-        # print(reftab[reftab[colname] == row[1][gene_id_col]])
         if reftab[reftab[colname] == row[1][gene_id_col]].empty:
             d = 'Unknown'
             for i in ['genbank_protein_accession','refseq_nucleotide_accession','genbank_nucleotide_accession']:
@@ -90,32 +56,8 @@ class Collate:
                     d= reftab[reftab[i] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
                     break
         else:
-        # try:s
             d = reftab[reftab[colname] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
-        # except:
-        #     d = '-'
-        # if d in self.NONRTM:
-        #     return self.RTM
-        # elif d in self.MACROLIDES:
-        #     return self.MAC
-        # elif d == "-":
-        #     try:
-        #         return reftab[reftab[colname] == row[1]["Gene symbol"]][
-        #             "subclass"
-        #         ].unique()[0]
-        #     except:
-        #         # genbank_protein_accession
-        #         self.logger.warning(f"There appears to be no refseq accession for this so we will try genbank.")
-        #         to_return = 'Unknown'
-        #         # self.logger.info('Will now look for the enhanced subclass for ')
-        #         # print(reftab[reftab[colname] == row[1][gene_id_col]])
-        #         for i in ['genbank_protein_accession','refseq_nucleotide_accession','genbank_nucleotide_accession']:
-        #             if len(reftab[reftab[i] == row[1]["Gene symbol"]]["subclass"].unique()) >= 1:
-        #                 return reftab[reftab[i] == row[1]["Gene symbol"]]["subclass"].unique()[0]
-        #         return to_return
-            
-                
-        # else:
+
         return d
 
     def extract_bifunctional_name(self, protein, reftab):
@@ -187,7 +129,6 @@ class Collate:
         partials = {"Isolate": isolate}
         other = {"Isolate": isolate}
         for row in df.iterrows():
-            # print(row)
             # if the match is good then generate a drugclass dict
             if row[1]["Gene symbol"] == "aac(6')-Ib-cr" and row[1]["Method"] in ["EXACTX", "ALLELEX"]: # This is always a partial - unclear
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
@@ -351,6 +292,7 @@ class Collate:
         self.save_files(path='' if self.run_type == 'batch' else f"{self.prefix}", match = summary_drugs,partial=summary_partial, virulence = virulence)
         
 class MduCollate(Collate):
+    
     def __init__(self, args):
         self.logger =logging.getLogger(__name__) 
         self.logger.setLevel(logging.INFO)
@@ -376,7 +318,7 @@ class MduCollate(Collate):
             "Enterococcus":"Van_Linez_NEG",
             "Other":"Cpase_16S_mcr_NEG"
         }
-
+        self.REPORTING = {"Salmonella enterica":self.mdu_reporting_salmonella}
     def mdu_qc_tab(self):
         self.logger.info(f"Checking the format of the QC file")
         cols = ["ISOLATE", 'SPECIES_EXP', 'SPECIES_OBS', 'TEST_QC']
@@ -486,14 +428,13 @@ class MduCollate(Collate):
         return ''
 
     def _gentamicin_res_salm(self, col, gene):
-        if 'Gentamicin' in col: #change
+        if col in ['Gentamicin', 'Aminoglycosides (Ribosomal methyltransferase)']: #change
             return gene
         return ''
     
     def _kanamycin_res_salm(self, col, gene):
-        # print(gene)
-        # print(col)
-        if 'Kanamycin' in col:
+    
+        if col in ['Kanamycin','Aminoglycosides (Ribosomal methyltransferase)']:
             return gene
         return ''
     
@@ -562,8 +503,7 @@ class MduCollate(Collate):
         
         all_genes = self.get_all_genes(row)
         all_genes = [a for a in all_genes if a != row[1]['Isolate'] and a != '']
-        print(all_genes)
-        
+                
         isodict = row[1].to_dict()
         item_code = self.assign_itemcode(row[1]['Isolate'], mduidreg)
         md = self.assign_mduid(row[1]['Isolate'], mduidreg)
@@ -639,7 +579,7 @@ class MduCollate(Collate):
             tmp_results['Trim-Sulpha'] = list(set(tmp_results['Trimethoprim']).union(tmp_results['Sulfathiazole']))
         # print(tmp_results)
         for res in tmp_results:
-            results[f"{res} - ResMech"] = ';'.join(tmp_results[res])                
+            results[f"{res} - ResMech"] = ';'.join(tmp_results[res]) if tmp_results[res] != [] else "None detected"              
             if res in ["Aminoglycosides (Ribosomal methyltransferase)","Colistin", "Other"]:
                 results[f"{res} - Interpretation"] = ''
             elif res == 'Ciprofloxacin':
@@ -737,8 +677,8 @@ class MduCollate(Collate):
                         else:
                             genes_not_reported.extend(genes)
 
-                else:
-                    genes_not_reported.extend(genes)
+                    else:
+                        genes_not_reported.extend(genes)
         if genes_reported == []:
             genes_reported = [self.none_replacement_code(genus= genus)] if neg_code else ''
         if genes_not_reported == []:
@@ -748,10 +688,10 @@ class MduCollate(Collate):
         self.logger.info(f"{row[1]['Isolate']} has {len(genes_reported)} reportable genes.")
         return genes_reported, genes_not_reported
 
-    def mdu_reporting_salmonella(self, match):
+    def mdu_reporting_salmonella(self, match, isolates):
 
         self.logger.info(f"Applying MDU business logic for interpretation of  Salmonella AST")
-        cols = ["MDU Sample ID", "Item code", 
+        cols = ["Isolate", "MDU Sample ID", "Item code", 
         "Ampicillin - ResMech", "Ampicillin - Interpretation",
         "Cefotaxime (ESBL) - ResMech","Cefotaxime (ESBL) - Interpretation",
         "Cefotaxime (AmpC) - ResMech","Cefotaxime (AmpC) - Interpretation",
@@ -773,11 +713,9 @@ class MduCollate(Collate):
         "Other - ResMech",
         "Other - Interpretation"]
         # select passed Salmonella
-        qc = self.mdu_qc_tab()
-        qc = qc[(qc['SPECIES_OBS'] == 'Salmonella enterica') & (qc['TEST_QC'] == 'PASS')]
-
+        
         df = pandas.read_csv(match, sep = '\t')
-        df = df[df['Isolate'].isin(list(qc['ISOLATE']))]
+        df = df[df['Isolate'].isin(isolates)]
         result_df = pandas.DataFrame()
         df = df.fillna('')
         for row in df.iterrows():
@@ -788,6 +726,14 @@ class MduCollate(Collate):
             else:
                 result_df = result_df.append(tmpdf)
         return result_df[cols]
+
+    def _extract_plus_isolates(self,species):
+
+        qc = self.mdu_qc_tab()
+        qc = qc[(qc['SPECIES_OBS'] == species) & (qc['TEST_QC'] == 'PASS')]
+
+        return list(qc["ISOLATE"])
+
 
     def mdu_reporting_general(self, match, neg_code = True):
 
@@ -846,9 +792,11 @@ class MduCollate(Collate):
         writer.close()
 
     def save_spreadsheet_interpreted(self, results):
+        sheets = {"Salmonella enterica":"MMS184-01"}
         self.logger.info(f"Saving MMS184")
         writer = pandas.ExcelWriter(f"{self.runid}_MMS184.xlsx", engine = "xlsxwriter")
-        results.to_excel(writer, sheet_name = "MMS184", index = False)
+        for result in results:
+            result[1].to_excel(writer, sheet_name = sheets[result[0]], index = False)
         writer.close()
 
     def run(self):
@@ -859,7 +807,15 @@ class MduCollate(Collate):
                 passed_match_df,
                 passed_partials_df
             )
-        elif self.sop == 'salmonella':
-
-            salmo_df = self.mdu_reporting_salmonella(match = self.match)
-            self.save_spreadsheet_interpreted(results = salmo_df)
+        elif self.sop == 'plus':
+            dfs = []
+            for r in self.REPORTING:
+                self.logger.info(f"Checking if there are any {r} in this run.")
+                isolates = self._extract_plus_isolates(species = r)
+                if isolates != []:
+                    self.logger.info(f"There are {len(isolates)} {r} in this run.")
+                    plus_df = self.mdu_reporting_salmonella(match = self.match, isolates=isolates)
+                    dfs.append((r,plus_df))
+                else:
+                    self.logger.info(f"There are no {r} in this run. Collation will be skipped.")
+            self.save_spreadsheet_interpreted(results = dfs)
