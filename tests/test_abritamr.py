@@ -116,7 +116,7 @@ def test_setup_fail():
         with pytest.raises(SystemExit):
             amr_obj.setup()
 
-# Test SetupMDU
+# # Test SetupMDU
 MDU = collections.namedtuple('MDU', ['runid', 'matches', 'partials', 'qc', 'sop'])
 def test_prefix_string():
     """
@@ -167,7 +167,7 @@ def test_mdu_setup_fail():
         with pytest.raises(SystemExit):
             amr_obj.setup()
 
-# test RunFinder
+# # test RunFinder
 
 Data = collections.namedtuple('Data', ['run_type', 'input', 'prefix', 'jobs', 'organism'])
 def test_batch_cmd_no_org():
@@ -351,8 +351,8 @@ def test_check_outputs_batch():
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._check_outputs()
 
-# test Collate
-# 
+# # test Collate
+# # 
 Colls = collections.namedtuple('Data', ['run_type', 'input', 'prefix'])
 def test_get_drugclass_allele_1():
     """
@@ -464,3 +464,128 @@ def test_save():
         summary_partial = pandas.DataFrame({"Isolate":isolate,'ESBL':'blaCTX-M-15'}, index = [0])
         virulence = pandas.DataFrame({"Isolate":isolate,'METAL':'qnrB1'}, index = [0])
         assert amr_obj.save_files('',summary_drugs,summary_partial, virulence)
+
+
+
+def test_save_one_empty():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        summary_drugs = pandas.DataFrame({"Isolate":isolate}, index = [0])
+        summary_partial = pandas.DataFrame({"Isolate":isolate,'ESBL':'blaCTX-M-15'}, index = [0])
+        virulence = pandas.DataFrame({"Isolate":isolate,'METAL':'qnrB1'}, index = [0])
+        assert amr_obj.save_files('',summary_drugs,summary_partial, virulence)
+
+
+
+def test_save_all_empty():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        summary_drugs = pandas.DataFrame({"Isolate":isolate}, index = [0])
+        summary_partial = pandas.DataFrame({"Isolate":isolate}, index = [0])
+        virulence = pandas.DataFrame({"Isolate":isolate}, index = [0])
+        assert amr_obj.save_files('',summary_drugs,summary_partial, virulence)
+
+
+
+def test_get_cols_works():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        summary_drugs = pandas.DataFrame({"Isolate":isolate,'ESBL': 'blaCTX-M-15', "Beta-lactamase (not ESBL or carbapenemase)":'blaSHV-11'}, index = [0])
+        # summary_partial = pandas.DataFrame({"Isolate":isolate,'ESBL':'blaCTX-M-15'}, index = [0])
+        # virulence = pandas.DataFrame({"Isolate":isolate,'METAL':'qnrB1'}, index = [0])
+        assert amr_obj._get_cols(df= summary_drugs) == ["ESBL","Beta-lactamase (not ESBL or carbapenemase)"]
+
+def test_get_cols_empty():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        summary_drugs = pandas.DataFrame()
+        # summary_partial = pandas.DataFrame({"Isolate":isolate,'ESBL':'blaCTX-M-15'}, index = [0])
+        # virulence = pandas.DataFrame({"Isolate":isolate,'METAL':'qnrB1'}, index = [0])
+        assert amr_obj._get_cols(df= summary_drugs) == []
+
+
+def test_commbine_all_empty():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        summary_drugs = pandas.DataFrame()
+        summary_partial = pandas.DataFrame()
+        virulence = pandas.DataFrame()
+        assert amr_obj._combine_dfs(summary_drugs,summary_partial, virulence).empty
+
+
+
+def test_save_merge():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        summary_drugs = pandas.DataFrame({"Isolate":isolate,'ESBL': 'blaCTX-M-15', "Beta-lactamase (not ESBL or carbapenemase)":'blaSHV-11'}, index = [0])
+        summary_partial = pandas.DataFrame({"Isolate":isolate,'ESBL':'blaCTX-M-15'}, index = [0])
+        virulence = pandas.DataFrame()
+        assert not amr_obj._merge(summary_drugs,summary_partial).empty
+
+
+
+def test_save_merge_one_empty():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        summary_drugs = pandas.DataFrame({"Isolate":isolate,'ESBL': 'blaCTX-M-15', "Beta-lactamase (not ESBL or carbapenemase)":'blaSHV-11'}, index = [0])
+        summary_partial = pandas.DataFrame({"Isolate":isolate}, index = [0])
+        virulence = pandas.DataFrame()
+        assert not amr_obj._merge(summary_drugs,summary_partial).empty
+
+
+
+def test_save_merge_both_empty():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = Colls("assembly", 'tests/contigs.fa', '')
+        amr_obj = Collate()
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        summary_drugs = pandas.DataFrame({"Isolate":isolate}, index = [0])
+        summary_partial = pandas.DataFrame({"Isolate":isolate}, index = [0])
+        virulence = pandas.DataFrame()
+        assert not amr_obj._merge(summary_drugs,summary_partial).empty

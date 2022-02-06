@@ -156,25 +156,28 @@ class Collate:
             df[c] = numpy.where(df[c]!="", df[c].str.strip("*") + "^", df[c])
         return df
 
-    def _merge(self, match, partial, pcols, mcols):
+    def _merge(self, match, partial):
 
         df = pandas.DataFrame()
         tmp = match.merge(partial, on = 'Isolate', how = 'outer')
         tmp_cols = self._get_cols(df = tmp)
+            # print(tmp_cols)
         for t in tmp_cols:
-            if t.endswith('_x') or t.endswith('_y'):
+            if t.endswith('_x') or t.endswith('_y'): 
+                # if this is a a col that has appeared in more than one df
                 if df.empty:
                     df = tmp[['Isolate']]
-                c = t.split('_')[0]
-                if c not in list(df.columns):
-                    df[c] = tmp[[f"{c}_x", f"{c}_y"]].apply(lambda x: ','.join(x), axis = 1)
+                c = t.split('_')[0] # strip the _x or _y for col name
+                if c not in list(df.columns): # if this has not already been added - should never happen but best safe than sorry
+                    df[c] = tmp[[f"{c}_x", f"{c}_y"]].apply(lambda x: ','.join(x), axis = 1) # combine the values and join with a comma
             else:
+                # if this is a column that only appears in one df
                 if df.empty:
                     df = tmp[['Isolate', t]]
                 else:
                     df = df.merge(tmp[['Isolate', t]], on = 'Isolate',how = 'outer') 
         
-        return df
+        return df if not df.empty else tmp
 
     def _combine_dfs(self, match, partial, virulence):
         
@@ -183,19 +186,22 @@ class Collate:
         pcols = self._get_cols(df = partial)
         mcols = self._get_cols(df = match)
         vcols = self._get_cols(df = virulence)
-
+        # print(pcols)
         if vcols == [] and pcols == [] and mcols == []:
             return pandas.DataFrame()
 
         if pcols != []:
             partial = self._add_caret(df = partial, cols = pcols)      
         
-        df = self._merge(match = match, partial = partial, mcols = mcols, pcols = pcols)
+        df = self._merge(match = match, partial = partial)
         
-        if isinstance(virulence, pandas.DataFrame) and not df.empty:
+        if not isinstance(virulence, pandas.DataFrame) and not df.empty:
             df = df.merge(virulence, on = 'Isolate', how = 'outer') 
         elif isinstance(virulence, pandas.DataFrame) and df.empty:
-            df = virulence
+            if not virulence.empty:
+                df = virulence
+            else:
+                df = pandas.DataFrame()
 
         return df
 
@@ -209,8 +215,8 @@ class Collate:
             files[f].set_index('Isolate').to_csv(f"{out}", sep = '\t')
         combd = self._combine_dfs(match = match, partial = partial, virulence = virulence)
         combd_out = f"{path}/abritamr.txt" if path != '' else f"abritamr.txt"
-        self.logger.info(f"Saving combined file : {combd_out}")
         if not combd.empty:
+            self.logger.info(f"Saving combined file : {combd_out}")
             combd.set_index('Isolate').to_csv(f"{combd_out}", sep = '\t')
         
         return True
