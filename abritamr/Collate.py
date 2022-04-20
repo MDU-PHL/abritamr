@@ -398,8 +398,9 @@ class MduCollate(Collate):
         return mduid
 
     def _ampicillin_res_sal(self, col, gene):
-
-        if col in [ 'Beta-lactamase (not ESBL or carbapenemase)', 'Beta-lactamase (narrow-spectrum)']:
+        # print(col)
+        # if gene == ''
+        if col in [ 'Beta-lactamase (not ESBL or carbapenemase)', 'Beta-lactamase (narrow-spectrum)','Beta-lactamase (unknown spectrum)'] or 'Ampicillin' in col:
             return gene
         return ''
 
@@ -530,7 +531,7 @@ class MduCollate(Collate):
             "Trimethoprim":self._trimet_res_salmo,
             "Trim-Sulpha":self._trim_sulpha_salmo,
             "Chloramphenicol":self._chloramphenicol_res_sal,
-            "Aminoglycosides (Ribosomal methyltransferase)": self._rmt_res_salmo,
+            "Aminoglycosides (RMT)": self._rmt_res_salmo,
             "Colistin":self._colistin_res_salmo
         }
 
@@ -551,8 +552,9 @@ class MduCollate(Collate):
             "Azithromycin":[],
             "Meropenem":[],
             "Chloramphenicol":[],
-            "Aminoglycosides (Ribosomal methyltransferase)":[],"Colistin":[], "Other":[]
+            "Aminoglycosides (RMT)":[],"Colistin":[], "Other":[]
         }
+
         # group drugs
         # NEED TO ADD in TRIM-SULPHA combo
         for ab in abx:
@@ -586,7 +588,7 @@ class MduCollate(Collate):
         # print(tmp_results)
         for res in tmp_results:
             results[f"{res} - ResMech"] = ';'.join(tmp_results[res]) if tmp_results[res] != [] else "None detected"              
-            if res in ["Aminoglycosides (Ribosomal methyltransferase)","Colistin", "Other"]:
+            if res in ["Aminoglycosides (RMT)","Colistin", "Other"]:
                 results[f"{res} - Interpretation"] = ''
             elif res == 'Ciprofloxacin':
                 if tmp_results[res] == []:
@@ -712,8 +714,8 @@ class MduCollate(Collate):
         "Ciprofloxacin - ResMech","Ciprofloxacin - Interpretation",
         "Meropenem - ResMech",	"Meropenem - Interpretation",
         "Azithromycin - ResMech","Azithromycin - Interpretation",
-        "Aminoglycosides (Ribosomal methyltransferase) - ResMech",
-        "Aminoglycosides (Ribosomal methyltransferase) - Interpretation",
+        "Aminoglycosides (RMT) - ResMech",
+        "Aminoglycosides (RMT) - Interpretation",
         "Colistin - ResMech",
         "Colistin - Interpretation", 
         "Other - ResMech",
