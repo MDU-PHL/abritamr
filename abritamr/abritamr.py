@@ -58,12 +58,13 @@ def set_parsers():
         default='', 
         help="Set the minimum identity of matches with amrfinder (0 - 1.0). Defaults to amrfinder preset, which is 0.9 unless a curated threshold is present for the gene."
     )
-    # parser_sub_run.add_argument(
-    #     "--amrfinder_db", 
-    #     "-d", 
-    #     default=f"{os.environ.get('AMRFINDER_DB')}", 
-    #     help="Path to amrfinder DB to use"
-    # )
+
+    parser_sub_run.add_argument(
+        "--amrfinder_db", 
+        "-d", 
+        default=f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinder' / '2022-09-30.1'}", 
+        help="Path to amrfinder DB to use"
+    )
     parser_sub_run.add_argument(
         "--species",
         "-sp",

@@ -400,7 +400,7 @@ class MduCollate(Collate):
     def _ampicillin_res_sal(self, col, gene):
         # print(col)
         # if gene == ''
-        if col in [ 'Beta-lactamase (not ESBL or carbapenemase)', 'Beta-lactamase (narrow-spectrum)','Beta-lactamase (unknown spectrum)'] or 'Ampicillin' in col:
+        if col in [ 'Beta-lactamase (not ESBL or carbapenemase)','ESBL','ESBL (AmpC type)', 'Beta-lactamase (narrow-spectrum)','Beta-lactamase (unknown spectrum)'] or 'Ampicillin' in col:
             return gene
         return ''
 
@@ -597,7 +597,7 @@ class MduCollate(Collate):
                     results[f"{res} - Interpretation"] = 'Intermediate'
                 else:
                     results[f"{res} - Interpretation"] = 'Resistant'
-            elif res not in ["Aminoglycosides (Ribosomal methyltransferase)","Colistin", "Other"]:
+            elif res not in ["Aminoglycosides (RMT)","Colistin", "Other"]:
                 if tmp_results[res] == []:
                     results[f"{res} - Interpretation"] = 'Susceptible'
                 else:
@@ -699,7 +699,7 @@ class MduCollate(Collate):
     def mdu_reporting_salmonella(self, match, isolates):
 
         self.logger.info(f"Applying MDU business logic for interpretation of  Salmonella AST")
-        cols = ["Isolate", "MDU Sample ID", "Item code", 
+        cols = ["MDU Sample ID", "Item code", 
         "Ampicillin - ResMech", "Ampicillin - Interpretation",
         "Cefotaxime (ESBL) - ResMech","Cefotaxime (ESBL) - Interpretation",
         "Cefotaxime (AmpC) - ResMech","Cefotaxime (AmpC) - Interpretation",

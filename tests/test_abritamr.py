@@ -118,6 +118,7 @@ def test_setup_fail():
 
 # # Test SetupMDU
 MDU = collections.namedtuple('MDU', ['runid', 'matches', 'partials', 'qc', 'sop'])
+
 def test_prefix_string():
     """
     assert True when non-empty string is given
