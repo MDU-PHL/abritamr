@@ -21,7 +21,7 @@ class Setup(object):
         fh.setFormatter(formatter)
         self.logger.addHandler(ch) 
         self.logger.addHandler(fh)
-
+        
         
     def file_present(self, name):
         """
@@ -68,6 +68,8 @@ class SetupAMR(Setup):
         # amr
         self.species = args.species if args.species in self.species_list else ""
         self.identity = args.identity
+        self.amrfinder_db = args.amrfinder_db
+        
 
     def _check_prefix(self):
         """
@@ -131,8 +133,8 @@ class SetupAMR(Setup):
         if running_type == 'assembly':
             self._check_prefix()
         
-        Data = collections.namedtuple('Data', ['run_type', 'input', 'prefix', 'jobs', 'organism', 'identity'])
-        input_data = Data(running_type, self.contigs, self.prefix, self.jobs, self.species, self.identity)
+        Data = collections.namedtuple('Data', ['run_type', 'input', 'prefix', 'jobs', 'organism', 'identity','amrfinder_db'])
+        input_data = Data(running_type, self.contigs, self.prefix, self.jobs, self.species, self.identity, self.amrfinder_db)
         
         return input_data
 

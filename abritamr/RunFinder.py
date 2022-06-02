@@ -27,7 +27,7 @@ class RunFinder(object):
         self.jobs = args.jobs
         self.prefix = args.prefix
         self.identity = args.identity
-        self.amrfinder_db = os.environ.get('AMRFINDER_DB')
+        self.amrfinder_db = args.amrfinder_db
 
     def _batch_cmd(self):
         """

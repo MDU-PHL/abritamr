@@ -1,6 +1,6 @@
 import pathlib, argparse, sys, os, logging
 
-from abritamr.AmrSetup import Setup, SetupAMR, SetupMDU
+from abritamr.AmrSetup import SetupAMR, SetupMDU
 from abritamr.RunFinder import RunFinder
 from abritamr.Collate import Collate, MduCollate
 from abritamr.version import __version__
@@ -13,6 +13,7 @@ abritamr is designed to implement AMRFinder and parse the results compatible for
 def run_pipeline(args):
     P = SetupAMR(args)
     input_data = P.setup()
+    print(input_data)
     A = RunFinder(input_data)
     amr_data = A.run()
     C = Collate(amr_data)
