@@ -69,6 +69,7 @@ class SetupAMR(Setup):
         self.species = args.species if args.species in self.species_list else ""
         self.identity = args.identity
         self.amrfinder_db = args.amrfinder_db
+
         
 
     def _check_prefix(self):

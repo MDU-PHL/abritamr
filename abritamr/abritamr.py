@@ -63,7 +63,8 @@ def set_parsers():
     parser_sub_run.add_argument(
         "--amrfinder_db", 
         "-d", 
-        default=f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinder' / '2022-09-30.1'}", 
+        default=f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus' / 'data' / '2021-09-30.1/'}", 
+        # default="/home/khhor/conda/envs/abritamr/share/amrfinderplus/data/2021-09-30.1/",
         help="Path to amrfinder DB to use"
     )
     parser_sub_run.add_argument(
