@@ -17,12 +17,13 @@ _abriTAMR is accredited by NATA for use in reporting the presence of reportable 
 ## Install
 
 
-abriTAMR requires [AMRFinder Plus](https://github.com/ncbi/amr), this can be installed with `conda` alone or as part of the abriTAMR `conda` installation (see below).
+abriTAMR requires [AMRFinder Plus](https://github.com/ncbi/amr), this can be installed with `conda`.
+
+abriTAMR comes packaged with an AMRFinder DB consistent with current NATA accreditation. If you would like to use another DB please download it and use the `-d` flag to point to your database.
 
 ```
 conda create -n abritamr -c bioconda ncbi-amrfinder
 conda activate abritamr
-amrfinder -U (to download and install recent DB)
 pip3 install abritamr
 ```
 
