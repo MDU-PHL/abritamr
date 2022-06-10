@@ -13,7 +13,6 @@ abritamr is designed to implement AMRFinder and parse the results compatible for
 def run_pipeline(args):
     P = SetupAMR(args)
     input_data = P.setup()
-    print(input_data)
     A = RunFinder(input_data)
     amr_data = A.run()
     C = Collate(amr_data)

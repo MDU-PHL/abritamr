@@ -56,8 +56,9 @@ class Collate:
                     d= reftab[reftab[i] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
                     break
         else:
+            
             d = reftab[reftab[colname] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
-
+        
         return d
 
     def extract_bifunctional_name(self, protein, reftab):
@@ -66,36 +67,46 @@ class Collate:
         """
         return reftab[reftab["refseq_protein_accession"] == protein]["gene_family"].values[0]
 
-    def extract_gene_name(self, protein, reftab):
+    def extract_gene_name(self, protein, reftab, pointn = False):
+        
+        # add in to address the calling of point mutations that are not an exact match to reference
+        # amrfinderplus returns the nucleotide accession with the range for what was detected.. these
+        # so extract just the name of accession and set col to work with to nucleotide rather than protein
+        # Add POINTN to end so users know this is a different type of match 
+        suff = f"_POINTN" if pointn else ""
+        protein = protein.split(':')[0] if pointn else protein
+        col ="refseq_nucleotide_accession" if pointn else "refseq_protein_accession"
         
         try:
-            if reftab[reftab["refseq_protein_accession"] == protein]["allele"].values[0] != '-':
-                return reftab[reftab["refseq_protein_accession"] == protein]["allele"].values[0]
+            if reftab[reftab[col] == protein]["allele"].values[0] != '-':
+                nme = f"{reftab[reftab[col] == protein]['allele'].values[0]}{suff}"
+                return nme
             else:
-                return reftab[reftab["refseq_protein_accession"] == protein]["gene_family"].values[0]
+                return reftab[reftab[col] == protein]["gene_family"].values[0]
         except IndexError:
             for i in ['genbank_protein_accession','refseq_nucleotide_accession','genbank_nucleotide_accession']:
                 if len(reftab[reftab[i] == protein]["gene_family"].unique()) >= 1:
                     return reftab[reftab[i] == protein]["gene_family"].unique()[0]
             
-    def setup_dict(self, drugclass_dict, reftab, row, _type = 'exact'):
+    def setup_dict(self, drugclass_dict, reftab, row, _type = 'exact', pointn = False):
         """
         return the dictionary for collation
         """
-        
         if row[1]["Gene symbol"] in list(reftab["allele"]):
             drugclass = self.get_drugclass(
                     reftab=reftab, row=row, colname="allele"
                     )
-            drugname = self.extract_gene_name(protein = row[1]["Accession of closest sequence"], reftab = reftab)
-
+            drugname = self.extract_gene_name(protein = row[1]["Accession of closest sequence"], reftab = reftab, pointn = pointn)
+            
         elif row[1]["Gene symbol"] in list(reftab["gene_family"]):
+            
             drugclass = self.get_drugclass(
                 reftab=reftab, row=row, colname="refseq_protein_accession"
             )
-            drugname = f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}*" if not row[1]["Method"] in ["EXACTX", "ALLELEX", "POINTX"] else f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}"
+            drugname = f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}*" if not row[1]["Method"] in ["EXACTX", "ALLELEX"] else f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}"
             
         elif row[1]["Accession of closest sequence"] in list(reftab["refseq_protein_accession"]):
+            
             drugclass = self.get_drugclass(
                 reftab = reftab, row = row, colname = "refseq_protein_accession"
             )
@@ -134,11 +145,12 @@ class Collate:
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
             elif row[1]["Method"] in self.MATCH and row[1]["Element type"] == "AMR" and row[1]['Element subtype'] != "AMR-SUSCEPTIBLE":
                 drugclass_dict = self.setup_dict(drugclass_dict = drugclass_dict, reftab = reftab, row = row)
+            elif "POINTN" in row[1]["Method"] and row[1]["Element type"] == "AMR" and row[1]['Element subtype'] != "AMR-SUSCEPTIBLE":
+                drugclass_dict = self.setup_dict(drugclass_dict = drugclass_dict, reftab = reftab, row = row, pointn = True)
             elif row[1]["Method"] not in self.MATCH and row[1]["Element type"] == "AMR" and row[1]['Element subtype'] != "AMR-SUSCEPTIBLE":
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
             else:
                 other = self._other_dict(other_dict = other, row = row)
-            
         drugclass_dict = self.joins(dict_for_joining=drugclass_dict)
         partials = self.joins(dict_for_joining=partials)
         other = self.joins(dict_for_joining = other)
@@ -161,7 +173,7 @@ class Collate:
         df = pandas.DataFrame()
         tmp = match.merge(partial, on = 'Isolate', how = 'outer')
         tmp_cols = self._get_cols(df = tmp)
-            # print(tmp_cols)
+        
         for t in tmp_cols:
             if t.endswith('_x') or t.endswith('_y'): 
                 # if this is a a col that has appeared in more than one df
@@ -169,7 +181,7 @@ class Collate:
                     df = tmp[['Isolate']]
                 c = t.split('_')[0] # strip the _x or _y for col name
                 if c not in list(df.columns): # if this has not already been added - should never happen but best safe than sorry
-                    df[c] = tmp[[f"{c}_x", f"{c}_y"]].apply(lambda x: ','.join(x), axis = 1) # combine the values and join with a comma
+                    df[c] = tmp[[f"{c}_x", f"{c}_y"]].apply(lambda x: ','.join([i for i in x if i != '']), axis = 1) # combine the values and join with a comma
             else:
                 # if this is a column that only appears in one df
                 if df.empty:
@@ -186,7 +198,7 @@ class Collate:
         pcols = self._get_cols(df = partial)
         mcols = self._get_cols(df = match)
         vcols = self._get_cols(df = virulence)
-        # print(pcols)
+        
         if vcols == [] and pcols == [] and mcols == []:
             return pandas.DataFrame()
 
@@ -259,7 +271,7 @@ class Collate:
         if existing.empty:
             existing = temp
         else:
-            existing = existing.append(temp)
+            existing = existing.concat(temp)
         
         return existing
 
@@ -398,8 +410,7 @@ class MduCollate(Collate):
         return mduid
 
     def _ampicillin_res_sal(self, col, gene):
-        # print(col)
-        # if gene == ''
+        
         if col in [ 'Beta-lactamase (not ESBL or carbapenemase)','ESBL','ESBL (AmpC type)', 'Beta-lactamase (narrow-spectrum)','Beta-lactamase (unknown spectrum)'] or 'Ampicillin' in col:
             return gene
         return ''
@@ -555,22 +566,14 @@ class MduCollate(Collate):
             "Aminoglycosides (RMT)":[],"Colistin":[], "Other":[]
         }
 
-        # group drugs
-        # NEED TO ADD in TRIM-SULPHA combo
+        
         for ab in abx:
-            # if ab == 'Trim-Sulpha':
-            #     if 'Trimethoprim' in isodict and 'Sulfathiazole' in isodict:
-            #         g = abx[ab](trim_col = isodict['Trimethoprim'], sul_col = isodict['Sulfathiazole'])
-            #         if g != '':
-            #             gene_list = g.split(',')
-            #             for gene in gene_list:
-            #                 tmp_results[ab].append(gene)
             if ab != 'Trim-Sulpha':
                 for i in isodict:
                     if i != "Isolate":
-                        # print(isodict[i])
+                        
                         g = abx[ab](col = i, gene = isodict[i])
-                        # print(g)
+                        
                         if g != '':
                             gene_list = g.split(',')
                             for gene in gene_list:
@@ -585,7 +588,7 @@ class MduCollate(Collate):
         
         if tmp_results['Trimethoprim'] != [] and tmp_results['Sulfathiazole'] != []:
             tmp_results['Trim-Sulpha'] = list(set(tmp_results['Trimethoprim']).union(tmp_results['Sulfathiazole']))
-        # print(tmp_results)
+        
         for res in tmp_results:
             results[f"{res} - ResMech"] = ';'.join(tmp_results[res]) if tmp_results[res] != [] else "None detected"              
             if res in ["Aminoglycosides (RMT)","Colistin", "Other"]:
@@ -778,7 +781,7 @@ class MduCollate(Collate):
             d['db_version'] = self.db
             tempdf = pandas.DataFrame(d, index=[0])
             tempdf = tempdf.set_index("MDU sample ID")
-            # print(tempdf)
+            
             if reporting_df.empty:
                 reporting_df = tempdf
             else:
