@@ -271,7 +271,7 @@ class Collate:
         if existing.empty:
             existing = temp
         else:
-            existing = existing.concat(temp)
+            existing = pandas.concat([existing,temp])
         
         return existing
 
