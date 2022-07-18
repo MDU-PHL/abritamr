@@ -92,11 +92,16 @@ class Collate:
         """
         return the dictionary for collation
         """
-        if row[1]["Gene symbol"] in list(reftab["allele"]):
+        if row[1]["Gene symbol"] in list(reftab["allele"]) and 'POINT' not in row[1]['Method']:
             drugclass = self.get_drugclass(
                     reftab=reftab, row=row, colname="allele"
                     )
             drugname = self.extract_gene_name(protein = row[1]["Accession of closest sequence"], reftab = reftab, pointn = pointn)
+        elif row[1]["Gene symbol"] in list(reftab["allele"]) and 'POINT' in row[1]['Method']:
+            drugclass = self.get_drugclass(
+                    reftab=reftab, row=row, colname="allele"
+                    )
+            drugname = row[1]["Gene symbol"]
             
         elif row[1]["Gene symbol"] in list(reftab["gene_family"]):
             
