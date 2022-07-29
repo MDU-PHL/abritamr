@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:4.7.12 as build
+FROM continuumio/miniconda3:4.11.0 as build
 
 ARG amrfinder_version=3.6.10
 
