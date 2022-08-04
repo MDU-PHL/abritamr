@@ -18,7 +18,7 @@ RUN cd /opt/abritamr && pip install .
 
 RUN conda remove --force curl entrez-direct tqdm idna pip setuptools wheel asn1crypto ca-certificates cryptography expat chardet libcurl libedit libssh2 ncurses openssl conda-package-handling readline pysocks pycosats pycparser pyopenssl sqlite tk urllib3 requests yaml ruamel_yaml
 
-RUN cd /opt/conda && rm -rf pkgs && rm -rf man/man* && cd bin && find * \( -iname "*blast*" -or -iname "*masker*" -or -iname "seqdb*" -or -iname "makembindex" \)  ! -iname "blastp" ! -iname "blastn" ! -iname "blastx" -type f -print -exec rm {} \;
+RUN cd /opt/conda && rm -rf pkgs && rm -rf man/man*
 
 FROM bitnami/minideb:buster
 
