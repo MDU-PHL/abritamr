@@ -662,8 +662,9 @@ class MduCollate(Collate):
             if i != 'Isolate':
                 if isinstance(isodict[i], str):
                     genes = isodict[i].split(',')
+                    genes = [gene for gene in genes if '_' not in gene]
                 if genes != []: # for each bin we do things to genes
-                    if i in reportable:
+                    if i in reportable: #don't report point mutations
                         if i in non_caveat_reportable:
                             genes_reported.extend(genes)
                         elif i == "Carbapenemase (MBL)" and species != "Stenotrophomonas maltophilia":

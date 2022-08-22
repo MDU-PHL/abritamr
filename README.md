@@ -8,14 +8,11 @@ abriTAMR is an AMR gene detection pipeline that runs AMRFinderPlus on a single (
 
 _abriTAMR is accredited by NATA for use in reporting the presence of reportable AMR genes in Victoria Australia._
 
-## New look in v 1.0.0
-
 * Acquired resistance mechanims in the form of point mutations (restricted to subset of species)
 * Streamlined output.
 * Presence of virulence factors
 
 ## Install
-
 
 abriTAMR requires [AMRFinder Plus](https://github.com/ncbi/amr), this can be installed with `conda`.
 

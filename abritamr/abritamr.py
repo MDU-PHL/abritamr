@@ -71,9 +71,9 @@ def set_parsers():
         "-sp",
         default="",
         help="Set if you would like to use point mutations, please provide a valid species.",
-        choices= ['Neisseria', 'Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"]
+        choices= ['Neisseria','Clostridioides_difficile', 'Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes"]
     )
-    parser_mdu = subparsers.add_parser('mdu', help='Finalise abritamr results for MDU service', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_mdu = subparsers.add_parser('report', help='Generate report for use at MDU', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     
     parser_mdu.add_argument(
         "--qc",
