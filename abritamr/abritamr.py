@@ -11,19 +11,21 @@ abritamr is designed to implement AMRFinder and parse the results compatible for
 """
 
 def run_pipeline(args):
+
     P = SetupAMR(args)
     input_data = P.setup()
     A = RunFinder(input_data)
     amr_data = A.run()
     C = Collate(amr_data)
-    collated_data = C.run()
+    C.run()
     
 
 def mdu(args):
+    
     M = SetupMDU(args)
     input_data = M.setup()
     C = MduCollate(input_data)
-    collated_data = C.run()
+    C.run()
 
 
 def main():

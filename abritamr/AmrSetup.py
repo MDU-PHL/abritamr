@@ -176,12 +176,24 @@ class SetupMDU(Setup):
         """
         Check the inputs for MDU - ensure all files are present for collation.
         """
-        self._check_runid()
+        file_dict = {
+            'QC': self.qc, 
+            'summary_matches': self.matches,
+            'summary_partials':self.partials
+            }
+            
+        if self._check_runid():
+            self.logger.info(f"You are generating a {'general report' if self.sop == 'general' else 'species specific report'}")
+            self.logger.info(f"Now checking all input files are present.")
+            for _file in file_dict:
+                self.logger.info(f"Checking that {_file} is present.")
+                if self.file_present(file_dict[_file]):
+                    self.logger.info(f"{file_dict[_file]} is present.")
+                else:
+                    self.logger.critical(f"The {_file} supplied does not exist. Please check your inputs and try again.")
+                    raise SystemExit
 
-        Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid', 'sop'])
-
-        if self.file_present(self.qc) and self.file_present(self.matches) and self._check_runid():
+            Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid', 'sop'])
+        
             return Data(self.qc, self.matches, self.partials, self.db, self.runid, self.sop)
-        else:
-            self.logger.critical(f"Something has gone wrong with your inputs. Please try again!")
-            raise SystemExit
+        
