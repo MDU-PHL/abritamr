@@ -1,4 +1,4 @@
-# abriTAMR
+# abriTAMR <figure><img src="documentation/abriTAMR_logo.png"></figure>
 
 [![CircleCI](https://circleci.com/gh/MDU-PHL/abritamr.svg?style=svg&circle-token=a54d59b013a30a507621695e738f0a72e47d6969)](https://circleci.com/gh/MDU-PHL/abritamr)
 
@@ -26,7 +26,7 @@ conda activate abritamr
 
 ## Command-line tool
 
-```bash
+```
 abritamr run --help
 
 
@@ -63,7 +63,7 @@ You can also run abriTAMR in `rpeort` mode, this will output a spreadsheet which
 
 ```
 abritamr report --help
- 
+
 optional arguments:
   -h, --help            show this help message and exit
   --qc QC, -q QC        Name of checked MDU QC file. (default: )
