@@ -181,7 +181,7 @@ class SetupMDU(Setup):
             'summary_matches': self.matches,
             'summary_partials':self.partials
             }
-            
+
         if self._check_runid():
             self.logger.info(f"You are generating a {'general report' if self.sop == 'general' else 'species specific report'}")
             self.logger.info(f"Now checking all input files are present.")
@@ -190,7 +190,7 @@ class SetupMDU(Setup):
                 if self.file_present(file_dict[_file]):
                     self.logger.info(f"{file_dict[_file]} is present.")
                 else:
-                    self.logger.critical(f"The {_file} supplied does not exist. Please check your inputs and try again.")
+                    self.logger.critical(f"The {_file} file supplied ({file_dict[_file]}) does not exist. Please check your inputs and try again.")
                     raise SystemExit
 
             Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid', 'sop'])
