@@ -1,5 +1,7 @@
 <figure><img src="documentation/abriTAMR_logo.jpg"></figure>
 
+**_logo by Charlie Higgs (PhD candidate)_**
+
 [![CircleCI](https://circleci.com/gh/MDU-PHL/abritamr.svg?style=svg&circle-token=a54d59b013a30a507621695e738f0a72e47d6969)](https://circleci.com/gh/MDU-PHL/abritamr)
 
 **_Taming the AMR beast_**
