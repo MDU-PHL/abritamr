@@ -6,7 +6,7 @@ RUN apt-get --yes update && apt-get --yes upgrade && apt-get install --yes curl 
 
 RUN conda update conda
 
-RUN conda install -c conda-forge -c bioconda -c defaults file blast=2.9=pl526h3066fca_4 ncbi-amrfinderplus=$amrfinder_version snakemake-minimal=5.8.2
+RUN conda install -c conda-forge -c bioconda -c defaults file blast=2.9=pl526h3066fca_4 ncbi-amrfinderplus=$amrfinder_version
 
 RUN amrfinder -u
 
