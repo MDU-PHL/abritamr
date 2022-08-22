@@ -102,3 +102,10 @@ optional arguments:
 
       * Genes recovered with >50% but <90% coverage of a gene in the gene catalog will be annotated with `^`.
       * Genes annotated with `*` indicate >90% coverage and > identity threshold < 100% identity.
+
+4. `abritamr.txt`
+  * Tab-delimited file, combining `summary_matches.txt`, `summary_partials.txt`, `summary_virulence.txt` with a row per sequence, and columns representing AMRFinderPlus virulence gene classification and/or functional drug classes.
+  * Genes recovered from sequence which have >50% coverage of the gene reported and greater than the desired identity threshold (default 90%). 
+
+      * Genes recovered with >50% but <90% coverage of a gene in the gene catalog will be annotated with `^`.
+      * Genes annotated with `*` indicate >90% coverage and > identity threshold < 100% identity.
