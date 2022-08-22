@@ -1,4 +1,4 @@
-# abriTAMR <figure><img src="documentation/abriTAMR_logo.png"></figure>
+<figure><img src="documentation/abriTAMR_logo.jpg"></figure>
 
 [![CircleCI](https://circleci.com/gh/MDU-PHL/abritamr.svg?style=svg&circle-token=a54d59b013a30a507621695e738f0a72e47d6969)](https://circleci.com/gh/MDU-PHL/abritamr)
 
