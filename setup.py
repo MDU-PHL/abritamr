@@ -28,7 +28,7 @@ setup(
     author_email="kristyhoran15@gmail.com",
     maintainer="Kristy Horan",
     maintainer_email="kristyhoran15@gmail.com",
-    python_requires=">=3.7, <4",
+    python_requires=">=3.9, <4",
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
     zip_safe=False,
     install_requires=["pandas","xlsxwriter"],

@@ -19,9 +19,8 @@ abriTAMR requires [AMRFinder Plus](https://github.com/ncbi/amr), this can be ins
 abriTAMR comes packaged with an AMRFinder DB consistent with current NATA accreditation. If you would like to use another DB please download it and use the `-d` flag to point to your database.
 
 ```
-conda create -n abritamr -c bioconda ncbi-amrfinderplus
+conda create -n abritamr -c bioconda abritamr
 conda activate abritamr
-pip3 install abritamr
 ```
 
 

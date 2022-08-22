@@ -26,7 +26,7 @@ def mdu(args):
     collated_data = C.run()
 
 
-def set_parsers():
+def main():
     parser = argparse.ArgumentParser(
         description="AMR gene detection pipeline", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -111,20 +111,16 @@ def set_parsers():
     parser_sub_run.set_defaults(func=run_pipeline)
     parser_mdu.set_defaults(func = mdu)
     args = parser.parse_args()
-    return args
-
-
-def main():
-    """
-    run pipeline
-    """
-
-    args = set_parsers()
-    if vars(args) == {}:
+    
+    if len(sys.argv) < 2:
         parser.print_help(sys.stderr)
+    elif len(sys.argv) <= 2 and sys.argv[1] == 'run':
+        parser_sub_run.print_help(sys.stderr)
+    elif len(sys.argv) <= 2 and sys.argv[1] == 'report':
+        parser_mdu.print_help(sys.stderr)
     else:
         args.func(args)
-    
-
-if __name__ == "__main__":
+	
+if __name__ == '__main__':
     main()
+
