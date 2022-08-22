@@ -47,8 +47,8 @@
                 "sha256:f1452578d0516283c87608a5a5548b0cdde15b99650efdfd85182102ef7a7c17",
                 "sha256:f39a995e47cb8649673cfa0579fbdd1cdd33ea497d1728a6cb194d6252268e48"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==1.20.3"
+            "markers": "python_version >= '3.9'",
+            "version": "==1.23.2"
         },
         "pandas": {
             "hashes": [
@@ -69,8 +69,8 @@
                 "sha256:c601c6fdebc729df4438ec1f62275d6136a0dd14d332fc0e8ce3f7d2aadb4dd6",
                 "sha256:d0877407359811f7b853b548a614aacd7dea83b0c0c84620a9a643f180060950"
             ],
-            "markers": "python_full_version >= '3.7.1'",
-            "version": "==1.2.4"
+            "markers": "python_full_version >= '3.9'",
+            "version": "==1.4.3"
         },
         "python-dateutil": {
             "hashes": [
@@ -78,14 +78,14 @@
                 "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
-            "version": "==2.8.1"
+            "version": "==2.8.2"
         },
         "pytz": {
             "hashes": [
                 "sha256:83a4a90894bf38e243cf052c8b58f381bfe9a7a483f6a9cab140bc7f702ac4da",
                 "sha256:eb10ce3e7736052ed3623d49975ce333bcd712c7bb19a58b9e2089d4057d0798"
             ],
-            "version": "==2021.1"
+            "version": "==2022.2.1"
         },
         "six": {
             "hashes": [
@@ -95,20 +95,12 @@
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
             "version": "==1.16.0"
         },
-        "toml": {
-            "hashes": [
-                "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b",
-                "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"
-            ],
-            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2'",
-            "version": "==0.10.2"
-        },
         "xlsxwriter": {
             "hashes": [
                 "sha256:1a7fac99687020e76aa7dd0d7de4b9b576547ed748e5cd91a99d52a6df54ca16",
                 "sha256:641db6e7b4f4982fd407a3f372f45b878766098250d26963e95e50121168cbe2"
             ],
-            "version": "==1.4.3"
+            "version": "==3.0.3"
         }
     },
     "develop": {}

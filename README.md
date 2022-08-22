@@ -85,7 +85,20 @@ optional arguments:
 2.  `summary_matches.txt` 
   * Tab-delimited file, with a row per sequence, and columns representing functional drug classes 
   * Only genes recovered from sequence which have >90% coverage of the gene reported and greater than the desired identity threshold (default 90%). 
+    
     I. Genes annotated with `*` indicate >90% coverage and > identity threshold < 100% identity.
+    
     II. No further annotation indicates that the gene recovered exhibits 100% coverage and 100% identity to a gene in the gene catalog.
+    
     III. Point mutations detected (if `--species` supplied) will also be present in this file in the form of `gene_AAchange`.
 
+3. `summary_partials.txt`
+  * Tab-delimited file, with a row per sequence, and columns representing functional drug classes 
+  * Genes recovered from sequence which have >50% but <90% coverage of the gene reported and greater than the desired identity threshold (default 90%). 
+
+4. `summary_virulence.txt`
+  * Tab-delimited file, with a row per sequence, and columns representing AMRFinderPlus virulence gene classification
+  * Genes recovered from sequence which have >50% coverage of the gene reported and greater than the desired identity threshold (default 90%). 
+
+      * Genes recovered with >50% but <90% coverage of a gene in the gene catalog will be annotated with `^`.
+      * Genes annotated with `*` indicate >90% coverage and > identity threshold < 100% identity.
