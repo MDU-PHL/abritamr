@@ -109,3 +109,17 @@ optional arguments:
 
       * Genes recovered with >50% but <90% coverage of a gene in the gene catalog will be annotated with `^`.
       * Genes annotated with `*` indicate >90% coverage and > identity threshold < 100% identity.
+
+`abritamr report` will output spreadsheets `MMS118_runid.xlsx` or `MMS184_runid.xlsx` depending upon the sop chosen.
+
+* `MMS118_rundid.xlsx` has two tabs, one for matches and one for partials (corresponding to genes reported in the `summary_matches.txt` and `summary_partials.txt`). Each tab has 7 columns 
+
+| Column | Interpretation |
+|:---: | :---: |
+| MDU sample ID | Sample ID |
+|Item code | suffix (MDU specific) |
+| Resistance genes (alleles) detected | genes detected that are reportable (based on species and drug classification)|
+| Resistance genes (alleles) det (non-rpt) | other genes detected that are not not reportable for the species detected.
+| Species_obs | Species observed (supplied in input file) |
+| Species_exp | Species expected (supplied in input file) |
+| db_version | Version of the AMRFinderPlus DB used |
