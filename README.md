@@ -75,3 +75,17 @@ optional arguments:
                         Path to partial matches, concatentated output of abritamr (default: summary_partials.txt)
   --sop {general,plus}  The MDU pipeline for reporting results. (default: general)
 ```
+
+## Output
+
+`abritAMR run` outputs 4 summary files and retains the raw AMRFinderPlus output for each sequence input.
+
+1. `amrfinder.out` raw output from AMRFinder plus (per sequence). For more information please see AMRFinderPlus help [here](https://github.com/ncbi/amr/wiki/Interpreting-results) 
+
+2.  `summary_matches.txt` 
+  * Tab-delimited file, with a row per sequence, and columns representing functional drug classes 
+  * Only genes recovered from sequence which have >90% coverage of the gene reported and greater than the desired identity threshold (default 90%). 
+    I. Genes annotated with `*` indicate >90% coverage and > identity threshold < 100% identity.
+    II. No further annotation indicates that the gene recovered exhibits 100% coverage and 100% identity to a gene in the gene catalog.
+    III. Point mutations detected (if `--species` supplied) will also be present in this file in the form of `gene_AAchange`.
+
