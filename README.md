@@ -48,7 +48,7 @@ optional arguments:
                         Set if you would like to use point mutations, please provide a valid species. (default: )
 ```
 
-You can also run abriTAMR in `rpeort` mode, this will output a spreadsheet which is based on reportable/not-reportable requirements in Victoria. You will need to supply a quality control file (comma separated) (`-q`), with the following columns:
+You can also run abriTAMR in `report` mode, this will output a spreadsheet which is based on reportable/not-reportable requirements in Victoria. You will need to supply a quality control file (comma separated) (`-q`), with the following columns:
 
 * ISOLATE
 * SPECIES_EXP (the species that was expected)
@@ -78,7 +78,9 @@ optional arguments:
 
 ## Output
 
-`abritAMR run` outputs 4 summary files and retains the raw AMRFinderPlus output for each sequence input.
+### `abritAMR run` 
+
+Outputs 4 summary files and retains the raw AMRFinderPlus output for each sequence input.
 
 1. `amrfinder.out` raw output from AMRFinder plus (per sequence). For more information please see AMRFinderPlus help [here](https://github.com/ncbi/amr/wiki/Interpreting-results) 
 
@@ -110,7 +112,9 @@ optional arguments:
       * Genes recovered with >50% but <90% coverage of a gene in the gene catalog will be annotated with `^`.
       * Genes annotated with `*` indicate >90% coverage and > identity threshold < 100% identity.
 
-`abritamr report` will output spreadsheets `MMS118_runid.xlsx` or `MMS184_runid.xlsx` depending upon the sop chosen.
+### `abritamr report` 
+
+will output spreadsheets `MMS118_runid.xlsx` (NATA accredited) or `MMS184_runid.xlsx` (validated - not yet accredited) depending upon the sop chosen.
 
 * `MMS118_rundid.xlsx` has two tabs, one for matches and one for partials (corresponding to genes reported in the `summary_matches.txt` and `summary_partials.txt`). Each tab has 7 columns 
 
@@ -123,3 +127,23 @@ optional arguments:
 | Species_obs | Species observed (supplied in input file) |
 | Species_exp | Species expected (supplied in input file) |
 | db_version | Version of the AMRFinderPlus DB used |
+
+* `MMS184_runid.xlsx` output is a spreadsheet with the different drug resistance mechanims and the corresponding interpretation (based on validation of genotype and phenotype) for drug-classes relevant to reporting of anti-microbial resistance in _Salmonella enterica_ (other species will be added as validation of genotype vs phenotype is performed).
+
+* Ampicillin
+* Cefotaxime (ESBL) 
+* Cefotaxime (AmpC)
+* Tetracycline
+* Gentamicin
+* Kanamycin
+* Streptomycin
+* Sulfathiazole
+* Trimethoprim
+* Trim-Sulpha
+* Chloramphenicol 
+* Ciprofloxacin
+* Meropenem 
+* Azithromycin
+* Aminoglycosides (RMT)
+* Colistin 
+
