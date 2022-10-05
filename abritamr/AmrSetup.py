@@ -176,10 +176,15 @@ class SetupMDU(Setup):
         """
         Check the inputs for MDU - ensure all files are present for collation.
         """
+        
         file_dict = {
             'QC': self.qc, 
             'summary_matches': self.matches,
             'summary_partials':self.partials
+            } if self.sop == 'general' else {
+            'QC': self.qc, 
+            'summary_matches': self.matches,
+            # 'summary_partials':self.partials
             }
 
         if self._check_runid():

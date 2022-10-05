@@ -30,7 +30,7 @@ def mdu(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="AMR gene detection pipeline", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        description=f"****AMR gene detection pipeline - version {__version__}****", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
     
@@ -73,7 +73,7 @@ def main():
         "-sp",
         default="",
         help="Set if you would like to use point mutations, please provide a valid species.",
-        choices= ['Neisseria','Clostridioides_difficile', 'Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes"]
+        choices= ["Burkholderia_cepacia","Acinetobacter_baumannii","Streptococcus_pyogenes","Streptococcus_agalactiae","Streptococcus_pneumoniae","Enterococcus_faecium","Pseudomonas_aeruginosa","Staphylococcus_pseudintermedius","Clostridioides_difficile","Klebsiella","Neisseria","Campylobacter","Salmonella","Escherichia","Staphylococcus_aureus","Burkholderia_pseudomallei","Enterococcus_faecalis"]
     )
     parser_mdu = subparsers.add_parser('report', help='Generate report for use at MDU', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     

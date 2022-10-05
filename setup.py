@@ -38,7 +38,7 @@ setup(
         "console_scripts": [
             # "mdu-amr-detection=abritamr.abritamr:main",
             "abritamr=abritamr.abritamr:main",
-            "abriTAMR=abritamr.abritamr:main",
+            # "abriTAMR=abritamr.abritamr:main",
         ]
     },
     classifiers=[
@@ -50,6 +50,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     package_data={"abritamr": ["db/*","db/amrfinderplus/data/*/*"]}
