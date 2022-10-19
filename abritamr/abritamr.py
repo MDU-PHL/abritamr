@@ -105,7 +105,12 @@ def main():
         "--sop",
         default=f"general",
         choices = ['general', 'plus'],
-        help="The MDU pipeline for reporting results."
+        help="The pipeline for reporting results."
+    )
+    parser_mdu.add_argument(
+        "--sop_name",
+        default=f"",
+        help="The name of the process - will be reflected in the names od the output files."
     )
 
     

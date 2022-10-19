@@ -329,6 +329,7 @@ class MduCollate(Collate):
         self.logger.addHandler(ch) 
         self.logger.addHandler(fh)
         self.sop = args.sop
+        self.sop_name = args.sop_name
         self.mduqc = args.qc
         self.db = args.db
         self.partials = args.partials
@@ -802,16 +803,16 @@ class MduCollate(Collate):
         passed_partials,
         
     ):
-        self.logger.info(f"Saving MMS118.")
-        writer = pandas.ExcelWriter(f"{self.runid}_MMS118.xlsx", engine="xlsxwriter")
-        passed_match.to_excel(writer, sheet_name="MMS118")
+        self.logger.info(f"Saving {self.sop_name}.")
+        writer = pandas.ExcelWriter(f"{self.runid}_{self.sop_name}.xlsx", engine="xlsxwriter")
+        passed_match.to_excel(writer, sheet_name=f"{self.sop_name}")
         passed_partials.to_excel(writer, sheet_name="Passed QC partial")
         writer.close()
 
     def save_spreadsheet_interpreted(self, results):
-        sheets = {"Salmonella enterica":"MMS184-01"}
+        sheets = {"Salmonella enterica":f"{self.sop_name}-1"}
         self.logger.info(f"Saving MMS184")
-        writer = pandas.ExcelWriter(f"{self.runid}_MMS184.xlsx", engine = "xlsxwriter")
+        writer = pandas.ExcelWriter(f"{self.runid}_{self.sop_name}.xlsx", engine = "xlsxwriter")
         for result in results:
             result[1].to_excel(writer, sheet_name = sheets[result[0]], index = False)
         writer.close()
