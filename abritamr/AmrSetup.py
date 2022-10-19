@@ -164,6 +164,7 @@ class SetupMDU(Setup):
         self.matches = args.matches
         self.partials = args.partials   
         self.sop = args.sop
+        self.sop = args.sop_name
 
     def _check_runid(self):
         if self.runid == '':
@@ -198,7 +199,7 @@ class SetupMDU(Setup):
                     self.logger.critical(f"The {_file} file supplied ({file_dict[_file]}) does not exist. Please check your inputs and try again.")
                     raise SystemExit
 
-            Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid', 'sop'])
+            Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid', 'sop','sop_name'])
         
-            return Data(self.qc, self.matches, self.partials, self.db, self.runid, self.sop)
+            return Data(self.qc, self.matches, self.partials, self.db, self.runid, self.sop, self.sop_name)
         
