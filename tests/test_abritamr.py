@@ -6,8 +6,11 @@ from abritamr.AmrSetup import Setup, SetupAMR, SetupMDU
 from abritamr.RunFinder import RunFinder
 from abritamr.Collate import Collate, MduCollate
 
+
+
 test_folder = pathlib.Path(__file__).parent
 REFGENES = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'refgenes_latest.csv'}"
+CONTROLS = pathlib.Path(__file__).parent.parent /'abritamr' / 'control'
 
 def test_file_present():
     """
@@ -16,7 +19,7 @@ def test_file_present():
     with patch.object(Setup, "__init__", lambda x: None):
         amr_obj = Setup()
         amr_obj.logger = logging.getLogger(__name__)
-        p = test_folder / "contigs.fa"
+        p = CONTROLS / "contigs.fa"
     
         assert amr_obj.file_present(p)
 
@@ -38,7 +41,7 @@ def test_check_run_type_single():
     """
     with patch.object(SetupAMR, "__init__", lambda x: None):
         amr_obj = SetupAMR()
-        amr_obj.contigs = f"{test_folder / 'contigs.fa'}"
+        amr_obj.contigs = f"{CONTROLS / 'contigs.fa'}"
         amr_obj.prefix = 'somename'
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj._get_input_shape() == 'assembly'
@@ -80,12 +83,12 @@ def test_prefix_empty():
 def test_setup_contigs():
     with patch.object(SetupAMR, "__init__", lambda x: None):
         amr_obj = SetupAMR()
-        amr_obj.contigs = f"{test_folder / 'contigs.fa'}"
+        amr_obj.contigs = f"{CONTROLS / 'contigs.fa'}"
         amr_obj.prefix = 'somename'
         amr_obj.jobs  = 16
         amr_obj.species = ''
         amr_obj.identity = ''
-        amr_obj.amrfinder_db = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus'/ 'data'/ '2021-09-30.1'}"
+        amr_obj.amrfinder_db = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus'/ 'data'/ '2022-08-09.1'}"
         amr_obj.logger = logging.getLogger(__name__)
         T = collections.namedtuple('T', ['run_type', 'input', 'prefix', 'jobs', 'organism', 'identity','amrfinder_db'])
         input_data = T('assembly', amr_obj.contigs, amr_obj.prefix, amr_obj.jobs, amr_obj.species, amr_obj.identity, amr_obj.amrfinder_db)
@@ -100,7 +103,7 @@ def test_setup_batch():
         amr_obj.jobs  = 16
         amr_obj.species = ''
         amr_obj.identity = ''
-        amr_obj.amrfinder_db = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus'/ 'data'/ '2021-09-30.1'}"
+        amr_obj.amrfinder_db = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus'/ 'data'/ '2022-08-09.1'}"
         amr_obj.logger = logging.getLogger(__name__)
         T = collections.namedtuple('T', ['run_type', 'input', 'prefix', 'jobs', 'organism','identity', 'amrfinder_db'])
         input_data = T('batch', amr_obj.contigs, amr_obj.prefix, amr_obj.jobs, amr_obj.species, amr_obj.identity,amr_obj.amrfinder_db)
@@ -121,14 +124,14 @@ def test_setup_fail():
             amr_obj.setup()
 
 # # Test SetupMDU
-MDU = collections.namedtuple('MDU', ['runid', 'matches', 'partials', 'qc', 'sop'])
+MDU = collections.namedtuple('MDU', ['runid', 'matches', 'partials', 'qc', 'sop', 'sop_name'])
 
 def test_prefix_string():
     """
     assert True when non-empty string is given
     """
     with patch.object(SetupAMR, "__init__", lambda x: None):
-        args = MDU("RUNID", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general')
+        args = MDU("RUNID", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general', 'sop_name')
         amr_obj = SetupMDU(args)
         # amr_obj.runid= 
         amr_obj.logger = logging.getLogger(__name__)
@@ -139,7 +142,7 @@ def test_prefix_empty():
     assert True when non-empty string is given
     """
     with patch.object(SetupAMR, "__init__", lambda x: None):
-        args = MDU("", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general')
+        args = MDU("", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general', 'sop_name')
         amr_obj = SetupMDU(args)
         amr_obj.logger = logging.getLogger(__name__)
         with pytest.raises(SystemExit):
@@ -151,10 +154,10 @@ def test_mdu_setup_success():
     assert True when non-empty string is given
     """
     with patch.object(SetupAMR, "__init__", lambda x: None):
-        args = MDU("RUNID", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general')
+        args = MDU("RUNID", 'tests/summary_matches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general', 'sop_name')
         amr_obj = SetupMDU(args)
-        Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid','sop'])
-        d = Data(args.qc, args.matches, args.partials, amr_obj.db, args.runid, args.sop)
+        Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid','sop', 'sop_name'])
+        d = Data(args.qc, args.matches, args.partials, amr_obj.db, args.runid, args.sop, args.sop_name)
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj.setup() == d
 
@@ -164,7 +167,7 @@ def test_mdu_setup_fail():
     assert True when non-empty string is given
     """
     with patch.object(SetupAMR, "__init__", lambda x: None):
-        args = MDU("RUNID", 'tests/summarymatches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general')
+        args = MDU("RUNID", 'tests/summarymatches.txt', 'tests/summary_matches.txt', 'tests/mdu_qc_checked.csv', 'general', 'sop_name')
         amr_obj = SetupMDU(args)
         Data = collections.namedtuple('Data', ['qc', 'matches', 'partials', 'db', 'runid'])
         d = Data(args.qc, args.matches, args.partials, amr_obj.db, args.runid)
