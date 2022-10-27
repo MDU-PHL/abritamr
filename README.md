@@ -17,23 +17,24 @@ _abriTAMR is accredited by NATA for use in reporting the presence of reportable 
 
 ## Install
 
-### Dependencies
-
-abriTAMR requires [AMRFinder Plus](https://github.com/ncbi/amr), this can be installed with `conda`. 
-
-abriTAMR comes packaged with an AMRFinder DB consistent with current NATA accreditation. If you would like to use another DB please download it using `amrfinder -U` and use the `-d` flag to point to your database.
-
-Current version of AMRFinder Plus compatible with abritAMR 3.10.42 (tested on versions down to 3.10.16)
-
 ### Conda
 
-abritAMR is best installed with `conda` as described below
+abritAMR is best installed with `conda` as described below (~2 minutes on laptop)
 
 
 ```
 conda create -n abritamr -c bioconda abritamr
 conda activate abritamr
 ```
+
+### A note on dependencies
+
+abriTAMR requires [AMRFinder Plus](https://github.com/ncbi/amr), this can be installed separately with `conda` if required. 
+
+abriTAMR comes packaged with a version of the  AMRFinder DB consistent with current NATA accreditation. If you would like to use another DB please download it using `amrfinder -U` and use the `-d` flag to point to your database.
+
+Current version of AMRFinder Plus compatible with abritAMR 3.10.42 (tested on versions down to 3.10.16)
+
 
 
 ## Command-line tool
@@ -55,7 +56,7 @@ optional arguments:
                         unless a curated threshold is present for the gene. (default: )
   --amrfinder_db AMRFINDER_DB, -d AMRFINDER_DB
                         Path to amrfinder DB to use (default:
-                        /home/khhor/dev/abritamr/abritamr/db/amrfinderplus/data/2021-09-30.1)
+                        /<path_to_installation>/abritamr/abritamr/db/amrfinderplus/data/2021-09-30.1)
   --species {Neisseria,Clostridioides_difficile,Acinetobacter_baumannii,Campylobacter,Enterococcus_faecalis,Enterococcus_faecium,Escherichia,Klebsiella,Salmonella,Staphylococcus_aureus,Staphylococcus_pseudintermedius,Streptococcus_agalactiae,Streptococcus_pneumoniae,Streptococcus_pyogenes}, -sp {Neisseria,Clostridioides_difficile,Acinetobacter_baumannii,Campylobacter,Enterococcus_faecalis,Enterococcus_faecium,Escherichia,Klebsiella,Salmonella,Staphylococcus_aureus,Staphylococcus_pseudintermedius,Streptococcus_agalactiae,Streptococcus_pneumoniae,Streptococcus_pyogenes}
                         Set if you would like to use point mutations, please provide a valid species. (default: )
 ```
@@ -126,9 +127,9 @@ Outputs 4 summary files and retains the raw AMRFinderPlus output for each sequen
 
 ### `abritamr report` 
 
-will output spreadsheets `MMS118_runid.xlsx` (NATA accredited) or `MMS184_runid.xlsx` (validated - not yet accredited) depending upon the sop chosen.
+will output spreadsheets `general_runid.xlsx` (NATA accredited) or `plus_runid.xlsx` (validated - not yet accredited) depending upon the sop chosen.
 
-* `MMS118_rundid.xlsx` has two tabs, one for matches and one for partials (corresponding to genes reported in the `summary_matches.txt` and `summary_partials.txt`). Each tab has 7 columns 
+* `general_rundid.xlsx` has two tabs, one for matches and one for partials (corresponding to genes reported in the `summary_matches.txt` and `summary_partials.txt`). Each tab has 7 columns 
 
 | Column | Interpretation |
 |:---: | :---: |
@@ -140,7 +141,7 @@ will output spreadsheets `MMS118_runid.xlsx` (NATA accredited) or `MMS184_runid.
 | Species_exp | Species expected (supplied in input file) |
 | db_version | Version of the AMRFinderPlus DB used |
 
-* `MMS184_runid.xlsx` output is a spreadsheet with the different drug resistance mechanims and the corresponding interpretation (based on validation of genotype and phenotype) for drug-classes relevant to reporting of anti-microbial resistance in _Salmonella enterica_ (other species will be added as validation of genotype vs phenotype is performed).
+* `plus_runid.xlsx` output is a spreadsheet with the different drug resistance mechanims and the corresponding interpretation (based on validation of genotype and phenotype) for drug-classes relevant to reporting of anti-microbial resistance in _Salmonella enterica_ (other species will be added as validation of genotype vs phenotype is performed).
 
 * Ampicillin
 * Cefotaxime (ESBL) 
