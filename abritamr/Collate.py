@@ -355,7 +355,7 @@ class MduCollate(Collate):
 
         pos = pandas.DataFrame(data = {"ISOLATE": "9999-99888", "TEST_QC" : "PASS", "SPECIES_EXP":"Staphylococcus aureus", "SPECIES_OBS":"Staphylococcus aureus" }, index = [0])
         
-        return tab.append(pos)
+        return pandas.concat([tab,pos])
 
     def strip_bla(self, gene):
         '''
@@ -792,7 +792,7 @@ class MduCollate(Collate):
             if reporting_df.empty:
                 reporting_df = tempdf
             else:
-                reporting_df = reporting_df.append(tempdf)
+                reporting_df = pandas.concat([reporting_df,tempdf])
         
         return reporting_df.reindex(labels = ['Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs', 'Species_exp', 'db_version'], axis = 'columns')
 

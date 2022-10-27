@@ -3,7 +3,7 @@ import pathlib, argparse, sys, os, logging
 from abritamr.AmrSetup import SetupAMR, SetupMDU
 from abritamr.RunFinder import RunFinder
 from abritamr.Collate import Collate, MduCollate
-from abritamr.version import __version__
+from abritamr.version import __version__, db
 
 """
 abritamr is designed to implement AMRFinder and parse the results compatible for MDU use. It may also be used for other purposes where the format of output is compatible
@@ -64,7 +64,7 @@ def main():
     parser_sub_run.add_argument(
         "--amrfinder_db", 
         "-d", 
-        default=f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus' / 'data' / '2021-09-30.1/'}", 
+        default=f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus' / 'data' / f'{db}/'}", 
         # default="/home/khhor/conda/envs/abritamr/share/amrfinderplus/data/2021-09-30.1/",
         help="Path to amrfinder DB to use"
     )

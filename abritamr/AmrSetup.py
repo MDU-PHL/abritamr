@@ -164,7 +164,7 @@ class SetupMDU(Setup):
         self.matches = args.matches
         self.partials = args.partials   
         self.sop = args.sop
-        self.sop = args.sop_name
+        self.sop_name = args.sop_name
 
     def _check_runid(self):
         if self.runid == '':
