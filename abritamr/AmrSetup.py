@@ -46,7 +46,7 @@ class SetupAMR(Setup):
         
 
         # for amr
-        self.species_list = ['Acinetobacter_baumannii','Clostridioides_difficile', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"]
+        self.species_list = ["Burkholderia_cepacia","Acinetobacter_baumannii","Streptococcus_pyogenes","Streptococcus_agalactiae","Streptococcus_pneumoniae","Enterococcus_faecium","Pseudomonas_aeruginosa","Staphylococcus_pseudintermedius","Clostridioides_difficile","Klebsiella","Neisseria","Campylobacter","Salmonella","Escherichia","Staphylococcus_aureus","Burkholderia_pseudomallei","Enterococcus_faecalis"]
         
         self.logger =logging.getLogger(__name__) 
         self.logger.setLevel(logging.INFO)

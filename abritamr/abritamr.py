@@ -75,6 +75,7 @@ def main():
         help="Set if you would like to use point mutations, please provide a valid species.",
         choices= ["Burkholderia_cepacia","Acinetobacter_baumannii","Streptococcus_pyogenes","Streptococcus_agalactiae","Streptococcus_pneumoniae","Enterococcus_faecium","Pseudomonas_aeruginosa","Staphylococcus_pseudintermedius","Clostridioides_difficile","Klebsiella","Neisseria","Campylobacter","Salmonella","Escherichia","Staphylococcus_aureus","Burkholderia_pseudomallei","Enterococcus_faecalis"]
     )
+    
     parser_mdu = subparsers.add_parser('report', help='Generate report for use at MDU', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     
     parser_mdu.add_argument(

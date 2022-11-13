@@ -94,6 +94,20 @@ def test_setup_contigs():
         input_data = T('assembly', amr_obj.contigs, amr_obj.prefix, amr_obj.jobs, amr_obj.species, amr_obj.identity, amr_obj.amrfinder_db)
         assert amr_obj.setup() == input_data
 
+def test_species():
+    with patch.object(SetupAMR, "__init__", lambda x: None):
+        amr_obj = SetupAMR()
+        amr_obj.contigs = f"{CONTROLS / 'contigs.fa'}"
+        amr_obj.prefix = 'somename'
+        amr_obj.jobs  = 16
+        amr_obj.species = 'Neiserria'
+        amr_obj.identity = ''
+        amr_obj.amrfinder_db = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus'/ 'data'/ '2022-08-09.1'}"
+        amr_obj.logger = logging.getLogger(__name__)
+        T = collections.namedtuple('T', ['run_type', 'input', 'prefix', 'jobs', 'organism', 'identity','amrfinder_db'])
+        input_data = T('assembly', amr_obj.contigs, amr_obj.prefix, amr_obj.jobs, amr_obj.species, amr_obj.identity, amr_obj.amrfinder_db)
+        assert amr_obj.setup() == input_data
+
 
 def test_setup_batch():
     with patch.object(SetupAMR, "__init__", lambda x: None):
@@ -203,6 +217,24 @@ def test_batch_cmd_with_org():
     """
     with patch.object(RunFinder, "__init__", lambda x: None):
         args = Data("batch", 'tests/batch.txt', '', 9, 'Salmonella')
+        amr_obj = RunFinder()
+        amr_obj.organism = args.organism
+        amr_obj.run_type = args.run_type
+        amr_obj.prefix = args.prefix
+        amr_obj.jobs = args.jobs
+        amr_obj.input = args.input
+        amr_obj.amrfinder_db = "2021-06-01.1"
+        amr_obj.identity = ''
+        cmd = f"parallel -j {args.jobs} --colsep '\\t' 'mkdir -p {{1}} && amrfinder -n {{2}} -o {{1}}/amrfinder.out --plus --organism {args.organism} --threads 1 -d {amr_obj.amrfinder_db}' :::: {args.input}"
+        amr_obj.logger = logging.getLogger(__name__)
+        assert amr_obj._batch_cmd() == cmd
+
+def test_batch_cmd_with_neiserria():
+    """
+    assert True when non-empty string is given
+    """
+    with patch.object(RunFinder, "__init__", lambda x: None):
+        args = Data("batch", 'tests/batch.txt', '', 9, 'Neiserria')
         amr_obj = RunFinder()
         amr_obj.organism = args.organism
         amr_obj.run_type = args.run_type
