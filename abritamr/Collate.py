@@ -395,7 +395,7 @@ class MduCollate(Collate):
         if genus in self.NONE_CODES:
             return self.NONE_CODES[genus]
         else:
-            return "GENRL_AMR_NEG1"
+            return "Cpase_16S_mcr_NEG"
 
     def assign_itemcode(self,mduid, reg):
         self.logger.info(f"Checking for item code")
