@@ -4,6 +4,7 @@
 
 [![CircleCI](https://circleci.com/gh/MDU-PHL/abritamr.svg?style=svg&circle-token=a54d59b013a30a507621695e738f0a72e47d6969)](https://circleci.com/gh/MDU-PHL/abritamr)
 
+[![DOI](https://zenodo.org/badge/209921768.svg)](https://zenodo.org/badge/latestdoi/209921768)
 
 **_Taming the AMR beast_**
 
