@@ -810,7 +810,7 @@ class MduCollate(Collate):
         writer.close()
 
     def save_spreadsheet_interpreted(self, results):
-        sheets = {"Salmonella enterica":f"{self.sop_name}-1"}
+        sheets = {"Salmonella enterica":f"{self.sop_name}-01"}
         self.logger.info(f"Saving MMS184")
         writer = pandas.ExcelWriter(f"{self.runid}_{self.sop_name}.xlsx", engine = "xlsxwriter")
         for result in results:
