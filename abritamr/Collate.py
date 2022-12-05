@@ -340,7 +340,7 @@ class MduCollate(Collate):
             "Shigella":"CPase_ESBL_AmpC_16S_NEG",
             "Staphylococcus":"Mec_VanAB_Linez_NEG",
             "Enterococcus":"Van_Linez_NEG",
-            "Other":"Cpase_16S_mcr_NEG"
+            "Other":"CPase_16S_mcr_NEG"
         }
         self.REPORTING = {"Salmonella enterica":self.mdu_reporting_salmonella}
     def mdu_qc_tab(self):
@@ -395,7 +395,7 @@ class MduCollate(Collate):
         if genus in self.NONE_CODES:
             return self.NONE_CODES[genus]
         else:
-            return "Cpase_16S_mcr_NEG"
+            return "CPase_16S_mcr_NEG"
 
     def assign_itemcode(self,mduid, reg):
         self.logger.info(f"Checking for item code")
