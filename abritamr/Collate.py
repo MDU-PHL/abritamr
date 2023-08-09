@@ -523,7 +523,8 @@ class MduCollate(Collate):
         # Ciprofloxacin - ResMech	Ciprofloxacin - Interpretation	
         # Azithromycin - ResMech	Azithromycin - Interpretation
 
-        mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
+        #mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
+        mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,4})?') #accept itemcode longer
         
         all_genes = self.get_all_genes(row)
         all_genes = [a for a in all_genes if a != row[1]['Isolate'] and a != '']
@@ -756,7 +757,8 @@ class MduCollate(Collate):
     def mdu_reporting_general(self, match, neg_code = True):
 
         self.logger.info(f"Applying MDU business logic {'matches' if neg_code else 'partials'}.")
-        mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
+        #mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
+        mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,4})?')
         reporting_df = pandas.DataFrame()
         qc = self.mdu_qc_tab()
         match_df = pandas.read_csv(match, sep = '\t')
