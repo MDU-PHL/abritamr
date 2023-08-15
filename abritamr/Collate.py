@@ -435,7 +435,7 @@ class MduCollate(Collate):
 
     def _cefo_ampc_res_sal(self, col, gene):
 
-        if col == 'ESBL (AmpC type)':
+        if 'AmpC' in col :
             return gene
         return ''
     
