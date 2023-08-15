@@ -452,7 +452,7 @@ class MduCollate(Collate):
         return ''
 
     def _gentamicin_res_salm(self, col, gene):
-        if col in ['Gentamicin', 'Aminoglycosides (Ribosomal methyltransferase)']: #change
+        if col in ['Gentamicin', 'Aminoglycosides (Ribosomal methyltransferase)']: 
             return gene
         return ''
     
@@ -624,19 +624,20 @@ class MduCollate(Collate):
         reportable = [
             "Carbapenemase",
             "Carbapenemase (MBL)",
-            "Carbapenemase (KPC variant)"
+            "ESBL (KPC variant)"
             "Carbapenemase (OXA-51 family)",
             "ESBL",
-            "ESBL (AmpC type)", # will need to change to reflect new subclass AmpC
+            "AmpC type", # will need to change to reflect new subclass AmpC
             "Aminoglycosides (Ribosomal methyltransferase)",
             "Colistin",
-            "Oxazolidinone & phenicol resistance", # Oxazolidinone or linezolid = reportable
+            "Chloramphenicol/Florfenicol/Linezolid", 
+            "Florfenicol/Oxazolidinone",
             "Vancomycin",
             "Methicillin"
         ]
         non_caveat_reportable = [
             "Carbapenemase",
-            "Carbapenemase (KPC variant)",
+            "ESBL (KPC variant)",
             "Aminoglycosides (Ribosomal methyltransferase)",
             "Colistin"
         ]
@@ -676,9 +677,9 @@ class MduCollate(Collate):
                             genes_not_reported.extend([g for g in genes if g.startswith("blaL1")])
                         elif i == "Carbapenemase (OXA-51 family)" and species not in abacter_excluded:
                             genes_reported.extend(genes)
-                        elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Salmonella"]: 
+                        elif i in ["ESBL","AmpC"] and genus in ["Salmonella"]: 
                             genes_reported.extend(genes)
-                        elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Shigella"]: 
+                        elif i in ["ESBL","AmpC"] and genus in ["Shigella"]: 
                             genes_reported.extend([g for g in genes if "blaEC" not in g])
                             genes_not_reported.extend([g for g in genes if "blaEC" in g]) # don't report blaEC for shigella
                         elif i == "Vancomycin":
