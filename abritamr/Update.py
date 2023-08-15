@@ -259,7 +259,7 @@ def _update_status(new_catalog, previous_catalog):
 def _compare_to_existing(new_catalog, previous_catalog):
 
     tab = pandas.DataFrame(new_catalog)
-    print(previous_catalog.columns)
+    
     if isinstance(previous_catalog,pandas.DataFrame):
         new_catalog = _update_status(new_catalog=tab,previous_catalog=previous_catalog)
         return new_catalog
