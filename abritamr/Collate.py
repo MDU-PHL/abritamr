@@ -627,7 +627,7 @@ class MduCollate(Collate):
             "Carbapenemase (KPC variant)"
             "Carbapenemase (OXA-51 family)",
             "ESBL",
-            "ESBL (AmpC type)",
+            "ESBL (AmpC type)", # will need to change to reflect new subclass AmpC
             "Aminoglycosides (Ribosomal methyltransferase)",
             "Colistin",
             "Oxazolidinone & phenicol resistance", # Oxazolidinone or linezolid = reportable
@@ -663,7 +663,7 @@ class MduCollate(Collate):
             if i != 'Isolate':
                 if isinstance(isodict[i], str):
                     genes = isodict[i].split(',')
-                    genes = [gene for gene in genes if '_' not in gene]
+                    genes = [gene for gene in genes if '_' not in gene] # this is to remove the point mutations for MMS118
                 if genes != []: # for each bin we do things to genes
                     if i in reportable: #don't report point mutations
                         if i in non_caveat_reportable:
