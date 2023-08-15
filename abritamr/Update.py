@@ -28,10 +28,10 @@ def _get_keys(cfg):
 
 def _get_vars():
 
-    cfg = pathlib.Path(__file__).parent.parent / "update_vars.json"
+    cfg = pathlib.Path(__file__).parent / "db" / "update_vars.json"
     if cfg.exists():
         with open(f"{cfg}", "r") as j:
-            return _get_keys(json.loads(j))
+            return _get_keys(json.load(j))
     else:
         logger.critical(f"It seems that {cfg} does not exist. Please check your installation and try again.")
         raise SystemExit
@@ -52,9 +52,10 @@ def _get_new_catalog():
         raise SystemExit
 
 def _make_key(df):
-    df['mut_acc'] = df[['allele','whitelisted_taxa','refseq_nucleotide_accession']].apply( lambda x: '_'.join(x), axis = 1)
-    df['key'] = numpy.where(df['refseq_protein_accession'] == '',df['genbank_protein_accession'],df['refseq_protein_accession'])
-    df['key'] = numpy.where(df['subtype'] == 'POINT', df['mut_acc'], df['key'])
+    if 'key' not in list(df.columns):
+        df['mut_acc'] = df[['allele','whitelisted_taxa','refseq_nucleotide_accession']].apply( lambda x: '_'.join(x), axis = 1)
+        df['key'] = numpy.where(df['refseq_protein_accession'] == '',df['genbank_protein_accession'],df['refseq_protein_accession'])
+        df['key'] = numpy.where(df['subtype'] == 'POINT', df['mut_acc'], df['key'])
 
     return df
 
@@ -72,6 +73,9 @@ def _get_previous_refgenes():
 
     if existing != False:
         logger.info(f"An existing refgenes file has been found.")
+        df = pandas.read_csv(existing)
+        df = df.fillna('')
+        return pandas.read_csv(existing)
     else:
         logger.warning(f"There is not an existing refgenes file. Refgenes file will be created from new.")
     return existing
@@ -79,7 +83,8 @@ def _get_previous_refgenes():
 
 def _check_existing():
 
-    existing = pathlib.Path(__file__).parent.parent / "refgenes_latest.csv"
+    existing = pathlib.Path(__file__).parent /"db" / "refgenes_latest.csv"
+    
     if existing.exists():
         return existing
     return False
@@ -195,15 +200,25 @@ def _logic(_dict,other_amr,other_non_amr,rename_key):
             row['enhanced_class'],row['enhanced_subclass'] = 'Other','Other'
         else:
             row['enhanced_class'],row['enhanced_subclass'] = _capitalise(row['class']),_capitalise(row['subclass'])
-
+    return _dict
 
 def _make_dict(df,other_amr,other_non_amr,rename_key):
     _new_dict = df.to_dict(orient='records')
     _new_dict = _logic(_dict = _new_dict,other_amr =other_amr,other_non_amr=other_non_amr,rename_key=rename_key)
+    
     return _new_dict
 
-def _email(adrs):
-    pass
+def _email(adrs,pth):
+    # f"cat {_email} | mailx -s '{runid} QC' {a} {user_email}"
+
+    cmd = f"echo 'Please confirm curation of the abritAMR refgenes database attached here.' | mailx -s 'abritamr update' -a {pth} {adrs}"
+    
+    p = subprocess.run(cmd, shell = True, capture_output=True, encoding='utf-8')
+
+    if p.returncode == 0:
+        logger.info("abritAMR update email sent for approval.")
+    else:
+        logger.critical(f"Something has gone wrong. {p.stderr}.")
 
 def _save_df(df):
     
@@ -212,15 +227,19 @@ def _save_df(df):
     return f"refgenes_{sfx}.csv"
 
 def _updated_entries(new_catalog, previous_catalog):
-
+    
+    new_catalog = new_catalog.rename(columns = {"class":"class_new", "subclass": "subclass_new"})
     _tmp= new_catalog.merge(previous_catalog, on = ['key'])
-    _tmp['changed'] = numpy.where((_tmp['class_x'] != _tmp['class_y']) | (_tmp['subclass_x'] != _tmp['subclass_y']), 'updated', '')
-    _tmp['Previous_class'] = numpy.where(_tmp['changed'] != '', _tmp['class_y'], _tmp['class_x'])
-    _tmp['Previous_subclass'] = numpy.where(_tmp['changed'] != '', _tmp['subclass_y'], _tmp['subclass_x'])
+    
+    _tmp['changed'] = numpy.where((_tmp['class'] != _tmp['class_new']) , 'updated', '')
+    _tmp['changed'] = numpy.where((_tmp['subclass'] != _tmp['subclass_new']) , 'updated', _tmp['changed'])
+    
+    _tmp['Previous_class'] = numpy.where(_tmp['changed'] == 'updated', _tmp['class'], '')
+    _tmp['Previous_subclass'] = numpy.where(_tmp['changed'] == 'updated', _tmp['subclass'],'')
     changed = list(_tmp[_tmp['changed']!='']['key'])
+    
     new_catalog['Status'] = numpy.where(new_catalog['key'].isin(changed), 'updated',new_catalog['Status'])
-    new_catalog = new_catalog.merge(_tmp[['key','Previous_class','Previous_subclass']], on = ['key'])
-
+    new_catalog = new_catalog.merge(_tmp[['key','Previous_class','Previous_subclass']], on = ['key'], how = 'left')
     return new_catalog
 
 def _new_entries(new_catalog, previous_catalog):
@@ -239,13 +258,15 @@ def _update_status(new_catalog, previous_catalog):
 
 def _compare_to_existing(new_catalog, previous_catalog):
 
-    if previous_catalog != False:
-        new_catalog = _update_status(new_catalog=new_catalog,previous_catalog=previous_catalog)
-
+    tab = pandas.DataFrame(new_catalog)
+    print(previous_catalog.columns)
+    if isinstance(previous_catalog,pandas.DataFrame):
+        new_catalog = _update_status(new_catalog=tab,previous_catalog=previous_catalog)
+        return new_catalog
     else:
         logger.info(f"There is in no previous file to compare with.")
-
-    return new_catalog
+        return tab
+    
 
 def create_refgenes():
 
@@ -254,7 +275,7 @@ def create_refgenes():
     new_catalog = _make_dict(df = new_catalog_df ,other_amr =other_amr,other_non_amr=other_non_amr,rename_key=rename_key)
     existing = _get_previous_refgenes()
     new_catalog = _compare_to_existing(new_catalog=new_catalog,previous_catalog=existing)
-    # pth = _save_df()
-    # logger.info(f"Saving new refgenes catalog as {pth} and emailing for confirmation.")
-    # _email(adrs)
+    pth = _save_df(df=new_catalog)
+    logger.info(f"Saved new refgenes catalog as {pth} and emailing for confirmation.")
+    _email(adrs = adrs, pth = pth)
     
