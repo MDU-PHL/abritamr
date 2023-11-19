@@ -1,0 +1,46 @@
+[INFO:10/12/2023 11:31:14 AM] Getting reference catalog from ncbi.
+[INFO:10/12/2023 11:31:20 AM] Reference catalog downloaded.
+[INFO:10/12/2023 11:31:20 AM] Generating a dataframe for update.
+[INFO:10/12/2023 11:31:20 AM] Applying classification logic.
+[INFO:10/12/2023 11:31:20 AM] An existing refgenes file has been found.
+[INFO:10/12/2023 11:31:20 AM] Checking for new entries.
+[INFO:10/12/2023 11:31:20 AM] Checking for updated entries.
+[INFO:10/12/2023 11:31:20 AM] Saved new refgenes catalog as refgenes_2023-10-12.csv and emailing for confirmation.
+[INFO:10/12/2023 11:31:21 AM] abritAMR update email sent for approval.
+[INFO:11/11/2023 04:52:10 PM] Getting reference catalog from ncbi.
+[INFO:11/11/2023 04:52:13 PM] Reference catalog downloaded.
+[INFO:11/11/2023 04:52:13 PM] Generating a dataframe for update.
+[INFO:11/11/2023 04:52:13 PM] Applying classification logic.
+[INFO:11/11/2023 04:52:13 PM] An existing refgenes file has been found.
+[INFO:11/11/2023 04:52:13 PM] Checking for new entries.
+[INFO:11/11/2023 04:52:13 PM] Checking for updated entries.
+[INFO:11/11/2023 04:53:32 PM] Getting reference catalog from ncbi.
+[INFO:11/11/2023 04:53:35 PM] Reference catalog downloaded.
+[INFO:11/11/2023 04:53:35 PM] Generating a dataframe for update.
+[INFO:11/11/2023 04:53:35 PM] Applying classification logic.
+[INFO:11/11/2023 04:53:35 PM] An existing refgenes file has been found.
+[INFO:11/11/2023 04:53:35 PM] Checking for new entries.
+[INFO:11/11/2023 04:53:35 PM] Checking for updated entries.
+[INFO:11/11/2023 04:56:06 PM] Getting reference catalog from ncbi.
+[INFO:11/11/2023 04:56:08 PM] Reference catalog downloaded.
+[INFO:11/11/2023 04:56:08 PM] Generating a dataframe for update.
+[INFO:11/11/2023 04:56:09 PM] Applying classification logic.
+[INFO:11/11/2023 04:56:09 PM] An existing refgenes file has been found.
+[INFO:11/11/2023 04:56:09 PM] Checking for new entries.
+[INFO:11/11/2023 04:56:09 PM] Checking for updated entries.
+[INFO:11/11/2023 04:58:52 PM] Getting reference catalog from ncbi.
+[INFO:11/11/2023 04:58:55 PM] Reference catalog downloaded.
+[INFO:11/11/2023 04:58:55 PM] Generating a dataframe for update.
+[INFO:11/11/2023 04:58:55 PM] Applying classification logic.
+[INFO:11/11/2023 04:58:55 PM] An existing refgenes file has been found.
+[INFO:11/11/2023 04:58:56 PM] Checking for new entries.
+[INFO:11/11/2023 04:58:56 PM] Checking for updated entries.
+[INFO:11/11/2023 04:59:31 PM] Getting reference catalog from ncbi.
+[INFO:11/11/2023 04:59:34 PM] Reference catalog downloaded.
+[INFO:11/11/2023 04:59:34 PM] Generating a dataframe for update.
+[INFO:11/11/2023 04:59:34 PM] Applying classification logic.
+[INFO:11/11/2023 04:59:34 PM] An existing refgenes file has been found.
+[INFO:11/11/2023 04:59:34 PM] Checking for new entries.
+[INFO:11/11/2023 04:59:34 PM] Checking for updated entries.
+[INFO:11/11/2023 04:59:34 PM] Saved new refgenes catalog as refgenes_2023-11-11.csv and emailing for confirmation.
+[INFO:11/11/2023 04:59:35 PM] abritAMR update email sent for approval.

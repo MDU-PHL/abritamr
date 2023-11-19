@@ -48,10 +48,11 @@ class Collate:
         if the enhanced subclass is in either NONRTM or MACROLIDES then then use the groups specified by Norelle. If it is empty (-) then fall back on the AMRFinder subclass, else report the extended subclass
         """
         gene_id_col = "Gene symbol" if colname != "refseq_protein_accession" else "Accession of closest sequence" # to get the name of drug and the drugclass
+        
         if reftab[reftab[colname] == row[1][gene_id_col]].empty:
             d = 'Unknown'
             for i in ['genbank_protein_accession','refseq_nucleotide_accession','genbank_nucleotide_accession']:
-                
+                # print(reftab[reftab[i] == row[1][gene_id_col]])
                 if not reftab[reftab[i] == row[1][gene_id_col]].empty:
                     d= reftab[reftab[i] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
                     break

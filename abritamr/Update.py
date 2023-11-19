@@ -37,8 +37,11 @@ def _get_vars():
         raise SystemExit
     
 def _archive_old_ref_catalog():
-
-    pass
+    tdy = _get_date()
+    og_ref = pathlib.Path(__file__).parent / "db" / "refgenes_latest.csv"
+    archive = pathlib.Path(__file__).parent / "db" / f"refgenes_latest.csv.{tdy}"
+    logger.info(f"Archiving reference catalog to : {archive}")
+    subprocess.run(["cp", f"{og_ref}", f"{archive}"])
 
 def _get_new_catalog():
     logger.info(f"Getting reference catalog from ncbi.")
@@ -227,15 +230,16 @@ def _save_df(df):
     return f"refgenes_{sfx}.csv"
 
 def _updated_entries(new_catalog, previous_catalog):
-    
+    # print(previous_catalog)
+    previous_catalog = previous_catalog.rename(columns = {"class_new": "class_prev", "subclass_new":"subclass_prev"})
     new_catalog = new_catalog.rename(columns = {"class":"class_new", "subclass": "subclass_new"})
     _tmp= new_catalog.merge(previous_catalog, on = ['key'])
+    print(_tmp.columns)
+    _tmp['changed'] = numpy.where((_tmp['class_prev'] != _tmp['class_new']) , 'updated', '')
+    _tmp['changed'] = numpy.where((_tmp['subclass_prev'] != _tmp['subclass_new']) , 'updated', _tmp['changed'])
     
-    _tmp['changed'] = numpy.where((_tmp['class'] != _tmp['class_new']) , 'updated', '')
-    _tmp['changed'] = numpy.where((_tmp['subclass'] != _tmp['subclass_new']) , 'updated', _tmp['changed'])
-    
-    _tmp['Previous_class'] = numpy.where(_tmp['changed'] == 'updated', _tmp['class'], '')
-    _tmp['Previous_subclass'] = numpy.where(_tmp['changed'] == 'updated', _tmp['subclass'],'')
+    _tmp['Previous_class'] = numpy.where(_tmp['changed'] == 'updated', _tmp['class_prev'], '')
+    _tmp['Previous_subclass'] = numpy.where(_tmp['changed'] == 'updated', _tmp['subclass_prev'],'')
     changed = list(_tmp[_tmp['changed']!='']['key'])
     
     new_catalog['Status'] = numpy.where(new_catalog['key'].isin(changed), 'updated',new_catalog['Status'])
