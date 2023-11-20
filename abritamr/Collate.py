@@ -628,7 +628,7 @@ class MduCollate(Collate):
             "ESBL (KPC variant)"
             "Carbapenemase (OXA-51 family)",
             "ESBL",
-            "AmpC type", # will need to change to reflect new subclass AmpC
+            "AmpC", # will need to change to reflect new subclass AmpC
             "Aminoglycosides (Ribosomal methyltransferase)",
             "Colistin",
             "Chloramphenicol/Florfenicol/Linezolid", 
@@ -668,6 +668,7 @@ class MduCollate(Collate):
                     genes = [gene for gene in genes if '_' not in gene] # this is to remove the point mutations for MMS118
                 if genes != []: # for each bin we do things to genes
                     if i in reportable: #don't report point mutations
+                        # print(i)
                         if i in non_caveat_reportable:
                             genes_reported.extend(genes)
                         elif i == "Carbapenemase (MBL)" and species != "Stenotrophomonas maltophilia":
@@ -689,11 +690,12 @@ class MduCollate(Collate):
                         elif i == "Methicillin":
                             genes_reported.extend([g for g in genes if mec_match.match(g)])
                             genes_not_reported.extend([g for g in genes if not mec_match.match(g)])
-                        else:
-                            genes_not_reported.extend(genes)
-                    elif "Oxazolidinone" in i or "Linezolid" in i:
-                        if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
-                            genes_reported.extend(genes)
+                        
+                        elif "Oxazolidinone" in i or "Linezolid" in i:
+                            if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
+                                genes_reported.extend(genes)
+                            else:
+                                genes_not_reported.extend(genes)
                         else:
                             genes_not_reported.extend(genes)
 
