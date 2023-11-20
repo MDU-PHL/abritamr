@@ -418,7 +418,7 @@ class MduCollate(Collate):
 
     def _ampicillin_res_sal(self, col, gene):
         
-        if col in [ 'Beta-lactamase (not ESBL or carbapenemase)','ESBL','ESBL (AmpC type)', 'Beta-lactamase (narrow-spectrum)','Beta-lactamase (unknown spectrum)'] or 'Ampicillin' in col:
+        if col in [ 'Beta-lactam','ESBL','AmpC'] or 'Ampicillin' in col:
             return gene
         return ''
 
@@ -747,6 +747,7 @@ class MduCollate(Collate):
                 result_df = tmpdf
             else:
                 result_df = result_df.append(tmpdf)
+        
         return result_df[cols]
 
     def _extract_plus_isolates(self,species):
