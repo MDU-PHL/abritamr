@@ -132,7 +132,7 @@ def _beta_lactams(row):
         return 'Beta-lactam','Carbapenemase'
     elif 'carbapenem-hydrolyzing' in row['product_name'] and 'OXA-51' not in row['product_name'] and row['subtype'] == 'POINT':
         # carbapenem-hydrolyzing
-        return 'Beta-lactam','Carbapen'
+        return 'Beta-lactam','Carbapenemase'
     elif 'metallo-beta-lactamase' in row['product_name'] and row['subclass'] == 'CARBAPENEM':
         return 'Beta-lactam','Carbapenemase (MBL)'
     elif 'OXA-51 family' in row['product_name'] or row['allele'] == 'OXA-51':
