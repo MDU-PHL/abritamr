@@ -1,14 +1,19 @@
-import pathlib, argparse, sys, os, logging
+import pathlib, argparse, sys, os, logging,json
 
 from abritamr.AmrSetup import SetupAMR, SetupMDU
 from abritamr.RunFinder import RunFinder
 from abritamr.Collate import Collate, MduCollate
+from abritamr.Update import create_refgenes
 from abritamr.version import __version__, db
 
 """
 abritamr is designed to implement AMRFinder and parse the results compatible for MDU use. It may also be used for other purposes where the format of output is compatible
 
 """
+
+def update_db(args):
+
+    create_refgenes()
 
 def run_pipeline(args):
 
@@ -29,6 +34,7 @@ def mdu(args):
 
 
 def main():
+
     parser = argparse.ArgumentParser(
         description=f"****AMR gene detection pipeline - version {__version__}****", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -73,7 +79,7 @@ def main():
         "-sp",
         default="",
         help="Set if you would like to use point mutations, please provide a valid species.",
-        choices= ["Burkholderia_cepacia","Acinetobacter_baumannii","Streptococcus_pyogenes","Streptococcus_agalactiae","Streptococcus_pneumoniae","Enterococcus_faecium","Pseudomonas_aeruginosa","Staphylococcus_pseudintermedius","Clostridioides_difficile","Klebsiella","Neisseria","Campylobacter","Salmonella","Escherichia","Staphylococcus_aureus","Burkholderia_pseudomallei","Enterococcus_faecalis"]
+        choices= json.load(open(f"{pathlib.Path(__file__).parent.parent / 'abritamr' /'species_config.json'}",'r'))
     )
     
     parser_mdu = subparsers.add_parser('report', help='Generate report for use at MDU', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -114,10 +120,13 @@ def main():
         help="The name of the process - will be reflected in the names od the output files."
     )
 
+    parser_update = subparsers.add_parser('update_db', help='Download and curate the Reference gene catalog from NCBI', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    
     
     
     parser_sub_run.set_defaults(func=run_pipeline)
     parser_mdu.set_defaults(func = mdu)
+    parser_update.set_defaults(func = update_db)
     args = parser.parse_args()
     
     if len(sys.argv) < 2:

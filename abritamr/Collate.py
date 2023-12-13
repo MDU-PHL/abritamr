@@ -48,10 +48,11 @@ class Collate:
         if the enhanced subclass is in either NONRTM or MACROLIDES then then use the groups specified by Norelle. If it is empty (-) then fall back on the AMRFinder subclass, else report the extended subclass
         """
         gene_id_col = "Gene symbol" if colname != "refseq_protein_accession" else "Accession of closest sequence" # to get the name of drug and the drugclass
+        
         if reftab[reftab[colname] == row[1][gene_id_col]].empty:
             d = 'Unknown'
             for i in ['genbank_protein_accession','refseq_nucleotide_accession','genbank_nucleotide_accession']:
-                
+                # print(reftab[reftab[i] == row[1][gene_id_col]])
                 if not reftab[reftab[i] == row[1][gene_id_col]].empty:
                     d= reftab[reftab[i] == row[1][gene_id_col]]['enhanced_subclass'].values[0]
                     break
@@ -417,7 +418,7 @@ class MduCollate(Collate):
 
     def _ampicillin_res_sal(self, col, gene):
         
-        if col in [ 'Beta-lactamase (not ESBL or carbapenemase)','ESBL','ESBL (AmpC type)', 'Beta-lactamase (narrow-spectrum)','Beta-lactamase (unknown spectrum)'] or 'Ampicillin' in col:
+        if col in [ 'Beta-lactam','ESBL','AmpC'] or 'Ampicillin' in col:
             return gene
         return ''
 
@@ -435,7 +436,7 @@ class MduCollate(Collate):
 
     def _cefo_ampc_res_sal(self, col, gene):
 
-        if col == 'ESBL (AmpC type)':
+        if 'AmpC' in col :
             return gene
         return ''
     
@@ -452,7 +453,7 @@ class MduCollate(Collate):
         return ''
 
     def _gentamicin_res_salm(self, col, gene):
-        if col in ['Gentamicin', 'Aminoglycosides (Ribosomal methyltransferase)']: #change
+        if col in ['Gentamicin', 'Aminoglycosides (Ribosomal methyltransferase)']: 
             return gene
         return ''
     
@@ -624,19 +625,20 @@ class MduCollate(Collate):
         reportable = [
             "Carbapenemase",
             "Carbapenemase (MBL)",
-            "Carbapenemase (KPC variant)"
+            "ESBL (KPC variant)"
             "Carbapenemase (OXA-51 family)",
             "ESBL",
-            "ESBL (AmpC type)",
+            "AmpC", # will need to change to reflect new subclass AmpC
             "Aminoglycosides (Ribosomal methyltransferase)",
             "Colistin",
-            "Oxazolidinone & phenicol resistance", # Oxazolidinone or linezolid = reportable
+            "Chloramphenicol/Florfenicol/Linezolid", 
+            "Florfenicol/Oxazolidinone",
             "Vancomycin",
             "Methicillin"
         ]
         non_caveat_reportable = [
             "Carbapenemase",
-            "Carbapenemase (KPC variant)",
+            "ESBL (KPC variant)",
             "Aminoglycosides (Ribosomal methyltransferase)",
             "Colistin"
         ]
@@ -663,9 +665,10 @@ class MduCollate(Collate):
             if i != 'Isolate':
                 if isinstance(isodict[i], str):
                     genes = isodict[i].split(',')
-                    genes = [gene for gene in genes if '_' not in gene]
+                    genes = [gene for gene in genes if '_' not in gene] # this is to remove the point mutations for MMS118
                 if genes != []: # for each bin we do things to genes
                     if i in reportable: #don't report point mutations
+                        # print(i)
                         if i in non_caveat_reportable:
                             genes_reported.extend(genes)
                         elif i == "Carbapenemase (MBL)" and species != "Stenotrophomonas maltophilia":
@@ -676,9 +679,9 @@ class MduCollate(Collate):
                             genes_not_reported.extend([g for g in genes if g.startswith("blaL1")])
                         elif i == "Carbapenemase (OXA-51 family)" and species not in abacter_excluded:
                             genes_reported.extend(genes)
-                        elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Salmonella"]: 
+                        elif i in ["ESBL","AmpC"] and genus in ["Salmonella"]: 
                             genes_reported.extend(genes)
-                        elif i in ["ESBL","ESBL (AmpC type)"] and genus in ["Shigella"]: 
+                        elif i in ["ESBL","AmpC"] and genus in ["Shigella"]: 
                             genes_reported.extend([g for g in genes if "blaEC" not in g])
                             genes_not_reported.extend([g for g in genes if "blaEC" in g]) # don't report blaEC for shigella
                         elif i == "Vancomycin":
@@ -687,11 +690,12 @@ class MduCollate(Collate):
                         elif i == "Methicillin":
                             genes_reported.extend([g for g in genes if mec_match.match(g)])
                             genes_not_reported.extend([g for g in genes if not mec_match.match(g)])
-                        else:
-                            genes_not_reported.extend(genes)
-                    elif "Oxazolidinone" in i or "Linezolid" in i:
-                        if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
-                            genes_reported.extend(genes)
+                        
+                        elif "Oxazolidinone" in i or "Linezolid" in i:
+                            if species in ["Staphylococcus aureus","Staphylococcus argenteus"] or genus == "Enterococcus":
+                                genes_reported.extend(genes)
+                            else:
+                                genes_not_reported.extend(genes)
                         else:
                             genes_not_reported.extend(genes)
 
@@ -743,6 +747,7 @@ class MduCollate(Collate):
                 result_df = tmpdf
             else:
                 result_df = result_df.append(tmpdf)
+        
         return result_df[cols]
 
     def _extract_plus_isolates(self,species):

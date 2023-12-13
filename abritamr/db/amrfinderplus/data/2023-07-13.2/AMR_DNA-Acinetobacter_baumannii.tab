@@ -1,0 +1,3 @@
+#accesion_version@gene_name@gene_symbol:start-stop	mutation_position	mutation_symbol	class	subclass	mutated_gene_name
+NZ_CP049806.1@blaOXA-143_family_promoter_region@blaOXA:3403170-3403400	15	blaOXA_G-42A	BETA-LACTAM	CARBAPENEM	Acinetobacter_baumannii_carbapenem_resistant_blaOXA
+NZ_CP049806.1@blaOXA-143_family_promoter_region@blaOXA:3403170-3403400	43	blaOXA_A-14G	BETA-LACTAM	CARBAPENEM	Acinetobacter_baumannii_carbapenem_resistant_blaOXA

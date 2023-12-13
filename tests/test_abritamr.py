@@ -408,7 +408,7 @@ def test_get_drugclass_allele_1():
                 row = i
         colname = 'allele'
         amr_obj.logger = logging.getLogger(__name__)
-        assert amr_obj.get_drugclass(reftab, row, colname) == "Beta-lactamase (not ESBL or carbapenemase)"
+        assert amr_obj.get_drugclass(reftab, row, colname) == "Beta-lactam"
 
 def test_extract_gene_name_1():
     """
@@ -450,7 +450,7 @@ def test_setup_dict():
             if i[1]['Gene symbol'] == 'blaSHV-11':
                 row = i
         amr_obj.logger = logging.getLogger(__name__)
-        assert amr_obj.setup_dict(drugclass_dict, reftab, row) == {"Beta-lactamase (not ESBL or carbapenemase)":['blaSHV-11']}
+        assert amr_obj.setup_dict(drugclass_dict, reftab, row) == {"Beta-lactam":['blaSHV-11']}
 
 
 def test_get_per_isolate():
@@ -466,7 +466,7 @@ def test_get_per_isolate():
         df= pandas.read_csv('tests/amrfinder.out', sep = '\t')
         isolate = 'tests'
         amr_obj.logger = logging.getLogger(__name__)
-        assert amr_obj.get_per_isolate(reftab=reftab, df=df, isolate=isolate) == ({"Isolate":isolate, "Beta-lactamase (not ESBL or carbapenemase)":'blaSHV-11','ESBL':'blaCTX-M-15'},{"Isolate":isolate,'ESBL':'blaCTX-M-15'},{"Isolate":isolate,'Metal':'qnrB1'})
+        assert amr_obj.get_per_isolate(reftab=reftab, df=df, isolate=isolate) == ({"Isolate":isolate, "Beta-lactam":'blaSHV-11','ESBL':'blaCTX-M-15'},{"Isolate":isolate,'ESBL':'blaCTX-M-15'},{"Isolate":isolate,'Metal':'qnrB1'})
 
 
 
@@ -480,7 +480,7 @@ def test_collate():
         reftab = pandas.read_csv(REFGENES)
         reftab = reftab.fillna('-')
         isolate = 'tests'
-        drugs = pandas.DataFrame({"Isolate":isolate,'ESBL': 'blaCTX-M-15', "Beta-lactamase (not ESBL or carbapenemase)":'blaSHV-11'}, index = [0])
+        drugs = pandas.DataFrame({"Isolate":isolate,'ESBL': 'blaCTX-M-15', "Beta-lactam":'blaSHV-11'}, index = [0])
         partial = pandas.DataFrame({"Isolate":isolate,'ESBL':'blaCTX-M-15'}, index = [0])
         virulence = pandas.DataFrame({"Isolate":isolate,'Metal':'qnrB1'}, index = [0])
         # print(drugs)
