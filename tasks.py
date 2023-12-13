@@ -2,8 +2,14 @@
 Automate deployment to PyPi
 """
 
-import invoke
+import invoke,json,pathlib
 
+
+def get_token():
+
+    with open(f"{pathlib.Path(__file__).parent /'token.json' }", "r") as cfg:
+
+        return cfg['token']
 
 @invoke.task
 def deploy(ctx):
@@ -15,11 +21,12 @@ def deploy(ctx):
     twine upload dist/*
     git push --tags
     """
+    
     ctx.run("rm -rf build/* dist/*")
     # ctx.run("bumpversion {bump} --verbose")
     ctx.run("python3 setup.py sdist bdist_wheel")
     ctx.run("python3 -m twine check dist/*")
-    ctx.run("python3 -m twine upload dist/*")
+    ctx.run(f"python3 -m twine upload --config-file {pathlib.Path(__file__).parent / '.pypirc' } dist/*")
     # ctx.run("git push origin --tags")
     # ctx.run("git push kristy --tags")
 
