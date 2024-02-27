@@ -617,6 +617,7 @@ class MduCollate(Collate):
 
             
     def reporting_logic_general(self, row, species, neg_code = True):
+        
         # get all genes found
         all_genes = self.get_all_genes(row)
         isodict = row[1].to_dict()
