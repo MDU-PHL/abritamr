@@ -774,7 +774,7 @@ class MduCollate(Collate):
             exp_species = qcdf["SPECIES_EXP"].values[0]
             obs_species = qcdf["SPECIES_OBS"].values[0]
            
-            species = obs_species if obs_species == exp_species else exp_species
+            species = obs_species if obs_species == exp_species else obs_species
             genes_reported, genes_not_reported = self.reporting_logic_general(
                 row=row, species=species, neg_code=neg_code
             )
