@@ -22,5 +22,7 @@
     "Streptococcus_agalactiae", 
     "Streptococcus_pneumoniae", 
     "Streptococcus_pyogenes", 
-    "Vibrio_cholerae"
+    "Vibrio_cholerae",
+    "Vibrio_vulfinicus",
+    "Vibrio_parahaemolyticus"
 ]

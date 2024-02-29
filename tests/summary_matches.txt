@@ -1,2 +1,2 @@
-	Isolate
-tests	tests
+Isolate	Florfenicol/Oxazolidinone
+tests	optrA

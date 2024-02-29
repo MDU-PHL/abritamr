@@ -19,7 +19,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="abritamr",
-    version="1.0.15",
+    version="1.0.15b",
     description="Running AMRFinderPlus for MDU",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -53,5 +53,5 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
-    package_data={"abritamr": ["db/*","db/amrfinderplus/data/*/*"]}
+    package_data={"abritamr": ["db/amrfinderplus/data/2023-09-26.1/*"]}
 )

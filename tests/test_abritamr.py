@@ -538,7 +538,6 @@ def test_save_all_empty():
         assert amr_obj.save_files('',summary_drugs,summary_partial, virulence)
 
 
-
 def test_get_cols_works():
     """
     assert True when non-empty string is given
@@ -629,3 +628,56 @@ def test_save_merge_both_empty():
         summary_partial = pandas.DataFrame({"Isolate":isolate}, index = [0])
         virulence = pandas.DataFrame()
         assert not amr_obj._merge(summary_drugs,summary_partial).empty
+
+
+
+MduColls = collections.namedtuple('Data', ['sop', 'sop_name', 'qc','db','partials','matches','runid'])
+def test_reporting_efaec_optra():
+
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = MduColls('sop', 'sop_name', 'mduqc','db','partials','match','runid')
+        amr_obj = MduCollate(args)
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        summary_drugs = pandas.DataFrame({"Isolate":isolate,'Florfenicol/Oxazolidinone': 'optrA'}, index = [0])
+        
+        for row in summary_drugs.iterrows():
+            assert amr_obj.reporting_logic_general(row = row, species = 'Enterococcus faecium') == (['optrA'],["No non-reportable genes found."])
+
+
+def test_reporting_ni_optra():
+
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = MduColls('sop', 'sop_name', 'mduqc','db','partials','match','runid')
+        amr_obj = MduCollate(args)
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        summary_drugs = pandas.DataFrame({"Isolate":isolate,'Florfenicol/Oxazolidinone': 'optrA'}, index = [0])
+        
+        for row in summary_drugs.iterrows():
+            assert amr_obj.reporting_logic_general(row = row, species = 'No identification') == (['CPase_16S_mcr_NEG'],['optrA'])
+
+
+
+def test_reporting_df():
+
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = MduColls('sop', 'sop_name', f"{test_folder / 'mdu_qc_checked.csv'}",'db',f"{test_folder / 'summary_partials.txt'}",f"{test_folder / 'summary_matches.txt'}",'runid')
+        amr_obj = MduCollate(args)
+        isolate = 'tests'
+        amr_obj.logger = logging.getLogger(__name__)
+        
+        df = pandas.DataFrame(
+            {"MDU sample ID":isolate,
+            'Item code':"",
+            'Resistance genes (alleles) detected':"optrA",
+            'Resistance genes (alleles) det (non-rpt)':"No non-reportable genes found.",
+            'Species_obs':'Enterococcus faecium',
+            'Species_exp':'No identification', 
+            'db_version':'db'},
+            index = [0]
+        )
+        df = df.set_index("MDU sample ID")
+        
+        assert amr_obj.mdu_reporting_general(match=f"{test_folder / 'summary_matches.txt'}").equals(df)
+

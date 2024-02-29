@@ -617,6 +617,7 @@ class MduCollate(Collate):
 
             
     def reporting_logic_general(self, row, species, neg_code = True):
+        
         # get all genes found
         all_genes = self.get_all_genes(row)
         isodict = row[1].to_dict()
@@ -774,7 +775,7 @@ class MduCollate(Collate):
             exp_species = qcdf["SPECIES_EXP"].values[0]
             obs_species = qcdf["SPECIES_OBS"].values[0]
            
-            species = obs_species if obs_species == exp_species else exp_species
+            species = obs_species if obs_species == exp_species else obs_species
             genes_reported, genes_not_reported = self.reporting_logic_general(
                 row=row, species=species, neg_code=neg_code
             )

@@ -44,3 +44,30 @@
 [INFO:11/11/2023 04:59:34 PM] Checking for updated entries.
 [INFO:11/11/2023 04:59:34 PM] Saved new refgenes catalog as refgenes_2023-11-11.csv and emailing for confirmation.
 [INFO:11/11/2023 04:59:35 PM] abritAMR update email sent for approval.
+[INFO:12/15/2023 03:14:27 PM] Getting reference catalog from ncbi.
+[INFO:12/15/2023 03:14:30 PM] Reference catalog downloaded.
+[INFO:12/15/2023 03:14:30 PM] Generating a dataframe for update.
+[INFO:12/15/2023 03:14:31 PM] Applying classification logic.
+[INFO:12/15/2023 03:14:31 PM] An existing refgenes file has been found.
+[INFO:12/15/2023 03:14:31 PM] Checking for new entries.
+[INFO:12/15/2023 03:14:31 PM] Checking for updated entries.
+[INFO:12/15/2023 03:14:31 PM] Saved new refgenes catalog as refgenes_2023-12-15.csv and emailing for confirmation.
+[INFO:12/15/2023 03:14:32 PM] abritAMR update email sent for approval.
+[INFO:02/23/2024 07:44:45 AM] Getting reference catalog from ncbi.
+[INFO:02/23/2024 07:44:48 AM] Reference catalog downloaded.
+[INFO:02/23/2024 07:44:48 AM] Generating a dataframe for update.
+[INFO:02/23/2024 07:44:49 AM] Applying classification logic.
+[INFO:02/23/2024 07:44:49 AM] An existing refgenes file has been found.
+[INFO:02/23/2024 07:44:49 AM] Checking for new entries.
+[INFO:02/23/2024 07:44:49 AM] Checking for updated entries.
+[INFO:02/23/2024 07:44:49 AM] Saved new refgenes catalog as refgenes_2024-02-23.csv and emailing for confirmation.
+[INFO:02/23/2024 07:44:50 AM] abritAMR update email sent for approval.
+[INFO:02/23/2024 07:45:34 AM] Getting reference catalog from ncbi.
+[INFO:02/23/2024 07:45:37 AM] Reference catalog downloaded.
+[INFO:02/23/2024 07:45:37 AM] Generating a dataframe for update.
+[INFO:02/23/2024 07:45:37 AM] Applying classification logic.
+[INFO:02/23/2024 07:45:37 AM] An existing refgenes file has been found.
+[INFO:02/23/2024 07:45:38 AM] Checking for new entries.
+[INFO:02/23/2024 07:45:38 AM] Checking for updated entries.
+[INFO:02/23/2024 07:45:38 AM] Saved new refgenes catalog as refgenes_2024-02-23.csv and emailing for confirmation.
+[INFO:02/23/2024 07:45:38 AM] abritAMR update email sent for approval.
