@@ -79,7 +79,7 @@ def main():
         "-sp",
         default="",
         help="Set if you would like to use point mutations, please provide a valid species.",
-        choices= json.load(open(f"{pathlib.Path(__file__).parent.parent / 'abritamr' /'species_config.json'}",'r'))
+        choices= json.load(open(f"{pathlib.Path(__file__).parent / 'species_config.json'}",'r'))
     )
     
     parser_mdu = subparsers.add_parser('report', help='Generate report for use at MDU', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
