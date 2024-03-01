@@ -53,5 +53,5 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
-    package_data={"abritamr": ["db/amrfinderplus/data/2024-01-31.1/*", "species_config.json"]}
+    package_data={"abritamr": ["db/amrfinderplus/data/2024-01-31.1/*", "species_config.json","db/"]}
 )
