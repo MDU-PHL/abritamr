@@ -774,8 +774,13 @@ class MduCollate(Collate):
             qcdf = qc[qc['ISOLATE'].str.contains(isolate)]
             exp_species = qcdf["SPECIES_EXP"].values[0]
             obs_species = qcdf["SPECIES_OBS"].values[0]
-           
-            species = obs_species if obs_species == exp_species else obs_species
+            if obs_species == exp_species:
+                species = exp_species
+            elif obs_species != exp_species and 'Shigella' in exp_species:
+                species = exp_species
+            else:
+                species = obs_species
+            # species = obs_species if obs_species == exp_species else obs_species
             genes_reported, genes_not_reported = self.reporting_logic_general(
                 row=row, species=species, neg_code=neg_code
             )
@@ -799,7 +804,7 @@ class MduCollate(Collate):
                 reporting_df = tempdf
             else:
                 reporting_df = pandas.concat([reporting_df,tempdf])
-        
+            
         return reporting_df.reindex(labels = ['Item code','Resistance genes (alleles) detected','Resistance genes (alleles) det (non-rpt)','Species_obs', 'Species_exp', 'db_version'], axis = 'columns')
 
     

@@ -659,7 +659,7 @@ def test_reporting_ni_optra():
 
 
 
-def test_reporting_df():
+def test_reporting_df_efaec():
 
     with patch.object(Collate, "__init__", lambda x: None):
         args = MduColls('sop', 'sop_name', f"{test_folder / 'mdu_qc_checked.csv'}",'db',f"{test_folder / 'summary_partials.txt'}",f"{test_folder / 'summary_matches.txt'}",'runid')
@@ -680,4 +680,28 @@ def test_reporting_df():
         df = df.set_index("MDU sample ID")
         
         assert amr_obj.mdu_reporting_general(match=f"{test_folder / 'summary_matches.txt'}").equals(df)
+
+
+
+def test_reporting_df_shig():
+
+    with patch.object(Collate, "__init__", lambda x: None):
+        args = MduColls('sop', 'sop_name', f"{test_folder / 'mdu_qc_checked.csv'}",'db',f"{test_folder / 'summary_partials_shig.txt'}",f"{test_folder / 'summary_matches_shig.txt'}",'runid')
+        amr_obj = MduCollate(args)
+        isolate = 'tests2'
+        amr_obj.logger = logging.getLogger(__name__)
+        
+        df = pandas.DataFrame(
+            {"MDU sample ID":isolate,
+            'Item code':"",
+            'Resistance genes (alleles) detected':"CTX-M-15",
+            'Resistance genes (alleles) det (non-rpt)':"No non-reportable genes found.",
+            'Species_obs':'Eschericia coli', 
+            'Species_exp':'Shigella flexneri',
+            'db_version':'db'},
+            index = [0]
+        )
+        df = df.set_index("MDU sample ID")
+        
+        assert amr_obj.mdu_reporting_general(match=f"{test_folder / 'summary_matches_shig.txt'}").equals(df)
 

@@ -1,2 +1,3 @@
 ISOLATE,SPECIES_EXP,SPECIES_OBS,TEST_QC
 tests,No identification,Enterococcus faecium,PASS
+tests2,Shigella flexneri,Eschericia coli,PASS
