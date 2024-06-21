@@ -1,4 +1,4 @@
-import pathlib, pandas, datetime, subprocess, os, logging,subprocess,collections
+import pathlib, pandas, datetime, subprocess, os, logging,subprocess,collections,json
 from abritamr.version import db
 from abritamr.CustomLog import CustomFormatter
 
@@ -46,7 +46,7 @@ class SetupAMR(Setup):
         
 
         # for amr
-        self.species_list = ["Burkholderia_cepacia","Acinetobacter_baumannii","Streptococcus_pyogenes","Streptococcus_agalactiae","Streptococcus_pneumoniae","Enterococcus_faecium","Pseudomonas_aeruginosa","Staphylococcus_pseudintermedius","Clostridioides_difficile","Klebsiella","Neisseria","Campylobacter","Salmonella","Escherichia","Staphylococcus_aureus","Burkholderia_pseudomallei","Enterococcus_faecalis"]
+        self.species_list = json.load(open(f"{pathlib.Path(__file__).parent / 'species_config.json'}",'r'))
         
         self.logger =logging.getLogger(__name__) 
         self.logger.setLevel(logging.INFO)
