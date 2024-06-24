@@ -1,0 +1,2 @@
+Isolate	ESBL
+tests2	CTX-M-15

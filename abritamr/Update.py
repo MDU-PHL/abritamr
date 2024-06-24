@@ -46,7 +46,8 @@ def _archive_old_ref_catalog():
 def _get_new_catalog():
     logger.info(f"Getting reference catalog from ncbi.")
     updated_html = f"https://ftp.ncbi.nlm.nih.gov/pathogen/Antimicrobial_resistance/AMRFinderPlus/database/latest/ReferenceGeneCatalog.txt"
-    p = subprocess.run(f"wget {updated_html}", shell = True, capture_output = True, encoding = "utf-8")
+                    
+    p = subprocess.run(f"wget -O ReferenceGeneCatalog.txt {updated_html}", shell = True, capture_output = True, encoding = "utf-8")
     if p.returncode == 0:
         logger.info(f"Reference catalog downloaded.")
         return True
@@ -63,6 +64,7 @@ def _make_key(df):
     return df
 
 def _open_catalog():
+
     _get_new_catalog()
     logger.info(f"Generating a dataframe for update.")
     _new = pandas.read_csv("ReferenceGeneCatalog.txt", sep = "\t")

@@ -344,6 +344,7 @@ class MduCollate(Collate):
             "Other":"CPase_16S_mcr_NEG"
         }
         self.REPORTING = {"Salmonella enterica":self.mdu_reporting_salmonella}
+
     def mdu_qc_tab(self):
         self.logger.info(f"Checking the format of the QC file")
         cols = ["ISOLATE", 'SPECIES_EXP', 'SPECIES_OBS', 'TEST_QC']
@@ -524,7 +525,7 @@ class MduCollate(Collate):
         # Ciprofloxacin - ResMech	Ciprofloxacin - Interpretation	
         # Azithromycin - ResMech	Azithromycin - Interpretation
 
-        mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
+        mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,})?')
         
         all_genes = self.get_all_genes(row)
         all_genes = [a for a in all_genes if a != row[1]['Isolate'] and a != '']
@@ -603,8 +604,8 @@ class MduCollate(Collate):
             elif res == 'Ciprofloxacin':
                 if tmp_results[res] == []:
                     results[f"{res} - Interpretation"] = 'Susceptible'
-                elif len(tmp_results[res]) == 1:
-                    results[f"{res} - Interpretation"] = 'Intermediate'
+                # elif len(tmp_results[res]) == 1:
+                #     results[f"{res} - Interpretation"] = 'Intermediate'
                 else:
                     results[f"{res} - Interpretation"] = 'Resistant'
             elif res not in ["Aminoglycosides (RMT)","Colistin", "Other"]:
@@ -762,7 +763,7 @@ class MduCollate(Collate):
     def mdu_reporting_general(self, match, neg_code = True):
 
         self.logger.info(f"Applying MDU business logic {'matches' if neg_code else 'partials'}.")
-        mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,2})?')
+        mduidreg = re.compile(r'(?P<id>[0-9]{4}-[0-9]{5,6})-?(?P<itemcode>.{1,})?')
         reporting_df = pandas.DataFrame()
         qc = self.mdu_qc_tab()
         match_df = pandas.read_csv(match, sep = '\t')
