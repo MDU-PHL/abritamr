@@ -1,0 +1,22 @@
+{
+  "version": "1.2",
+  "dbname": "AMRProt",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "/tmp/khhor/amrfinder_index.mOg3SA/db/AMRProt",
+  "number-of-letters": 2980300,
+  "number-of-sequences": 8600,
+  "last-updated": "2024-08-12T12:46:00",
+  "number-of-volumes": 1,
+  "bytes-total": 4888400,
+  "bytes-to-cache": 3057829,
+  "files": [
+    "AMRProt.pdb",
+    "AMRProt.phr",
+    "AMRProt.pin",
+    "AMRProt.pot",
+    "AMRProt.psq",
+    "AMRProt.ptf",
+    "AMRProt.pto"
+  ]
+}
