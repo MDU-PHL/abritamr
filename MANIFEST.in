@@ -1,5 +1,5 @@
 include tests/*
-include abritamr/db/amrfinderplus/data/2024-05-02.2/*
+include abritamr/db/amrfinderplus/data/2024-07-22.1/*
 include abritamr/db/*.csv
 include abritamr/control/*
 include abritamr/species_config.json
