@@ -1,0 +1,12 @@
+drug,fp,fn,tp,tn,ni,acc
+Ampicillin_AD,6,9,382,460,1,98.25
+Tetracycline_AD,10,9,344,490,5,97.77
+Gentamicin_AD,2,0,27,811,18,99.76
+Trimethoprim_AD,18,0,147,693,0,97.9
+Trim-Sulpha_AD,4,5,117,661,71,98.86
+Kanamycin_AD,0,0,44,814,0,100.0
+Streptomycin_AD,43,2,236,442,135,93.78
+Ciprofloxacin_AD,24,0,120,370,344,95.33
+Azithromycin_AD,1,5,29,795,28,99.28
+Meropenem_AD,0,0,0,787,71,100.0
+Chloramphenicol_AD,7,0,108,737,6,99.18
