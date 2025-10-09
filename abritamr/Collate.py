@@ -348,7 +348,7 @@ class MduCollate(Collate):
     def mdu_qc_tab(self):
         self.logger.info(f"Checking the format of the QC file")
         cols = ["ISOLATE", 'SPECIES_EXP', 'SPECIES_OBS', 'TEST_QC']
-        tab = pandas.read_csv(self.mduqc)
+        tab = pandas.read_csv(self.mduqc, dtype = str)
         tab = tab.rename(columns = {tab.columns[0]: 'ISOLATE'})
         for c in cols:
             if c not in list(tab.columns):
@@ -401,7 +401,7 @@ class MduCollate(Collate):
 
     def assign_itemcode(self,mduid, reg):
         self.logger.info(f"Checking for item code")
-        m = reg.match(mduid)
+        m = reg.match(f"{mduid}")
         try:
             itemcode = m.group('itemcode') if m.group('itemcode') else ''
         except AttributeError:
@@ -410,7 +410,7 @@ class MduCollate(Collate):
 
     def assign_mduid(self, mduid, reg):
         self.logger.info(f"Extracting MDU sample ID")
-        m = reg.match(mduid)
+        m = reg.match(f"{mduid}")
         try:
             mduid = m.group('id')
         except AttributeError:
