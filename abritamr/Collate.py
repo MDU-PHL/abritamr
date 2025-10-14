@@ -531,8 +531,8 @@ class MduCollate(Collate):
         all_genes = [a for a in all_genes if a != row[1]['Isolate'] and a != '']
                 
         isodict = row[1].to_dict()
-        item_code = self.assign_itemcode(row[1]['Isolate'], mduidreg)
-        md = self.assign_mduid(row[1]['Isolate'], mduidreg)
+        item_code = self.assign_itemcode(f"{row[1]['Isolate']}", mduidreg)
+        md = self.assign_mduid(f"{row[1]['Isolate']}", mduidreg)
 
         abx = {
             "Ampicillin" : self._ampicillin_res_sal,
