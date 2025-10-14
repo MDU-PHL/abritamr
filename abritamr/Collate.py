@@ -772,7 +772,7 @@ class MduCollate(Collate):
             item_code = self.assign_itemcode(f"{isolate}", mduidreg)
             md = self.assign_mduid(f"{isolate}", mduidreg)
             d = {"MDU sample ID": md, "Item code" : item_code}
-            qcdf = qc[qc['ISOLATE'].str.contains(isolate)]
+            qcdf = qc[qc['ISOLATE'].str.contains(f"{isolate}")]
             exp_species = qcdf["SPECIES_EXP"].values[0]
             obs_species = qcdf["SPECIES_OBS"].values[0]
             if obs_species == exp_species:
