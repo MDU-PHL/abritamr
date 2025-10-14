@@ -769,8 +769,8 @@ class MduCollate(Collate):
         match_df = pandas.read_csv(match, sep = '\t')
         for row in match_df.iterrows():
             isolate = row[1]['Isolate']
-            item_code = self.assign_itemcode(isolate, mduidreg)
-            md = self.assign_mduid(isolate, mduidreg)
+            item_code = self.assign_itemcode(f"{isolate}", mduidreg)
+            md = self.assign_mduid(f"{isolate}", mduidreg)
             d = {"MDU sample ID": md, "Item code" : item_code}
             qcdf = qc[qc['ISOLATE'].str.contains(isolate)]
             exp_species = qcdf["SPECIES_EXP"].values[0]
