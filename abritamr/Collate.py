@@ -348,7 +348,7 @@ class MduCollate(Collate):
     def mdu_qc_tab(self):
         self.logger.info(f"Checking the format of the QC file")
         cols = ["ISOLATE", 'SPECIES_EXP', 'SPECIES_OBS', 'TEST_QC']
-        tab = pandas.read_csv(self.mduqc)
+        tab = pandas.read_csv(self.mduqc, dtype = str)
         tab = tab.rename(columns = {tab.columns[0]: 'ISOLATE'})
         for c in cols:
             if c not in list(tab.columns):
@@ -401,7 +401,7 @@ class MduCollate(Collate):
 
     def assign_itemcode(self,mduid, reg):
         self.logger.info(f"Checking for item code")
-        m = reg.match(mduid)
+        m = reg.match(f"{mduid}")
         try:
             itemcode = m.group('itemcode') if m.group('itemcode') else ''
         except AttributeError:
@@ -410,7 +410,7 @@ class MduCollate(Collate):
 
     def assign_mduid(self, mduid, reg):
         self.logger.info(f"Extracting MDU sample ID")
-        m = reg.match(mduid)
+        m = reg.match(f"{mduid}")
         try:
             mduid = m.group('id')
         except AttributeError:
@@ -531,8 +531,8 @@ class MduCollate(Collate):
         all_genes = [a for a in all_genes if a != row[1]['Isolate'] and a != '']
                 
         isodict = row[1].to_dict()
-        item_code = self.assign_itemcode(row[1]['Isolate'], mduidreg)
-        md = self.assign_mduid(row[1]['Isolate'], mduidreg)
+        item_code = self.assign_itemcode(f"{row[1]['Isolate']}", mduidreg)
+        md = self.assign_mduid(f"{row[1]['Isolate']}", mduidreg)
 
         abx = {
             "Ampicillin" : self._ampicillin_res_sal,
@@ -769,10 +769,10 @@ class MduCollate(Collate):
         match_df = pandas.read_csv(match, sep = '\t')
         for row in match_df.iterrows():
             isolate = row[1]['Isolate']
-            item_code = self.assign_itemcode(isolate, mduidreg)
-            md = self.assign_mduid(isolate, mduidreg)
+            item_code = self.assign_itemcode(f"{isolate}", mduidreg)
+            md = self.assign_mduid(f"{isolate}", mduidreg)
             d = {"MDU sample ID": md, "Item code" : item_code}
-            qcdf = qc[qc['ISOLATE'].str.contains(isolate)]
+            qcdf = qc[qc['ISOLATE'].str.contains(f"{isolate}")]
             exp_species = qcdf["SPECIES_EXP"].values[0]
             obs_species = qcdf["SPECIES_OBS"].values[0]
             if obs_species == exp_species:
