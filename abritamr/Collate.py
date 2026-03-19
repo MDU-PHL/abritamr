@@ -47,7 +47,7 @@ class Collate:
         """
         if the enhanced subclass is in either NONRTM or MACROLIDES then then use the groups specified by Norelle. If it is empty (-) then fall back on the AMRFinder subclass, else report the extended subclass
         """
-        gene_id_col = "Gene symbol" if colname != "refseq_protein_accession" else "Accession of closest sequence" # to get the name of drug and the drugclass
+        gene_id_col = "Element symbol" if colname != "refseq_protein_accession" else "Closest reference accession" # to get the name of drug and the drugclass
         
         if reftab[reftab[colname] == row[1][gene_id_col]].empty:
             d = 'Unknown'
@@ -93,32 +93,32 @@ class Collate:
         """
         return the dictionary for collation
         """
-        if row[1]["Gene symbol"] in list(reftab["allele"]) and 'POINT' not in row[1]['Method']:
+        if row[1]["Element symbol"] in list(reftab["allele"]) and 'POINT' not in row[1]['Method']:
             drugclass = self.get_drugclass(
                     reftab=reftab, row=row, colname="allele"
                     )
-            drugname = self.extract_gene_name(protein = row[1]["Accession of closest sequence"], reftab = reftab, pointn = pointn)
-        elif row[1]["Gene symbol"] in list(reftab["allele"]) and 'POINT' in row[1]['Method']:
+            drugname = self.extract_gene_name(protein = row[1]["Closest reference accession"], reftab = reftab, pointn = pointn)
+        elif row[1]["Element symbol"] in list(reftab["allele"]) and 'POINT' in row[1]['Method']:
             drugclass = self.get_drugclass(
                     reftab=reftab, row=row, colname="allele"
                     )
-            drugname = row[1]["Gene symbol"]
+            drugname = row[1]["Element symbol"]
             
-        elif row[1]["Gene symbol"] in list(reftab["gene_family"]):
+        elif row[1]["Element symbol"] in list(reftab["gene_family"]):
             
             drugclass = self.get_drugclass(
                 reftab=reftab, row=row, colname="refseq_protein_accession"
             )
-            drugname = f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}*" if not row[1]["Method"] in ["EXACTX", "ALLELEX"] else f"{self.extract_gene_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)}"
+            drugname = f"{self.extract_gene_name(protein = row[1]['Closest reference accession'], reftab = reftab)}*" if not row[1]["Method"] in ["EXACTX", "ALLELEX"] else f"{self.extract_gene_name(protein = row[1]['Closest reference accession'], reftab = reftab)}"
             
-        elif row[1]["Accession of closest sequence"] in list(reftab["refseq_protein_accession"]):
+        elif row[1]["Closest reference accession"] in list(reftab["refseq_protein_accession"]):
             
             drugclass = self.get_drugclass(
                 reftab = reftab, row = row, colname = "refseq_protein_accession"
             )
-            drugname = self.extract_bifunctional_name(protein = row[1]['Accession of closest sequence'], reftab = reftab)
+            drugname = self.extract_bifunctional_name(protein = row[1]['Closest reference accession'], reftab = reftab)
         else:
-            drugname = row[1]["Gene symbol"]
+            drugname = row[1]["Element symbol"]
             drugclass = "Unknown"
 
         if drugclass in drugclass_dict:
@@ -132,10 +132,10 @@ class Collate:
         """
         report virulence and stress genes
         """
-        if row[1]['Element subtype'].capitalize() in other_dict:
-            other_dict[row[1]['Element subtype'].capitalize()].append(row[1]['Gene symbol'])
+        if row[1]['Subtype'].capitalize() in other_dict:
+            other_dict[row[1]['Subtype'].capitalize()].append(row[1]['Element symbol'])
         else:
-            other_dict[row[1]['Element subtype'].capitalize()] = [row[1]['Gene symbol']]
+            other_dict[row[1]['Subtype'].capitalize()] = [row[1]['Element symbol']]
         return other_dict
 
     def get_per_isolate(self, reftab, df, isolate):
@@ -147,13 +147,13 @@ class Collate:
         other = {"Isolate": isolate}
         for row in df.iterrows():
             # if the match is good then generate a drugclass dict
-            if row[1]["Gene symbol"] == "aac(6')-Ib-cr" and row[1]["Method"] in ["EXACTX", "ALLELEX"]: # This is always a partial - unclear
+            if row[1]["Element symbol"] == "aac(6')-Ib-cr" and row[1]["Method"] in ["EXACTX", "ALLELEX"]: # This is always a partial - unclear
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
-            elif row[1]["Method"] in self.MATCH and row[1]["Element type"] == "AMR" and row[1]['Element subtype'] != "AMR-SUSCEPTIBLE":
+            elif row[1]["Method"] in self.MATCH and row[1]["Type"] == "AMR" and row[1]['Subtype'] != "AMR-SUSCEPTIBLE":
                 drugclass_dict = self.setup_dict(drugclass_dict = drugclass_dict, reftab = reftab, row = row)
-            elif "POINTN" in row[1]["Method"] and row[1]["Element type"] == "AMR" and row[1]['Element subtype'] != "AMR-SUSCEPTIBLE":
+            elif "POINTN" in row[1]["Method"] and row[1]["Type"] == "AMR" and row[1]['Subtype'] != "AMR-SUSCEPTIBLE":
                 drugclass_dict = self.setup_dict(drugclass_dict = drugclass_dict, reftab = reftab, row = row, pointn = True)
-            elif row[1]["Method"] not in self.MATCH and row[1]["Element type"] == "AMR" and row[1]['Element subtype'] != "AMR-SUSCEPTIBLE":
+            elif row[1]["Method"] not in self.MATCH and row[1]["Type"] == "AMR" and row[1]['Subtype'] != "AMR-SUSCEPTIBLE":
                 partials = self.setup_dict(drugclass_dict = partials, reftab = reftab, row = row)
             else:
                 other = self._other_dict(other_dict = other, row = row)
