@@ -26,6 +26,7 @@ abritAMR is best installed with `conda` as described below (~2 minutes on laptop
 ```
 conda create -n abritamr -c bioconda abritamr
 conda activate abritamr
+
 ```
 
 ### A note on dependencies
