@@ -205,7 +205,7 @@ File questions, bugs, or ideas on the
 
 Sherry, N.L., Horan, K.A., ... , Seemann, T. 
 _An ISO-certified genomics workflow for identification and surveillance of antimicrobial resistance_
-*Nat Commun* 14;60 (2023). 
+**Nat Commun** 14;60 (2023). 
 [DOI:10.1038/s41467-022-35713-4](https://doi.org/10.1038/s41467-022-35713-4)
 [PMID:36599823](https://pubmed.ncbi.nlm.nih.gov/36599823/)
 
@@ -215,3 +215,4 @@ _An ISO-certified genomics workflow for identification and surveillance of antim
 * Kristy Horan
 * [Torsten Seemann](https://tseemann.github.io)
 * Norelle Sherry
+* CHarlie Higgs (logo design)
