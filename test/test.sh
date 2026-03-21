@@ -30,6 +30,6 @@ setup () {
   run ! $exe run -c /dev/null
 }
 @test "Small input file" {
-  run -0 $exe run -c small.fna
+  run -0 $exe run -c genome.fna
   [[ -r "abritamr/amrfinder.out" ]]
 }
