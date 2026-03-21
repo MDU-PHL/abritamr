@@ -1,48 +1,70 @@
-[![CI](https://github.com/tseemann/abritamr/workflows/CI/badge.svg)](https://github.com/tseemann/abritamr/actions)
-[![GitHub release](https://img.shields.io/github/release/tseemann/abritamr.svg)](https://github.com/tseemann/abritamr/releases)
+[![CI](https://github.com/MDU-PHL/abritamr/workflows/CI/badge.svg)](https://github.com/MDU-PHL/abritamr/actions)
+[![GitHub release](https://img.shields.io/github/release/MDU-PHL/abritamr.svg)](https://github.com/MDU-PHL/abritamr/releases)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Conda](https://img.shields.io/conda/dn/bioconda/abritamr.svg)](https://anaconda.org/bioconda/abritamr)
 [![DOI](https://zenodo.org/badge/209921768.svg)](https://zenodo.org/badge/latestdoi/209921768)
 
 <img src="documentation/abriTAMR_logo.jpg" height="100">
 
-**_Taming the AMR beast_**
+## Taming the AMR beast
 
-abriTAMR is an AMR gene detection pipeline that runs AMRFinderPlus on a single (or  list ) of given isolates and collates the results into a table, separating genes identified into functionally relevant groups.
+_abriTAMR_ is an AMR gene/variant detection 
+pipeline  that runs AMRFinderPlus 
+on bacteiral genome assemblues,
+categorises the variants into 
+reportable/not-reportable,
+and sorts into clinical drug classes.
 
-_abriTAMR is accredited by NATA for use in reporting the presence of reportable AMR genes in Victoria Australia._
+_abriTAMR_ is accredited by NATA for use 
+in identifying the presence of reportable 
+AMR genes the MDU PHL in Victoria, Australia.
 
-* Acquired resistance mechanims in the form of point mutations (restricted to subset of species)
-* Streamlined output.
-* Presence of virulence factors
-
-## Install
-
-### Conda
-
-abritAMR is best installed with `conda` as described below (~2 minutes on laptop)
-
+## Installation
 
 ```
-conda create -n abritamr -c bioconda abritamr
-conda activate abritamr
-abritamr --version
+% conda create -n abritamr -c bioconda abritamr
+% conda activate abritamr
+% abritamr --version
 
 ```
 
-### A note on dependencies
+## Quick start
+```
+% abritamr run -c genome.fasta
 
-abriTAMR requires 
-[AMRFinder Plus](https://github.com/ncbi/amr), 
-this can be installed separately with `conda` if required. 
+% ls abritamr
+abritamr.log         summary_partials.txt
+amrfinder.out        summary_virulence.txt
+summary_matches.txt  update_abritamr_db.log
 
-abriTAMR comes packaged with a version of the  AMRFinder DB consistent with current NATA accreditation. If you would like to use another DB please download it using `amrfinder -U` and use the `-d` flag to point to your database.
+% cat abritamr/abritamr.txt
+Isolate	Methicillin	Tetracycline	Tigecycline	Beta-lactam	Penicillin resistance (Staphylococcus aureus)
+abritamr	mecA,mecR1^	tet(38)*	mepA*	blaI*,blaR1*	blaZ
+```
 
-Current version of AMRFinder Plus compatible with abritAMR 3.10.42 (tested on versions down to 3.10.16)
+## Input
 
+The `-c` option is used for input, and 
+can accept 2 types of files:
 
+1. a single FASTA file, usually a genome assembly:
+```
+>contug001
+AGTCTCGATATGCTATAGGCTTATATATAT
+ATGCTATAGGCTTATATATATTTATATCTT
+>contig002
+CGATATGCTATAGGCTTATATATATTTATA
+...
+```
 
-## Command-line tool
+2. a TSV file for multiple FASTA files:
+```
+ID1 <tab> /path/to/assembly1.fasta
+ID2 <tab> /path/to/second/file.fna
+...
+```
+
+## Running
 
 ```
 abritamr run --help
@@ -165,3 +187,31 @@ will output spreadsheets `general_runid.xlsx` (NATA accredited) or `plus_runid.x
 * Aminoglycosides (RMT)
 * Colistin 
 
+## References
+
+* [AMR FInder Plus](https://www.ncbi.nlm.nih.gov/pathogens/antimicrobial-resistance/AMRFinder/)
+* [Abricate](https://github.com/tseemann/abricate)
+
+## Feedback
+
+File questions, bugs, or ideas on the 
+[Issues page](https://github.com/MDU-PHL/abritamr/issues)
+
+## License
+
+[GPLv3](https://raw.githubusercontent.com/MDU-PHL/abritamr/master/LICENSE)
+
+## Citation
+
+Sherry, N.L., Horan, K.A., ... , Seemann, T. 
+_An ISO-certified genomics workflow for identification and surveillance of antimicrobial resistance_
+*Nat Commun* 14;60 (2023). 
+[DOI:10.1038/s41467-022-35713-4](https://doi.org/10.1038/s41467-022-35713-4)
+[PMID:36599823](https://pubmed.ncbi.nlm.nih.gov/36599823/)
+
+
+## Authors
+
+* Kristy Horan
+* [Torsten Seemann](https://tseemann.github.io)
+* Norelle Sherry
