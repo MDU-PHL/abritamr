@@ -1,0 +1,15 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python >=3.9
+  - pip
+  - pytest
+  - setuptools
+  - pandas
+  - libcurl
+  - xlsxwriter
+  - ncbi-amrfinderplus >=4
+  - parallel
+  - make
+  - bats-core

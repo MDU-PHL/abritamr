@@ -1,8 +1,10 @@
-<figure><img src="documentation/abriTAMR_logo.jpg"></figure>
-
-**_logo by Charlie Higgs (PhD candidate)_**
-
+[![CI](https://github.com/tseemann/abritamr/workflows/CI/badge.svg)](https://github.com/tseemann/abritamr/actions)
+[![GitHub release](https://img.shields.io/github/release/tseemann/abritamr.svg)](https://github.com/tseemann/abritamr/releases)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Conda](https://img.shields.io/conda/dn/bioconda/abritamr.svg)](https://anaconda.org/bioconda/abritamr)
 [![DOI](https://zenodo.org/badge/209921768.svg)](https://zenodo.org/badge/latestdoi/209921768)
+
+<img src="documentation/abriTAMR_logo.jpg" height="100">
 
 **_Taming the AMR beast_**
 
@@ -24,12 +26,15 @@ abritAMR is best installed with `conda` as described below (~2 minutes on laptop
 ```
 conda create -n abritamr -c bioconda abritamr
 conda activate abritamr
+abritamr --version
 
 ```
 
 ### A note on dependencies
 
-abriTAMR requires [AMRFinder Plus](https://github.com/ncbi/amr), this can be installed separately with `conda` if required. 
+abriTAMR requires 
+[AMRFinder Plus](https://github.com/ncbi/amr), 
+this can be installed separately with `conda` if required. 
 
 abriTAMR comes packaged with a version of the  AMRFinder DB consistent with current NATA accreditation. If you would like to use another DB please download it using `amrfinder -U` and use the `-d` flag to point to your database.
 
