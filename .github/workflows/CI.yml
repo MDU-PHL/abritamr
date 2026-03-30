@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    branches:
+      - master
+      - main
+    paths-ignore:
+      - 'README.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: abritamr
+          environment-file: environment.yml
+          miniforge-version: latest
+          channels: conda-forge,bioconda
+          conda-remove-defaults: true
+          channel-priority: strict
+          auto-update-conda: true
+
+      - name: Check tools
+        run: |
+          set +x
+          python --version
+          amrfinder --version
+          bats -v
+          make --version | head -n 1
+
+      - name: Install our code
+        run: |
+          pip install --no-deps .
+
+      - name: Run BATS test suite
+        run: bats -T test/test.sh
