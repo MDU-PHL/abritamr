@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional,Literal
 import pandas as pd
 import json
 
@@ -11,7 +11,7 @@ CRITERIA_COLS = {
 
 @dataclass(frozen=True)
 class BaseCriteria:
-    action: str   # "report" or "not_report"
+    action: Literal['reportable','not-reportable']
     drugclass: Optional[list] = None
     drugsubclass: Optional[list]  = None
     species: Optional[list]  = None
@@ -20,10 +20,15 @@ class BaseCriteria:
     abx: Optional[str]  = None
     gene: Optional[list]  = None
     # exception: Optional[list]  = None
-    
+    def __post_init__(self):
+        if self.action not in ['reportable','not-reportable']:
+            raise ValueError(f"Action must be one of reportable or not-reportable")
+        if not self.drugclass and not self.drugsubclass and not self.gene:
+            raise ValueError(f"You must supply one of 'drugclass', 'drugsubclass' or 'gene'")
+        
 @dataclass(frozen=True)
 class Criteria:
-    action: str   # "report" or "not_report"
+    action: Literal['reportable','not-reportable']
     drugclass: Optional[list] = None
     drugsubclass: Optional[list]  = None
     species: Optional[list]  = None
@@ -32,34 +37,14 @@ class Criteria:
     abx: Optional[str]  = None
     gene: Optional[list]  = None
     exception: BaseCriteria  = None
+    def __post_init__(self):
+        if self.action not in ['reportable','not-reportable']:
+            raise ValueError(f"Action must be one of reportable or not-reportable")
+        if not self.drugclass and not self.drugsubclass and not self.gene:
+            raise ValueError(f"You must supply one of 'drugclass', 'drugsubclass' or 'gene'")
     
 
 
-
-def check_required(criteria:dict)-> bool:
-    print(f"Checking that required fields are supplied for criteria.")
-    for req in CRITERIA_COLS['required']:
-        if req not in criteria:
-            print(f"You must have {req} in your criteria. Please try again.")
-            raise SystemExit(1)
-        if criteria[req] == "":
-            print(f"You must supply a valid value for {req}. Please try again.")
-            raise SystemExit(1)
-    print(f"Looks like all the required fields are present and not empty.")
-    return True
-
-def check_one_ofs(criteria:dict) -> bool:
-    print(f"Checking that the criteria has at least one of {' | '.join(CRITERIA_COLS['one_of'])}")
-
-    ones = []
-    for o in CRITERIA_COLS['one_of']:
-        if o in criteria and criteria[o] != "":
-            ones.append(o)
-    if ones == []:
-        print(f"You must supply at least one of {' | '.join(CRITERIA_COLS['one_of'])}. Please try again.")
-        raise SystemExit(1)
-    print(f"Looks like you have correctly supplied {' | '.join(ones)}")
-    return True
 
 def wrangle_lists(criteria:dict) -> dict:
 
@@ -75,8 +60,8 @@ def wrangle_lists(criteria:dict) -> dict:
     return criteria
 
 def construct_criteria(criteria:dict) -> Criteria:
-    check_required(criteria = criteria)
-    check_one_ofs(criteria = criteria)
+    # check_required(criteria = criteria)
+    # check_one_ofs(criteria = criteria)
     criteria = wrangle_lists(criteria)
     # print(criteria)
     if 'exception' in criteria and criteria['exception'] != []:
@@ -84,6 +69,7 @@ def construct_criteria(criteria:dict) -> Criteria:
         for cr in criteria['exception']:
             ct = wrangle_lists(cr)
             bcr = BaseCriteria(**ct)
+            
             exceptioncriteria.append(bcr)
         criteria['exception'] = exceptioncriteria
     
@@ -96,6 +82,7 @@ def construct_criteria(criteria:dict) -> Criteria:
 #                             genes_not_reported.extend([g for g in genes if g.startswith("blaL1")])
 
 criterias= [
+
     {
         "drugsubclass": "Carbapenemase",
         "action":"reportable"
@@ -121,6 +108,9 @@ for c in criterias:
     c1 = construct_criteria(c)
     # print(c1)
     listofcriteria.append(c1)
+print(listofcriteria)
+# with open('criteria.json', 'w') as j:
+#     json.dump(listofcriteria, j, indent = 4)
 
 # abritamr = Abritamr(RULES)
 # abritamr.run(data, output, etc)

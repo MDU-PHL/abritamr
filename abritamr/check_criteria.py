@@ -1,4 +1,4 @@
-from criteria import criterias # for now - will need to be cleverer/cleaner/better 
+# from criteria import criterias # for now - will need to be cleverer/cleaner/better 
 
 from cel import evaluate
 
@@ -11,7 +11,7 @@ def construct_query(crt: dict):
 
     _filter = []
     for key in crt:
-        
+
             
 
 construct_query()
