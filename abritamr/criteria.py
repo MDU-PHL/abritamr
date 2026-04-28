@@ -108,9 +108,3 @@ for c in criterias:
     c1 = construct_criteria(c)
     # print(c1)
     listofcriteria.append(c1)
-print(listofcriteria)
-# with open('criteria.json', 'w') as j:
-#     json.dump(listofcriteria, j, indent = 4)
-
-# abritamr = Abritamr(RULES)
-# abritamr.run(data, output, etc)
