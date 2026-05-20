@@ -53,7 +53,7 @@ def find_classes(refgenes:pd.DataFrame,accession:str) -> str:
 
     return _class,_subclass
     
-def add_abritamr_results(refgenes:pd.DataFrame, amr:dict, species: str= "", genus:str="") -> pd.DataFrame:
+def add_abritamr_results(refgenes:pd.DataFrame, amr:dict, species: str= "", genus:str="", output:str="abritamr") -> pd.DataFrame:
 
     for row in amr:
         _class,_subclass = find_classes(refgenes = refgenes, accession = row['Accession of closest sequence'])
@@ -72,6 +72,7 @@ def add_abritamr_results(refgenes:pd.DataFrame, amr:dict, species: str= "", genu
         # print(row)
     
     result = pd.DataFrame(amr)
+    result.to_csv(f"{output}.csv", index = False)
     print(result[['Gene symbol', 'abritamr class', 'abritamr subclass', 'abritamr AMR reporting']])
 
     
