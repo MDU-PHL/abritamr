@@ -88,7 +88,7 @@ def test_setup_contigs():
         amr_obj.jobs  = 16
         amr_obj.species = ''
         amr_obj.identity = ''
-        amr_obj.amrfinder_db = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus'/ 'data'/ '2022-08-09.1'}"
+        amr_obj.amrfinder_db = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus'/ 'data'/ '2026-03-24.1'}"
         amr_obj.logger = logging.getLogger(__name__)
         T = collections.namedtuple('T', ['run_type', 'input', 'prefix', 'jobs', 'organism', 'identity','amrfinder_db'])
         input_data = T('assembly', amr_obj.contigs, amr_obj.prefix, amr_obj.jobs, amr_obj.species, amr_obj.identity, amr_obj.amrfinder_db)
@@ -102,7 +102,7 @@ def test_species():
         amr_obj.jobs  = 16
         amr_obj.species = 'Neiserria'
         amr_obj.identity = ''
-        amr_obj.amrfinder_db = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus'/ 'data'/ '2022-08-09.1'}"
+        amr_obj.amrfinder_db = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus'/ 'data'/ '2026-03-24.1'}"
         amr_obj.logger = logging.getLogger(__name__)
         T = collections.namedtuple('T', ['run_type', 'input', 'prefix', 'jobs', 'organism', 'identity','amrfinder_db'])
         input_data = T('assembly', amr_obj.contigs, amr_obj.prefix, amr_obj.jobs, amr_obj.species, amr_obj.identity, amr_obj.amrfinder_db)
@@ -117,7 +117,7 @@ def test_setup_batch():
         amr_obj.jobs  = 16
         amr_obj.species = ''
         amr_obj.identity = ''
-        amr_obj.amrfinder_db = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus'/ 'data'/ '2022-08-09.1'}"
+        amr_obj.amrfinder_db = f"{pathlib.Path(__file__).parent.parent /'abritamr' /'db' / 'amrfinderplus'/ 'data'/ '2026-03-24.1'}"
         amr_obj.logger = logging.getLogger(__name__)
         T = collections.namedtuple('T', ['run_type', 'input', 'prefix', 'jobs', 'organism','identity', 'amrfinder_db'])
         input_data = T('batch', amr_obj.contigs, amr_obj.prefix, amr_obj.jobs, amr_obj.species, amr_obj.identity,amr_obj.amrfinder_db)
@@ -404,7 +404,7 @@ def test_get_drugclass_allele_1():
         reftab = pandas.read_csv(REFGENES)
         df= pandas.read_csv('tests/amrfinder.out', sep = '\t')
         for i in df.iterrows():
-            if i[1]['Gene symbol'] == 'blaSHV-11':
+            if i[1]['Element symbol'] == 'blaSHV-11':
                 row = i
         colname = 'allele'
         amr_obj.logger = logging.getLogger(__name__)
@@ -447,7 +447,7 @@ def test_setup_dict():
         drugclass_dict = {}
         df= pandas.read_csv('tests/amrfinder.out', sep = '\t')
         for i in df.iterrows():
-            if i[1]['Gene symbol'] == 'blaSHV-11':
+            if i[1]['Element symbol'] == 'blaSHV-11':
                 row = i
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj.setup_dict(drugclass_dict, reftab, row) == {"Beta-lactam":['blaSHV-11']}

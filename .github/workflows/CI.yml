@@ -38,12 +38,11 @@ jobs:
           set +x
           python --version
           amrfinder --version
-          bats -v
-          make --version | head -n 1
-
+          
       - name: Install our code
         run: |
           pip install --no-deps .
+          pip install pytest
 
-      - name: Run BATS test suite
-        run: bats -T test/test.sh
+      - name: Run test
+        run: pytest -vvv
