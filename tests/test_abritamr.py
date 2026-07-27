@@ -404,7 +404,7 @@ def test_get_drugclass_allele_1():
         reftab = pandas.read_csv(REFGENES)
         df= pandas.read_csv('tests/amrfinder.out', sep = '\t')
         for i in df.iterrows():
-            if i[1]['Gene symbol'] == 'blaSHV-11':
+            if i[1]['Element symbol'] == 'blaSHV-11':
                 row = i
         colname = 'allele'
         amr_obj.logger = logging.getLogger(__name__)
@@ -447,7 +447,7 @@ def test_setup_dict():
         drugclass_dict = {}
         df= pandas.read_csv('tests/amrfinder.out', sep = '\t')
         for i in df.iterrows():
-            if i[1]['Gene symbol'] == 'blaSHV-11':
+            if i[1]['Element symbol'] == 'blaSHV-11':
                 row = i
         amr_obj.logger = logging.getLogger(__name__)
         assert amr_obj.setup_dict(drugclass_dict, reftab, row) == {"Beta-lactam":['blaSHV-11']}
