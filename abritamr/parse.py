@@ -4,7 +4,7 @@ import numpy as np
 import json
 import pathlib
 
-from filter_results import construct_filter
+from filter_reportable import construct_filter
 
 def open_amrfinder(pth : pathlib.Path) -> pd.DataFrame:
 
@@ -52,8 +52,11 @@ def find_classes(refgenes:pd.DataFrame,accession:str) -> str:
             break
 
     return _class,_subclass
+
+def infer_resistance():
+    pass
     
-def add_abritamr_results(refgenes:pd.DataFrame, amr:dict, species: str= "", genus:str="", output:str="abritamr") -> pd.DataFrame:
+def add_abritamr_results(refgenes:pd.DataFrame, amr:dict, species: str= "", genus:str="", infer:bool=False,output:str="abritamr") -> pd.DataFrame:
 
     for row in amr:
         _class,_subclass = find_classes(refgenes = refgenes, accession = row['Accession of closest sequence'])

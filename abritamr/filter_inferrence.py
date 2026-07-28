@@ -22,6 +22,7 @@ def filter_string(crt:dict, dlm:str = " && ")-> str:
                 for l in lst:
                     tmp.append(f"'{l}' in {k}")
                 f = ' || '.join(tmp)
+                # print(f)
             fl.append(f)
     # print(f'{dlm}'.join(fl))
     return f'{dlm}'.join(fl)
@@ -29,17 +30,22 @@ def filter_string(crt:dict, dlm:str = " && ")-> str:
 def extract_criteria(criteria):
 
     crt = {k: str(v) for k, v in asdict(criteria).items() if k != "action"}
+    # print(crt)
     return crt
 
 def construct_filter(result:dict):
     rpt = "not-reportable"
+    
     for criteria in listofreportable:
        
-        # print(crt)
+        
         crt = extract_criteria(criteria = criteria)
+        # print(crt)
         action = {k: str(v) for k, v in asdict(criteria).items() if k == "action"}
         primary_filter = filter_string(crt)
+        # print(action)
         # print(primary_filter)
+        # print(result['drugsubclass'])
         res = evaluate(primary_filter,result)
         if res:
             rpt = action['action']
@@ -66,7 +72,7 @@ def construct_filter(result:dict):
 
 # results = [
 #     {"data":{"drugsubclass": "Carbapenemase","gene":"blabla", "species":"Salmonella enterica", "genus": "Salmonella"}, "res": "reportable"}, #this should be report
-#     {"data":{"drugsubclass": "Carbapenemases","gene":"blabla", "species":"Salmonella enterica","genus": "Salmonella"}, "res":"not-reportable"}, # this will not report}
+#     {"data":{"drugsubclass": "Carbapen","gene":"blabla", "species":"Salmonella enterica","genus": "Salmonella"}, "res":"not-reportable"}, # this will not report}
 #     {"data":{"drugsubclass": "Carbapenemase (MBL)", "gene": "bla1", "species":"Salmonella enterica", "genus": "Salmonella"},"res":"reportable"}, # this should report
 #     {"data":{"drugsubclass": "Carbapenemase (MBL)", "gene": "bla1", "species":"Stenotrophomonas maltophilia", "genus":"Stenotrophomonas"},"res":"not-reportable"}, # this not should report
 #     {"data": {"drugsubclass": "Carbapenemase (MBL)", "gene": "bla2", "species":"Stenotrophomonas maltophilia","genus":"Stenotrophomonas"}, "res":"reportable"}, # this  should report
@@ -79,6 +85,6 @@ def construct_filter(result:dict):
 #     if res == result["res"]:
 #         print("Success")
 #     else:
-#         print(f"something is wrong, {result['data']} should return {result['res']}")
+#         print(f"Something is wrong, {result['data']} should return {result['res']}")
 
-    # break
+#     # break

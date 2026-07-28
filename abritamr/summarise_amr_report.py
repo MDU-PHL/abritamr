@@ -14,7 +14,7 @@ def save_report(report: pd.DataFrame, outname:str= "abritamr_reportable", long:b
 
     
 
-def report(results:pd.DataFrame,species:str="", simple:bool=False, sid:str="abritamr", genesonly:bool = False, minidentity:float = 90, mincoverage:float = 90) -> pd.DataFrame:
+def report(results:pd.DataFrame,species:str="", simple:bool=True, sid:str="abritamr", genesonly:bool = False, minidentity:float = 90, mincoverage:float = 90) -> pd.DataFrame:
 
     repmechs = {'seq_id':sid}
     reportable = results[
