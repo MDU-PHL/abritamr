@@ -13,7 +13,7 @@ def filter_string(crt:dict, dlm:str = " && ")-> str:
         # print(k)
         # print(crt[k])
         if f"{crt[k]}" != "None" and k != "exception" and k != "action":
-            if k not in ["drugclass","drugsubclass","gene"]:
+            if k not in ["abritamr_class","abritamr_subclass","gene"]:
                 f = f"{k} in {crt[k]}"
             else:
                 # print(type(crt[k])) 
@@ -45,7 +45,7 @@ def construct_filter(result:dict):
         primary_filter = filter_string(crt)
         # print(action)
         # print(primary_filter)
-        # print(result['drugsubclass'])
+        # print(result['abritamr_subclass'])
         res = evaluate(primary_filter,result)
         if res:
             rpt = action['action']
@@ -70,21 +70,21 @@ def construct_filter(result:dict):
 
 
 
-# results = [
-#     {"data":{"drugsubclass": "Carbapenemase","gene":"blabla", "species":"Salmonella enterica", "genus": "Salmonella"}, "res": "reportable"}, #this should be report
-#     {"data":{"drugsubclass": "Carbapen","gene":"blabla", "species":"Salmonella enterica","genus": "Salmonella"}, "res":"not-reportable"}, # this will not report}
-#     {"data":{"drugsubclass": "Carbapenemase (MBL)", "gene": "bla1", "species":"Salmonella enterica", "genus": "Salmonella"},"res":"reportable"}, # this should report
-#     {"data":{"drugsubclass": "Carbapenemase (MBL)", "gene": "bla1", "species":"Stenotrophomonas maltophilia", "genus":"Stenotrophomonas"},"res":"not-reportable"}, # this not should report
-#     {"data": {"drugsubclass": "Carbapenemase (MBL)", "gene": "bla2", "species":"Stenotrophomonas maltophilia","genus":"Stenotrophomonas"}, "res":"reportable"}, # this  should report
-#     {"data": {"drugsubclass": "Linezolid/Phenicol", "gene": "bla2", "species":"Staphylococcus aureus","genus":"Staphylococcus"}, "res":"reportable"}, # this  should report
+results = [
+    {"data":{"abritamr_subclass": "Carbapenemase","gene":"blabla", "species":"Salmonella enterica", "genus": "Salmonella"}, "res": "reportable"}, #this should be report
+    {"data":{"abritamr_subclass": "Carbapen","gene":"blabla", "species":"Salmonella enterica","genus": "Salmonella"}, "res":"not-reportable"}, # this will not report}
+    {"data":{"abritamr_subclass": "Carbapenemase (MBL)", "gene": "bla1", "species":"Salmonella enterica", "genus": "Salmonella"},"res":"reportable"}, # this should report
+    {"data":{"abritamr_subclass": "Carbapenemase (MBL)", "gene": "bla1", "species":"Stenotrophomonas maltophilia", "genus":"Stenotrophomonas"},"res":"not-reportable"}, # this not should report
+    {"data": {"abritamr_subclass": "Carbapenemase (MBL)", "gene": "bla2", "species":"Stenotrophomonas maltophilia","genus":"Stenotrophomonas"}, "res":"reportable"}, # this  should report
+    {"data": {"abritamr_subclass": "Linezolid/Phenicol", "gene": "bla2", "species":"Staphylococcus aureus","genus":"Staphylococcus"}, "res":"reportable"}, # this  should report
 
-# ]
+]
 
-# for result in results:
-#     res = construct_filter(result["data"])
-#     if res == result["res"]:
-#         print("Success")
-#     else:
-#         print(f"Something is wrong, {result['data']} should return {result['res']}")
+for result in results:
+    res = construct_filter(result["data"])
+    if res == result["res"]:
+        print("Success")
+    else:
+        print(f"Something is wrong, {result['data']} should return {result['res']}")
 
-#     # break
+    # break

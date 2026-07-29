@@ -56,32 +56,27 @@ def find_classes(refgenes:pd.DataFrame,accession:str) -> str:
 def infer_resistance():
     pass
     
-def add_abritamr_results(refgenes:pd.DataFrame, amr:dict, species: str= "", genus:str="", infer:bool=False,output:str="abritamr") -> pd.DataFrame:
+def add_abritamr_results(refgenes:pd.DataFrame, amr:dict, species: str= "", genus:str="") -> pd.DataFrame:
 
     for row in amr:
         _class,_subclass = find_classes(refgenes = refgenes, accession = row['Accession of closest sequence'])
         result_tocheck = {
-            'drugclass':_class,
-            'drugsubclass':_subclass,
+            'abritamr_class':_class,
+            'abritamr_subclass':_subclass,
             'species':species,
             'genus':genus,
             'gene':row['Gene symbol']
         }
         report = construct_filter( result = result_tocheck )
-        row['abritamr class'] = _class
-        row['abritamr subclass'] = _subclass
-        row['abritamr AMR reporting'] = report
+        row['abritamr_class'] = _class
+        row['abritamr_subclass'] = _subclass
+        row['abritamr_AMR_reporting'] = report
+        row['species'] = species
+        row['genus'] = genus
 
         # print(row)
     
-    result = pd.DataFrame(amr)
-    result.to_csv(f"{output}.csv", index = False)
-    print(result[['Gene symbol', 'abritamr class', 'abritamr subclass', 'abritamr AMR reporting']])
-
+    # result = pd.DataFrame(amr)
     
-
-refgenes = get_refgenes()
-amrfinder = pathlib.Path('/home/mdu/data/M2026-00688/2026-007396/abritamr/current/amrfinder.out')
-amr = open_amrfinder(pth = amrfinder)
-
-add_abritamr_results(refgenes= refgenes, amr = amr)
+    return amr
+    

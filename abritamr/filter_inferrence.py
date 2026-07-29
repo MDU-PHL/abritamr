@@ -1,90 +1,160 @@
-from criteria import listofreportable # for now - will need to be cleverer/cleaner/better 
+from criteria import listofreportable,listofinfer # for now - will need to be cleverer/cleaner/better 
 from dataclasses import dataclass, asdict
 from cel import evaluate
-
+import pandas as pd
 # print(criterias)
 
 
-def filter_string(crt:dict, dlm:str = " && ")-> str:
+def filter_string(ifr:dict)-> str:
 
     fl = []
-
-    for k in crt:
+    # print(ifr)
+    for k in ifr:
         # print(k)
-        # print(crt[k])
-        if f"{crt[k]}" != "None" and k != "exception" and k != "action":
-            if k not in ["drugclass","drugsubclass","gene"]:
-                f = f"{k} in {crt[k]}"
-            else:
-                # print(type(crt[k])) 
-                lst = eval(crt[k]) if not isinstance(crt[k],list) else crt[k]
-                tmp = []
-                for l in lst:
-                    tmp.append(f"'{l}' in {k}")
-                f = ' || '.join(tmp)
+        # print(ifr[k])
+        if f"{ifr[k]}" != "None" and k != "exception" and k != "result" and k != "drugname":
+            # print(ifr[k])
+            # if k  in ["genus","species"]:
+            #     f = f"{k} == {ifr[k]}"
+            # else:
+                # print(type(ifr[k])) 
+            dlm = " || " 
+            key = k.split("_")
+            # print(ifr[k])
+            cond = '_'.join(key[:2]) if len(key) > 3 else key[0]
+            # print(cond)
+            comp = key[3] if len(key) == 4 else "in"
+            # print(comp)
+            # val = ifr[k].split(",")
+            lst = eval(ifr[k]) if not isinstance(ifr[k],list) else ifr[k]
+            # print(lst)
+            tmp = []
+            for l in lst:
+                if comp == "equals":
+                    tmp.append(f"'{l}' == {cond}")
+                
+                else:
+                    tmp.append(f"'{l}' in {cond}")
+            if comp == "and":
+                dlm = " && "
+            f = f'{dlm}'.join(tmp)
+            f =f"({f})"
                 # print(f)
             fl.append(f)
-    # print(f'{dlm}'.join(fl))
-    return f'{dlm}'.join(fl)
+    # # print(f'{dlm}'.join(fl))
+    return f' && '.join(fl)
 
-def extract_criteria(criteria):
+def extract_criteria(criteria:dict) -> dict:
 
-    crt = {k: str(v) for k, v in asdict(criteria).items() if k != "action"}
+    crt = {k: str(v) for k, v in asdict(criteria).items() if k not in ["result"]}
     # print(crt)
     return crt
 
-def construct_filter(result:dict):
-    rpt = "not-reportable"
-    
-    for criteria in listofreportable:
+def combine_results( result: list, species:str="", genus:str="" ) -> dict:
+    res = {}
+    to_test = {
+        'abritamr_class':[],
+        'abritamr_subclass':[],
+        'gene':[],
        
+    }
+    # print(result)
+    for row in result:
+        for col in to_test:
+            if col in row:
+                to_test[col].append(row[col])
         
+    
+    for k in to_test:
+        # print(to_test[k])
+        val = ','.join(to_test[k]) if to_test[k] != [] else "None"
+        
+        res[k] = val
+    # print(res)
+    res['species']= species,
+    res['genus']=genus
+    return res
+
+def get_mechs(crt:dict,result:dict, primary_filter:str="", mechs:list=[]) -> str:
+
+    conds = [i for i in crt if ('class' in i  or 'gene' in i) and (crt[i] != "None" or not crt[i])]
+   
+    cols = eval(crt[conds[0]]) if not isinstance(crt[conds[0]], list) else crt[conds[0]]
+   
+    for row in result:
+        for k in row:
+            if k in conds[0] and row[k] in primary_filter:
+                mechs.append(row['gene'])
+            elif k in conds[0]:
+                for c in cols:
+                    if c in row[k]:
+                        mechs.append(row['gene'])
+   
+    return mechs
+
+def construct_filter(result:list, species:str="",genus:str="",sid:str="",default:str = "Susceptible"):
+    
+    
+    to_test = combine_results(result = result)
+
+    inferred = {}
+    for criteria in listofinfer:
+        rpt = f"{default}"
+        
+        mechs = []
         crt = extract_criteria(criteria = criteria)
-        # print(crt)
-        action = {k: str(v) for k, v in asdict(criteria).items() if k == "action"}
+        dr = crt['drugname']
+        resistance = {k: str(v) for k, v in asdict(criteria).items() if k == "result"}
         primary_filter = filter_string(crt)
-        # print(action)
-        # print(primary_filter)
-        # print(result['drugsubclass'])
-        res = evaluate(primary_filter,result)
+        
+        res = evaluate(primary_filter,to_test)
         if res:
-            rpt = action['action']
+            rpt = resistance['result']
+            mechs = get_mechs(crt = crt, result = result, primary_filter = primary_filter, mechs = mechs)
+            
         if 'exception' in crt and crt['exception'] != "None":
-            # print(crt['exception'])
+            print(f"Found an exception rule")
             sfilterres = set()
+            mechs = []
             for xcptn in eval(crt['exception']):
-                # print(xcptn)
-                flt = filter_string(xcptn,dlm = " && ")
-                # print(flt)
-                # print(result)
-                resxptn = evaluate(flt, result)
+                flt = filter_string(xcptn)
+                
+                resxptn = evaluate(flt, to_test)
+                
                 if resxptn:
-                    sfilterres.add(xcptn["action"])
+                    mechs = get_mechs(crt = xcptn, result = result, primary_filter = flt, mechs=mechs)
+                    sfilterres.add(xcptn["result"])
             if sfilterres:
                 rpt = "|".join(list(sfilterres))
+            
+        mechs = ";".join(sorted(mechs)) if mechs != [] else "No mechanisms identified"
+        
+        inferred[f"{dr} - mechanisms"] = mechs
+        inferred[f"{dr} - interpretation"] = rpt
 
-    return rpt
+    
+    return inferred
 
 
         
 
 
 
-# results = [
-#     {"data":{"drugsubclass": "Carbapenemase","gene":"blabla", "species":"Salmonella enterica", "genus": "Salmonella"}, "res": "reportable"}, #this should be report
-#     {"data":{"drugsubclass": "Carbapen","gene":"blabla", "species":"Salmonella enterica","genus": "Salmonella"}, "res":"not-reportable"}, # this will not report}
-#     {"data":{"drugsubclass": "Carbapenemase (MBL)", "gene": "bla1", "species":"Salmonella enterica", "genus": "Salmonella"},"res":"reportable"}, # this should report
-#     {"data":{"drugsubclass": "Carbapenemase (MBL)", "gene": "bla1", "species":"Stenotrophomonas maltophilia", "genus":"Stenotrophomonas"},"res":"not-reportable"}, # this not should report
-#     {"data": {"drugsubclass": "Carbapenemase (MBL)", "gene": "bla2", "species":"Stenotrophomonas maltophilia","genus":"Stenotrophomonas"}, "res":"reportable"}, # this  should report
-#     {"data": {"drugsubclass": "Linezolid/Phenicol", "gene": "bla2", "species":"Staphylococcus aureus","genus":"Staphylococcus"}, "res":"reportable"}, # this  should report
+results = [
+    {"data":[{"abritamr_subclass": "Carbapenemase","gene":"exc_gene", "species":"Salmonella enterica", "genus": "Salmonella"}], "res": "Resistant"}, #this should be report
+    # {"data":[{"abritamr_subclass": "phenicol","gene":"blabla", "species":"Salmonella enterica","genus": "Salmonella"}], "res":"Resistant"}, # this will not report}
+    # {"data":[{"abritamr_subclass": "ESBL", "gene": "bla1", "species":"Salmonella enterica", "genus": "Salmonella"}],"res":"Resistant"}, # this should report
+    # {"data":[{"abritamr_subclass": "Trimethoprim", "gene": "bla1", "species":"Salmonella enterica", "genus": "Salmonella"},
+    # {"abritamr_subclass": "Sulfathiazole", "gene": "sul", "species":"Salmonella enterica", "genus": "Salmonella"},
+    # {"abritamr_subclass": "Carbapenase (MBL)", "gene": "bla2", "species":"Salmonella enterica","genus": "Salmonella"}],"res":"Resistant"}, # this not should report
+    # {"data": [{"abritamr_subclass": "Carbapenase (MBL)", "gene": "bla2", "species":"Salmonella enterica","genus": "Salmonella"}], "res":"Susceptible"}, # this  should report
+    # {"data": [{"abritamr_subclass": "Linezolid/Phenicol", "gene": "bla2", "species":"Salmonella enterica","genus": "Salmonella"}], "res":"Resistant"}, # this  should report
 
-# ]
+]
 
-# for result in results:
-#     res = construct_filter(result["data"])
-#     if res == result["res"]:
-#         print("Success")
-#     else:
-#         print(f"Something is wrong, {result['data']} should return {result['res']}")
+for result in results:
+    res = construct_filter(result["data"])
+    print(result["data"])
+    print(pd.DataFrame(res, index = [0]).T)
 
-#     # break
+    # break
