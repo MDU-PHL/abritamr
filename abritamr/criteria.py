@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional,Literal
 import pandas as pd
 import json
-
+import pathlib
 
 
 @dataclass(frozen=True)
@@ -197,239 +197,27 @@ def construct_amrtype(amrtype:dict) -> Criteria:
 
     return ctr
 
-
-
-amrtypes = [
-    {
-        "abritamr_subclass": "Carbapenemase",
-        "amrtype":"Possible CPO"    
-    },
-    {
-        "abritamr_subclass": "Vancomycin",
-        "gene":"vanA,vanB,vanC,vanD,vanE,vanE,vanG,vanL,vanM,vanN",
-        "amrtype":"Possible VRE"
+def get_abritamr_configs(cfgtype:str):
+    
+    _funcs= {
+        'infer': construct_inference,
+        'amr_type': construct_amrtype,
+        'reportable': construct_criteria
     }
-]
 
-resistance = [
-    {
-        "drugname":"Colistin",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_in":"Colistin",
-        "result":"Resistant"
-       
-    },
-    {
-        "drugname":"Aminoglycosides (RMT)",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_in":"Aminoglycosides (Ribosomal methyltransferase)",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Chloramphenicol",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_contains":"henicol",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Trim-Sulpha",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_and":"Trimethoprim,Sulfathiazole",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Trimethoprim",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_contains":"Trimethoprim",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Sulfathiazole",
-        "abritamr_subclass_present_contains":"Sulfathiazole",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Ciprofloxacin",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_contains":"uinolone",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Tetracycline",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_equals":"Tetracycline",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Streptomycin",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_in":"Streptomycin,Spectinomycin",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Kanamycin",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_in":"Kanamycin,Aminoglycosides (Ribosomal methyltransferase)",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Gentamicin",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_in":"Gentamicin,Aminoglycosides (Ribosomal methyltransferase)",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Azithromycin",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_in":"Macrolide,Lincosamide/Macrolide/Streptogramin,Azithromycin",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Meropenem",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_contains":"Carbapenemase",
-        "result":"Resistant",
-        
+    try:
+        with open(f"{cfgtype}_criteria.json", "r") as j:
 
-    },
-    {
-        "drugname":"Cefotaxime (AmpC)",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_contains":"AmpC",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Cefotaxime (ESBL)",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_equals":"ESBL",
-        "result":"Resistant",
-    },
-    {
-        "drugname":"Ampicillin",
-        "species":"Salmonella enterica",
-        "abritamr_subclass_present_in":"Beta-lactam,ESBL,AmpC,Ampicillin",
-        "result":"Resistant",
-    },
+            config = json.load(j)
+    except Exception as e:
+        print(f"An error has occured: {e}")
+        raise SystemExit(1)
+    
 
-]
+    listcriteria = []
 
-criterias= [
+    for c in config:
+        c1 = _funcs[cfgtype](c)
+        listcriteria.append(c1)
 
-    {
-        "abritamr_subclass": "Carbapenemase",
-        "action":"reportable"
-    },
-    {
-        "abritamr_subclass":"ESBL (KPC variant)",
-        "action":"reportable"
-    },
-    {
-        "abritamr_subclass":"Aminoglycosides (Ribosomal methyltransferase)",
-        "action":"reportable"
-    },
-    {
-        "abritamr_subclass":"Colistin",
-        "action":"reportable",
-        "exception":[
-            {
-                "abritamr_subclass":"Colistin",
-                "action":"not-reportable",
-                "gene":"mcr9"
-            }
-        ]
-    },
-    {
-        "abritamr_subclass":"Carbapenemase (OXA-51 family)",
-        "action":"reportable",
-        "exception":[
-            {
-                "action":"not-reportable",
-                "abritamr_subclass":"Carbapenemase (OXA-51 family)",
-                "species":"Acinetobacter baumannii,Acinetobacter calcoaceticus,Acinetobacter nosocomialis,Acinetobacter pittii,Acinetobacter baumannii complex"
-            }
-        ]
-    },
-    {
-        "abritamr_subclass": "Carbapenemase (MBL)",
-        "action":"reportable",
-        "exception":
-            [
-                {
-                    "species": "Stenotrophomonas maltophilia",
-                    "abritamr_subclass": "Carbapenemase (MBL)",
-                    "gene":"bla1",
-                    "action":"not-reportable"
-                }
-            ]
-    },
-    {
-        "abritamr_subclass": "ESBL",
-        "genus": "Salmonella,Shigella",
-        "action":"reportable"
-    },
-    {
-        "abritamr_subclass":"AmpC",
-        "genus":"Salmonella,Shigella",
-        "action":"reportable",
-        "exception":[
-            {
-                "abritamr_subclass":"AmpC",
-                "genus":"Shigella",
-                "action":"not-reportable",
-                "gene":"blaEC"
-            }
-        ]
-    },
-    {
-        "abritamr_subclass":"Vancomycin",
-        "gene" : "vanA,vanB,vanC,vanD,vanE,vanE,vanG,vanL,vanM,vanN",
-        "action": "reportable"
-    },
-    {
-        "abritamr_subclass":"Methicillin",
-        "gene" : "mecI,mecR",
-        "action": "reportable"
-    },
-    {
-        "abritamr_subclass":"Oxazolidinone",
-        "species" : "Staphylococcus aureus,Staphylococcus argenteus",
-        "action": "reportable"
-    },
-    {
-        "abritamr_subclass":"Oxazolidinone",
-        "genus" : "Enterococcus",
-        "action": "reportable"
-    },
-    {
-        "abritamr_subclass":"Linezolid",
-        "species" : "Staphylococcus aureus,Staphylococcus argenteus",
-        "action": "reportable"
-    },
-    {
-        "abritamr_subclass":"Linezolid",
-        "genus" : "Enterococcus",
-        "action": "reportable"
-    }
-    ]
-
-listofreportable = []
-listofinfer = []
-listofamrtypes = []
-for c in criterias:
-
-    c1 = construct_criteria(c)
-    # print(c1)
-    listofreportable.append(c1)
-
-
-for r in resistance:
-
-    r1 = construct_inference(r)
-    # print(r1)
-    listofinfer.append(r1)
-
-
-for a in amrtypes:
-    a1 = construct_amrtype(a)
-    # print(a1)
-    listofamrtypes.append(a1)
+    return listcriteria

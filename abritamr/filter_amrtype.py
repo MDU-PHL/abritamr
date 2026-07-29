@@ -35,7 +35,7 @@ def extract_amrtype(criteria:dict):
 
 def construct_filter(result:dict):
     rpt = "No known type"
-    
+    listofamrtypes = get_abritamr_configs(cfgtype = "amr_type")
     for criteria in listofamrtypes:
        
         # print(criteria)

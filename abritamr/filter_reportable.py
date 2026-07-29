@@ -1,4 +1,4 @@
-from criteria import listofreportable # for now - will need to be cleverer/cleaner/better 
+from criteria import get_abritamr_configs
 from dataclasses import dataclass, asdict
 from cel import evaluate
 
@@ -35,7 +35,7 @@ def extract_criteria(criteria):
 
 def construct_filter(result:dict):
     rpt = "not-reportable"
-    
+    listofreportable = get_abritamr_configs(cfgtype = "reportable")
     for criteria in listofreportable:
        
         

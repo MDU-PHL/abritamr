@@ -1,0 +1,101 @@
+[
+    {
+        "drugname":"Colistin",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_in":"Colistin",
+        "result":"Resistant"
+       
+    },
+    {
+        "drugname":"Aminoglycosides (RMT)",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_in":"Aminoglycosides (Ribosomal methyltransferase)",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Chloramphenicol",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_contains":"henicol",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Trim-Sulpha",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_and":"Trimethoprim,Sulfathiazole",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Trimethoprim",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_contains":"Trimethoprim",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Sulfathiazole",
+        "abritamr_subclass_present_contains":"Sulfathiazole",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Ciprofloxacin",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_contains":"uinolone",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Tetracycline",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_equals":"Tetracycline",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Streptomycin",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_in":"Streptomycin,Spectinomycin",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Kanamycin",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_in":"Kanamycin,Aminoglycosides (Ribosomal methyltransferase)",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Gentamicin",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_in":"Gentamicin,Aminoglycosides (Ribosomal methyltransferase)",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Azithromycin",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_in":"Macrolide,Lincosamide/Macrolide/Streptogramin,Azithromycin",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Meropenem",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_contains":"Carbapenemase",
+        "result":"Resistant"
+        
+
+    },
+    {
+        "drugname":"Cefotaxime (AmpC)",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_contains":"AmpC",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Cefotaxime (ESBL)",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_equals":"ESBL",
+        "result":"Resistant"
+    },
+    {
+        "drugname":"Ampicillin",
+        "species":"Salmonella enterica",
+        "abritamr_subclass_present_in":"Beta-lactam,ESBL,AmpC,Ampicillin",
+        "result":"Resistant"
+    }
+
+]

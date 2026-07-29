@@ -1,4 +1,4 @@
-from criteria import listofreportable,listofinfer # for now - will need to be cleverer/cleaner/better 
+from criteria import get_abritamr_configs # for now - will need to be cleverer/cleaner/better 
 from dataclasses import dataclass, asdict
 from cel import evaluate
 import pandas as pd
@@ -94,6 +94,7 @@ def get_mechs(crt:dict,result:dict, primary_filter:str="", mechs:list=[]) -> str
 
 def construct_filter(result:list, species:str="",genus:str="",sid:str="",default:str = "Susceptible"):
     
+    listofinfer = get_abritamr_configs(cfgtype = "infer")
     
     to_test = combine_results(result = result)
 
