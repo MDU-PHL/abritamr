@@ -71,7 +71,7 @@ def combine_results( result: list, species:str="", genus:str="" ) -> dict:
         
         res[k] = val
     # print(res)
-    res['species']= species,
+    res['species']= species
     res['genus']=genus
     return res
 
@@ -93,15 +93,15 @@ def get_mechs(crt:dict,result:dict, primary_filter:str="", mechs:list=[]) -> str
     return mechs
 
 def construct_filter(result:list, species:str="",genus:str="",sid:str="",default:str = "Susceptible"):
-    
+  
     listofinfer = get_abritamr_configs(cfgtype = "infer")
     
-    to_test = combine_results(result = result)
+    to_test = combine_results(result = result, species = species, genus = genus)
 
     inferred = {}
     for criteria in listofinfer:
         rpt = f"{default}"
-        
+        # print(criteria)
         mechs = []
         crt = extract_criteria(criteria = criteria)
         dr = crt['drugname']
@@ -139,23 +139,3 @@ def construct_filter(result:list, species:str="",genus:str="",sid:str="",default
 
         
 
-
-
-results = [
-    {"data":[{"abritamr_subclass": "Carbapenemase","gene":"exc_gene", "species":"Salmonella enterica", "genus": "Salmonella"}], "res": "Resistant"}, #this should be report
-    # {"data":[{"abritamr_subclass": "phenicol","gene":"blabla", "species":"Salmonella enterica","genus": "Salmonella"}], "res":"Resistant"}, # this will not report}
-    # {"data":[{"abritamr_subclass": "ESBL", "gene": "bla1", "species":"Salmonella enterica", "genus": "Salmonella"}],"res":"Resistant"}, # this should report
-    # {"data":[{"abritamr_subclass": "Trimethoprim", "gene": "bla1", "species":"Salmonella enterica", "genus": "Salmonella"},
-    # {"abritamr_subclass": "Sulfathiazole", "gene": "sul", "species":"Salmonella enterica", "genus": "Salmonella"},
-    # {"abritamr_subclass": "Carbapenase (MBL)", "gene": "bla2", "species":"Salmonella enterica","genus": "Salmonella"}],"res":"Resistant"}, # this not should report
-    # {"data": [{"abritamr_subclass": "Carbapenase (MBL)", "gene": "bla2", "species":"Salmonella enterica","genus": "Salmonella"}], "res":"Susceptible"}, # this  should report
-    # {"data": [{"abritamr_subclass": "Linezolid/Phenicol", "gene": "bla2", "species":"Salmonella enterica","genus": "Salmonella"}], "res":"Resistant"}, # this  should report
-
-]
-
-for result in results:
-    res = construct_filter(result["data"])
-    print(result["data"])
-    print(pd.DataFrame(res, index = [0]).T)
-
-    # break

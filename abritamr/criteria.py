@@ -197,7 +197,7 @@ def construct_amrtype(amrtype:dict) -> Criteria:
 
     return ctr
 
-def get_abritamr_configs(cfgtype:str):
+def get_abritamr_configs(cfgtype:str, cfgpath:str) -> list:
     
     _funcs= {
         'infer': construct_inference,
@@ -206,7 +206,7 @@ def get_abritamr_configs(cfgtype:str):
     }
 
     try:
-        with open(f"{cfgtype}_criteria.json", "r") as j:
+        with open(f"{pathlib.Path(cfgpath)}", "r") as j:
 
             config = json.load(j)
     except Exception as e:

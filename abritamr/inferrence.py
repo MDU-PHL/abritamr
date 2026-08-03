@@ -9,18 +9,18 @@ from filter_inferrence import construct_filter
 
     
 def infer_resistance(amr:dict, species: str= "", genus:str="", default:str="Susceptible") -> dict:
-
+    
     inferred = construct_filter(result = amr, species=species, genus=genus, default= default)
 
-
-    
     return inferred
 
 
-def infer(amr:dict, species: str= "", genus:str="", default:str="Susceptible", sid:str="abritamr", output:str="abritamr_inferred_ast.csv") -> bool:
+def infer(amr:dict, species: str= "", genus:str="", default:str="Susceptible") ->  dict:
 
-    inferred = infer_resistance(amr = amd, species = species, genus= genus, default = default)
+    for a in amr:
+        a['gene'] = a["Element symbol"]
 
-    if inferred != {}:
+    inferred = infer_resistance(amr = amr, species = species, genus= genus, default = default)
+    return inferred
+    # if inferred != {}:
 
-        

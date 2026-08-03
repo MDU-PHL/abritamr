@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "abritamr"
+dynamic = ["version"]
+description = "Running AMRFinderPlus for MDU"
+readme = "README.md"
+license = ""
+requires-python = ">=3.9, <4"
+authors = [
+    { name = "Kristy Horan", email = "kristyhoran15@gmail.com" },
+]
+maintainers = [
+    { name = "Kristy Horan", email = "kristyhoran15@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+    "pandas",
+    "xlsxwriter",
+    "cel"
+]
+
+[project.scripts]
+abritamr = "abritamr.abritamr:main"
+
+[project.urls]
+Homepage = "https://github.com/MDU-PHL/abritamr"
+
+[tool.hatch.version]
+path = "abritamr/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/abritamr",
+]
