@@ -3,11 +3,11 @@ import pathlib
 import json
 import logging
 
-from utils import check_assembly, check_amrfinder, check_any2fasta, wrangle_species
-from run_finder import run_amrf
-from parse_finder import amrf2dict
-from parse_reportable import add_abritamr_results
-from parse_amrtype import get_amr_type
+from abritamr.utils import check_assembly, check_amrfinder, check_any2fasta, wrangle_species
+from abritamr.run_finder import run_amrf
+from abritamr.parse_finder import amrf2dict
+from abritamr.parse_reportable import add_abritamr_results
+from abritamr.parse_amrtype import get_amr_type
 
 
 logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 

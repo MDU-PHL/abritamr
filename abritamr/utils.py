@@ -1,6 +1,6 @@
 import pathlib
 import subprocess
-from version import db
+from abritamr.version import db
 import pandas as pd
 import logging 
 
@@ -14,7 +14,7 @@ def get_refgenes()-> pd.DataFrame:
     if rf.exists():
         return pd.read_csv(rf)
     else:
-        log.critcal(f"Something is very wrong - the reference catalog is not present.")
+        log.critical(f"Something is very wrong - the reference catalog is not present.")
         raise SystemExit(1)
 
 
@@ -62,14 +62,14 @@ def check_assembly(pth) -> bool:
             raise SystemExit(1)
 
 def wrangle_species(organism:str) -> tuple:
-    print(organism)
+    
     if organism == "":
         log.info("No species specific criteria will be applied")
         return "",""
 
     else:
         og = organism.split("_")
-        print(og)
+        
         if len(og) == 1:
             return "",og[0]
         else:

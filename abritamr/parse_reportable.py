@@ -5,9 +5,9 @@ import json
 import pathlib
 
 
-from utils import get_refgenes
+from abritamr.utils import get_refgenes
 
-from filter_reportable import construct_filter
+from abritamr.filter_reportable import construct_filter
 
 
 logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p') 

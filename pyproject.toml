@@ -7,7 +7,7 @@ name = "abritamr"
 dynamic = ["version"]
 description = "Running AMRFinderPlus for MDU"
 readme = "README.md"
-license = ""
+license = "GPL-3.0-or-later"
 requires-python = ">=3.9, <4"
 authors = [
     { name = "Kristy Horan", email = "kristyhoran15@gmail.com" },
@@ -30,19 +30,20 @@ classifiers = [
 dependencies = [
     "pandas",
     "xlsxwriter",
-    "cel"
+    "pycel"
 ]
 
 [project.scripts]
-abritamr = "abritamr.abritamr:main"
+abritamr = "abritamr.abritamr:cli"
 
 [project.urls]
 Homepage = "https://github.com/MDU-PHL/abritamr"
 
 [tool.hatch.version]
-path = "abritamr/__init__.py"
+path = "abritamr/version.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
     "/abritamr",
+    "/abritamr/*"
 ]

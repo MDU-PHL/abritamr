@@ -1,4 +1,4 @@
-from criteria import get_abritamr_configs
+from abritamr.criteria import get_abritamr_configs
 from dataclasses import dataclass, asdict
 from cel import evaluate
 

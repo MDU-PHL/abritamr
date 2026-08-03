@@ -3,8 +3,8 @@ from click.exceptions import UsageError
 from click._compat import get_text_stderr
 import sys
 
-import run
-from version import __version__ as version
+import abritamr.run 
+from abritamr.version import __version__ as version
 
 def _show_usage_error(self, file=None):
     if file is None:
@@ -29,7 +29,7 @@ def cli():
     pass
 
 
-cli.add_command(run.run)
+cli.add_command(abritamr.run.run)
 
 
 

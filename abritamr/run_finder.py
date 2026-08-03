@@ -1,6 +1,6 @@
 import subprocess
 import pandas as pd
-from utils import check_amrfinder, check_any2fasta, check_assembly
+from abritamr.utils import check_amrfinder, check_any2fasta, check_assembly
 
 import logging
 
@@ -45,5 +45,5 @@ def run_amrf(min_identity:float, min_coverage:float, asm:str,threads:int, organi
     cmd = generate_cmd(min_identity = min_identity, min_coverage = min_coverage, asm = asm, threads = threads, organism = organism)
     stdout = run_cmd(cmd = cmd) 
     amr = parse_output(results = stdout)
-    
+
     return amr

@@ -1,4 +1,4 @@
-from criteria import get_abritamr_configs # for now - will need to be cleverer/cleaner/better 
+from abritamr.criteria import get_abritamr_configs # for now - will need to be cleverer/cleaner/better 
 from dataclasses import dataclass, asdict
 from cel import evaluate
 import pandas as pd

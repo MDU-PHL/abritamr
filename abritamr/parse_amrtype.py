@@ -4,7 +4,7 @@ import numpy as np
 import json
 import pathlib
 
-from filter_amrtype import construct_filter
+from abritamr.filter_amrtype import construct_filter
 
 import logging
 
