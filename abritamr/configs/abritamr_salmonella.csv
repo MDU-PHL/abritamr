@@ -1,0 +1,17 @@
+﻿criteria_id,criteria_version,criteria,species,drugname,inferred
+cidsalmo000001,0.0.1,('Colistin' in abritamr_subclass),Salmonella enterica,Colistin,Resistant
+cidsalmo000002,0.0.1,('Aminoglycosides (Ribosomal methyltransferase)' in abritamr_subclass),Salmonella enterica,Aminoglycosides (RMT),Resistant
+cidsalmo000003,0.0.1,('henicol' in abrtiamr_subclass),Salmonella enterica,Chloramphenicol,Resistant
+cidsalmo000004,0.0.1,('Trimethoprim' in abritamr_subclass && 'Sulfathiazole' in abritamr_subclass),Salmonella enterica,Trimeth-Sulpha,Resistant
+cidsalmo000005,0.0.1,('Trimethoprim' in abritamr_subclass ),Salmonella enterica,Trimethoprim,Resistant
+cidsalmo000006,0.0.1,('Sulfathiazole' in abritamr_subclass),Salmonella enterica,Sulfathiazole,Resistant
+cidsalmo000007,0.0.1,('uinolone' in abritamr_subclass),Salmonella enterica,Ciproflxacin,Resistant
+cidsalmo000008,0.0.1,('Tetracycline' in abritamr_subclass),Salmonella enterica,Tetracycline,Resistant
+cidsalmo000009,0.0.1,('Streptomycin' in abritamr_subclass),Salmonella enterica,Streptomycin,Resistant
+cidsalmo000010,0.0.1,('Kanamycin' in abritamr_subclass || 'Aminoglycosides (Ribosomal methyltransferase)' in abritamr_subclass),Salmonella enterica,Kanamycin,Resistant
+cidsalmo000011,0.0.1,('Gentamicin' in abritamr_subclass || 'Aminoglycosides (Ribosomal methyltransferase)' in abritamr_subclass),Salmonella enterica,Gentamicin,Resistant
+cidsalmo000012,0.0.1,('Macrolide' in abritamr_subclass || 'Lincosamide/Macrolide/Streptogramin' in abritamr_subclass || 'Azithromycin' in abritamr_subclass),Salmonella enterica,Azithromycin,Resistant
+cidsalmo000013,0.0.1,('Carbapenemase' in abritamr_subclass),Salmonella enterica,Meropenem,Resistant
+cidsalmo000014,0.0.1,('AmpC' in abritamr_subclass),Salmonella enterica,Cefotaxime (AmpC),Resistant
+cidsalmo000015,0.0.1,('ESBL' in abritamr_subclass,Salmonella enterica,Cefotaxime (ESBL),Resistant
+cidsalmo000016,0.0.1,('Beta-lactam' in abritamr_subclass || 'ESBL' in abritamr_subclass || 'AmpC' in abritamr_subclass || 'Ampicillin' in abritamr_subclass),Salmonella enterica,Ampicillin,Resistant

@@ -2,6 +2,7 @@ import pathlib
 import subprocess
 from abritamr.version import db
 import pandas as pd
+import sys
 import logging 
 
 logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p') 
@@ -74,3 +75,12 @@ def wrangle_species(organism:str) -> tuple:
             return "",og[0]
         else:
             return " ".join(og), og[0]
+
+
+def output_results(amr:dict, output:str= "") -> bool:
+
+
+    df = pd.DataFrame(amr)
+    if output == "":
+        df.to_csv(sys.stdout, index = False)
+        

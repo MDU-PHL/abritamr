@@ -2,12 +2,14 @@ import click
 import pathlib
 import json
 import logging
+import pandas as pd
 
-from abritamr.utils import check_assembly, check_amrfinder, check_any2fasta, wrangle_species
+from abritamr.utils import check_assembly, check_amrfinder, check_any2fasta, wrangle_species, output_results
 from abritamr.run_finder import run_amrf
 from abritamr.parse_finder import amrf2dict
 from abritamr.parse_reportable import add_abritamr_results
 from abritamr.parse_amrtype import get_amr_type
+from abritamr.amr_report import summary
 
 
 logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
@@ -55,7 +57,7 @@ except Exception as e:
 @click.option(
     '--output',
     '-o',
-    help = "Filename to save output - default sample-id.",
+    help = "Filename to save output - default stdout.",
     default = "",
     show_default = True
 )
@@ -64,7 +66,7 @@ except Exception as e:
     is_flag=True,
     default=False,
     show_default=True,
-    help = "Set --summary if you require summarised report output. Report will be saved as sample-id_abritamr_report.csv"
+    help = "Set --summary if you require summarised report output. Report will be saved as sample-id_report.csv"
 )
 @click.option(
     '--species',
@@ -88,6 +90,13 @@ except Exception as e:
     show_default=True,
     type = click.Choice(["full", "compact"]),
     help = "Format of abritamr report. Only applicable if --summary is set. Default - full will output all results for the sequence. Compact will only output summarised results."
+)
+@click.option(
+    '--genesonly',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help = "If only whole genes, not SNPs should be reported. Only applicable if --summary is set."
 )
 @click.option(
     "--min-identity",
@@ -122,12 +131,12 @@ except Exception as e:
     help = "Path to config that defines the criteria for amr type based on genes and mechanisms detected. Supplying a new config will override the default abritamr criteria.",
     show_default = True
 )
-def run(
+def scan(
     **kwargs
-        ) -> bool:
+        ) -> dict:
 
     
-    print(kwargs)
+    # print(kwargs)
    
     if kwargs['assembly'] == "" and kwargs['amrfinder'] == "":
         log.critical("You must supply an input file (assembly or amrfinder plus output). Exiting.")
@@ -150,3 +159,7 @@ def run(
     
     amr = add_abritamr_results(amr = amr, cfgpath = kwargs['reportable_config'], species=species, genus = genus, sid = kwargs['sample_id'])
     amr= get_amr_type(amr=amr, species=species, genus=genus, cfgpath=kwargs['amr_type_config'])
+
+    output_results(amr = amr, output = kwargs['output'])
+
+    return amr

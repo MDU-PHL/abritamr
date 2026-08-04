@@ -1,21 +1,25 @@
 import pandas as pd
 import numpy as np
 
-from inferrence import infer
-
-from parse_amrtype import get_amr_type
-from parse_reportable import add_abritamr_results
+from abritamr.inferrence import infer
 
 import json
 import pathlib
+import logging
+
+logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 
-
-def save_report(report: pd.DataFrame, outname:str= "abritamr_reportable", long:bool = True) -> bool:
-    if long:
-        report.T.to_csv(f'{outname}.csv', header = False)
-    else:
-        report.to_csv(f'{outname}.csv', index = False)
+def save_report(report: pd.DataFrame, outname:str= "abritamr_report", _format:str="csv") -> bool:
+    
+    dlm= ","
+    if _format == "tab":
+        dlm = "\t"
+        _format = "txt"
+    
+    report.to_csv(f'{outname}.{_format}', sep = dlm, index = False)
 
 def wrangle_cols(repdf:pd.DataFrame, repmechs:dict, cols:list) -> tuple:
 
@@ -26,26 +30,42 @@ def wrangle_cols(repdf:pd.DataFrame, repmechs:dict, cols:list) -> tuple:
     
     return repmechs,cols
 
-def summary(results:pd.DataFrame,species:str="", genus:str="", simple:bool=False, sid:str="abritamr", genesonly:bool = False, minidentity:float = 90, mincoverage:float = 90) -> pd.DataFrame:
-
+def summary(
+    results:pd.DataFrame,
+    _format:str="csv",
+    species:str="", 
+    genus:str="", 
+    simple:bool=False, 
+    sid:str="abritamr", 
+    genesonly:bool = False, 
+    minidentity:float = 90, 
+    mincoverage:float = 90,
+    outname:str = "abritamr_report"
+    ) -> bool:
+    
+    mincoverage = float(mincoverage)
+    minidentity = float(minidentity)
+    log.info(f"Generating report for {sid}")
+    results['% Coverage of reference'] =  pd.to_numeric(results['% Coverage of reference'] , errors='coerce')
+    results['% Identity to reference'] = pd.to_numeric(results['% Identity to reference'] , errors='coerce')
     repmechs = {'Sample_id':sid}
     reportable = results[
         (results['abritamr_AMR_reporting'] == 'reportable') & 
         (results['% Identity to reference']>=minidentity) &
         (results['% Coverage of reference']>=mincoverage)]
     if genesonly:
-        reportable = reportable[~reportable['Element subtype'].str.contains('POINT')]
+        reportable = reportable[~reportable['Subtype'].str.contains('POINT')]
     reportable_amr_low=results[
         (results['abritamr_AMR_reporting'] == 'reportable') & 
         (
-            (results['% Identity to reference']<minidentity) |
-            (results['% Coverage of reference']<mincoverage)
+            (results['% Identity to reference']<float(minidentity)) |
+            (results['% Coverage of reference']<float(mincoverage))
         ) &
         (results['Type'] == 'AMR')]
     nonreportable_amr = results[
         (~results['Element symbol'].isin(reportable['Element symbol'].unique().tolist())) & 
-        (results['% Identity to reference']>=minidentity) &
-        (results['% Coverage of reference']>=mincoverage) &
+        (results['% Identity to reference']>=float(minidentity)) &
+        (results['% Coverage of reference']>=float(mincoverage)) &
         (results['Type'] == 'AMR')]
     nonreportable_other=results[(results['Type'] != 'AMR')]
     amrtype = results["abritamr AMR type"].unique().tolist()
@@ -68,23 +88,9 @@ def summary(results:pd.DataFrame,species:str="", genus:str="", simple:bool=False
     report = pd.DataFrame(repmechs, index = [0])
     report=report[cols]
     # print(report.T)
-    return report
-    # report.T.to_csv('abritamr_report.csv', header = False)
-
-def reportable(amrfinder:str='amrfinder.out', species:str="", genus:str="", sid:str="abritamr") -> pd.DataFrame:
-    try:
-        amrdf = pd.read_csv(amrfinder, sep = "\t")
-    except Exception as e:
-        print(f"An error has occured opening the amrfinder output : {e}.\n Please try again.")
-        raise SystemExit
-
-    amr = amrdf.to_dict(orient = "records")
-    
-    reportable_amr = add_abritamr_results( amr = amr )
-    reportable_amr = get_amr_type( amr = reportable_amr)
-    # print(reportable_amr)
-
-    return reportable_amr
+    log.info(f"Saving report.")
+    save_report(report = report, _format = _format, outname = outname)
+    return True
 
 
 def infer_phenotype(amr:dict, species: str= "", genus:str="", default:str="Susceptible", sid:str="abritamr", output:str="abritamr_inferred_ast.csv") -> bool:
@@ -99,13 +105,3 @@ def infer_phenotype(amr:dict, species: str= "", genus:str="", default:str="Susce
     indf[colorder].to_csv(f"{output}", index = False)
 
     return True
-
-rep = reportable(amrfinder = "salmo.out", species = "Salmonella enterica", genus = "Salmonella")
-
-summary(results = pd.DataFrame(rep),species = "Salmonella enterica", genus = "Salmonella")
-infer_phenotype(amr = rep, species = "Salmonella enterica")
-# for r in rep:
-#     print(r)
-# report = report(result, simple= True)
-
-# save_report(report= report,long = False)
