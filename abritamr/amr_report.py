@@ -2,14 +2,14 @@ import pandas as pd
 import numpy as np
 
 from abritamr.inferrence import infer
-
+from abritamr.abritamr_logging import log
 import json
 import pathlib
 import logging
 
-logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
-log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+# logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
+# log = logging.getLogger(__name__)
+# log.setLevel(logging.DEBUG)
 
 
 def save_report(report: pd.DataFrame, outname:str= "abritamr_report", _format:str="csv") -> bool:

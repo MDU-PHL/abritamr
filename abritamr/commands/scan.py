@@ -3,163 +3,100 @@ import pathlib
 import json
 import logging
 import pandas as pd
+import sys
 
-from abritamr.utils import check_assembly, check_amrfinder, check_any2fasta, wrangle_species, output_results
+from abritamr.utils import output_results, check_assembly, check_amrfinder, check_any2fasta, wrangle_species, output_results, check_path
 from abritamr.run_finder import run_amrf
 from abritamr.parse_finder import amrf2dict
-from abritamr.parse_reportable import add_abritamr_results
-from abritamr.parse_amrtype import get_amr_type
-from abritamr.amr_report import summary
-
+# from abritamr.parse_reportable import add_abritamr_results
+from abritamr.abritamr_classes import apply_classes
+# from abritamr.amr_report import summary
 
 logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
+handler = logging.StreamHandler(sys.stderr)
+
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.addHandler(handler)
 
-try:
-    with open(f"{pathlib.Path(__file__).parent / 'species_config.json'}") as j:
-        SPCFG = json.load(j)
+def generate_output(species:str,sample_id:str,amr:list)-> list:
+    amr = apply_classes(amr = amr, species=species, sid = sample_id)
+    
+    return amr
 
-except Exception as e:
-    log.critical(f"Something has gone very wrong : {e}.")
-    raise SystemExit
-
-@click.command()
-@click.option(
-    '--assembly',
-    '-asm',
-    help = "Assembly file to use as input (*.fa*, *.gbk *.fa*.gz, *.gbk.gz)",
-    default = "",
-    show_default = True
-)
-@click.option(
-    '--amrfinder',
-    '-amf',
-    help = "EXPERIMENTAL - USE WITH CAUTION. AMR finder output file. Please note unexpected behaviour may result were versions and databases differ from abritamr",
-    default = "",
-    show_default = True
-)
-@click.option(
-    '--sample-id',
-    '-s',
-    help = "sample identifier, this will be used to name output files and in line list reports",
-    default = "abritamr",
-    show_default = True
-)
-@click.option(
-    '--format',
-    '-f',
-    help = "Output format",
-    type = click.Choice(["csv", "tab"]),
-    default = "csv",
-    show_default = True
-)
-@click.option(
-    '--output',
-    '-o',
-    help = "Filename to save output - default stdout.",
-    default = "",
-    show_default = True
-)
-@click.option(
-    '--summary/--no-summary',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help = "Set --summary if you require summarised report output. Report will be saved as sample-id_report.csv"
-)
-@click.option(
-    '--species',
-    '-sp',
-    help = "Species from which assemblies were derived. Must be supplied for SNP detection and inferrence.",
-    default = "",
-    show_default = True,
-    type = click.Choice(SPCFG)
-)
-@click.option(
-    '--threads',
-    '--cpus',
-    help="Number of max CPU cores to run.",
-    default=1,
-    show_default=True
-)
-@click.option(
-    '--viewtype',
-    '-vt',
-    default = "full",
-    show_default=True,
-    type = click.Choice(["full", "compact"]),
-    help = "Format of abritamr report. Only applicable if --summary is set. Default - full will output all results for the sequence. Compact will only output summarised results."
-)
-@click.option(
-    '--genesonly',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help = "If only whole genes, not SNPs should be reported. Only applicable if --summary is set."
-)
-@click.option(
-    "--min-identity",
-    default = 0.9,
-    help ="Minimum identity to reference gene for reporting a match.",
-    show_default = True
-)
-@click.option(
-    "--min-coverage",
-    default = 0.5,
-    help ="Minimum coverage of the reference gene for reporting a complete match.",
-    show_default = True
-)
-@click.option(
-    '--force',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help = "Set to override existing outputs of the same name."
-)
-@click.option(
-    "--reportable-config",
-    "-rc",
-    default = f"{pathlib.Path(__file__).parent / 'configs' / 'reportable_criteria.json'}",
-    help = "Path to config that defines the criteria for highlighting relevant genes and mechanisms for reporting. Supplying a new config will override the default abritamr criteria.",
-    show_default = True
-)
-@click.option(
-    "--amr_type-config",
-    "-ac",
-    default = f"{pathlib.Path(__file__).parent / 'configs' / 'amr_type_criteria.json'}",
-    help = "Path to config that defines the criteria for amr type based on genes and mechanisms detected. Supplying a new config will override the default abritamr criteria.",
-    show_default = True
-)
 def scan(
-    **kwargs
+    args
         ) -> dict:
 
-    
-    # print(kwargs)
-   
-    if kwargs['assembly'] == "" and kwargs['amrfinder'] == "":
+    if not args.assembly and not args.amrfinderplus :
         log.critical("You must supply an input file (assembly or amrfinder plus output). Exiting.")
         raise SystemExit(1)
-    if kwargs['assembly'] != "" and pathlib.Path(f"{kwargs['assembly']}").exists() and check_assembly(f"{kwargs['assembly']}"):
-        log.info(f"Running amrfinder plus")
-        amr = run_amrf(
-            min_identity = kwargs['min_identity'], 
-            min_coverage = kwargs['min_identity'], 
-            asm=kwargs['assembly'],
-            threads=kwargs['threads'], 
-            organism=kwargs['species']
-            )
-    elif kwargs['amrfinder'] != "":
-        log.info(f"Opening existing amrfinder plus output")
-        amr = amrf2dict(amrfinder = amrfinder)
+    amr = []
+    
+    if args.assembly:
+        log.info("Assembly(ies) have been supplied.")
+        organism = wrangle_species(organism = args.species)
+        for asm in args.assembly:  
+            
+            log.info(f"Will now try to run amrfinderplus on supplied assembly {asm}")
+            if check_path(pth = f"{asm}") and check_assembly(f"{asm}"):
+                full_path = f"{pathlib.Path(f'{asm}').absolute()}"
+                sample_id = args.sample_id if args.sample_id else full_path
+                log.info(f"Running amrfinder plus")
+                res = run_amrf(
+                    min_identity = args.min_identity, 
+                    min_coverage = args.min_identity, 
+                    asm=asm,
+                    threads=args.threads, 
+                    organism=organism
+                    )
+                
+            # amr.extend(res)
+                res = generate_output(species = args.species, sample_id = sample_id, amr = res )
+                
+                # print(res)
+                amr.extend(res)
+    if args.amrfinderplus:
+        for afp in args.amrfinderplus:
+            sample_id = args.sample_id if args.sample_id else full_path
+            full_path = f"{pathlib.Path(f'{args.afp}').absolute()}"
+            log.info(f"Opening existing amrfinder plus output")
+
+            res = amrf2dict(amrfinder = args.amrfinder)
+            res = generate_output(species = args.species, sample_id = sample_id, amr = res  )
+            amr.append(res)
+        
+    abritamr_cols = [
+        'sample_id',
+        'Element symbol',
+        'abritamr_class', 
+        'abritamr_subclass', 
+        # 'abritamr_AMR_reporting_status',
+        # 'abritamr_AMR_type', 
+        # 'criteria_id', 
+        # 'criteria_version',
+        'Element name', 
+        'Scope', 
+        'Type', 
+        'Subtype',
+        'Method',
+        'pmid', 
+        'abritamr_class_version',
+        'Target length', 
+        'Reference sequence length',
+        '% Coverage of reference', 
+        '% Identity to reference',
+        'Alignment length', 
+        'Closest reference accession',
+        'Closest reference name', 
+        'HMM accession', 
+        'HMM description',
+        ]
+    amr = pd.DataFrame(amr)
+    amr = amr[abritamr_cols]
     
 
-    species,genus = wrangle_species(organism = kwargs['species'])
+    # print(pd.DataFrame(amr))
     
-    amr = add_abritamr_results(amr = amr, cfgpath = kwargs['reportable_config'], species=species, genus = genus, sid = kwargs['sample_id'])
-    amr= get_amr_type(amr=amr, species=species, genus=genus, cfgpath=kwargs['amr_type_config'])
-
-    output_results(amr = amr, output = kwargs['output'])
+    # output_results(amr = amr, output = kwargs['output'])
 
     return amr

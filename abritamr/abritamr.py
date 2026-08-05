@@ -1,38 +1,182 @@
-import click
-from click.exceptions import UsageError
-from click._compat import get_text_stderr
-import sys
 
-import abritamr.run 
-from abritamr.version import __version__ as version
+import pathlib, argparse, sys, os, logging,json
 
-def _show_usage_error(self, file=None):
-    if file is None:
-        file = get_text_stderr()
-    color = None
-    if self.ctx is not None:
-        color = self.ctx.color
-        click.echo(self.ctx.get_help() + '\n', file=file, color=color)
-    click.echo('ERROR: %s' % self.format_message(), file=file, color=color)
+from abritamr.commands import scan,linelist
+from abritamr.version import __version__, db
+from abritamr.utils import output_results
 
+"""
+abritamr is designed to implement AMRFinder and parse the results compatible for MDU use. It may also be used for other purposes where the format of output is compatible
 
-UsageError.show = _show_usage_error
-CONTEXT_SETTINGS = dict(
-    help_option_names=['-h', '--help'],
-    
-)
+"""
+def run_scan(args):
 
-@click.group(no_args_is_help=True, context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
-@click.version_option(version, message='%(prog)s %(version)s')
-# @click.pass_context
+    amr = scan.scan(args)
+    output_results(df = amr, output = args.output, _format = args.format)
+
+def run_linelist(args):
+    # print('linelist')
+    # print(args.amr)
+    linelist.linelist(args)
+
 def cli():
-    pass
+
+    parser = argparse.ArgumentParser(
+        description=f"****abritamr - AMR gene detection and reporting pipeline - version {__version__}****", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
+    
+    subparsers = parser.add_subparsers(help="What would you like to do?")
+    parser_sub_scan = subparsers.add_parser('scan', help='Run amrfinder and apply reporting logic. Outputs a file with rows populated with per-gene information.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_sub_scan.add_argument(
+        "--assembly",
+        "-asm",
+        nargs="*",
+        # default="",
+        help="Assembly file to use as input (*.fa*, *.gbk *.fa*.gz, *.gbk.gz). Can be multiple or wildcard.",
+    )
+    parser_sub_scan.add_argument(
+        "--amrfinderplus",
+        "-afp",
+        nargs="*",
+        # default="",
+        help="EXPERIMENTAL - USE WITH CAUTION. AMR finder output file. Please note unexpected behaviour may result were versions and databases differ from abritamr. Can be mutliple",
+    )
+    parser_sub_scan.add_argument(
+        '--sample-id',
+        '-s',
+        help = "sample identifier, this will be used to name output files and in line list reports. If not supplied, path to input file will be used as sample id",
+        # default = ""
+    )
+    parser_sub_scan.add_argument(
+        '--format',
+        '-f',
+        help = "Output format",
+        choices=['csv', 'tab'],
+        default = "csv"
+    )
+    parser_sub_scan.add_argument(
+        '--output',
+        '-o',
+        help = "Filename to save output - default stdout.",
+
+    )
+    parser_sub_scan.add_argument(
+        '--species',
+        '-sp',
+        help = "Species from which assemblies were derived. Must be supplied for SNP detection and inferrence.",
+       
+    )
+    parser_sub_scan.add_argument(
+        '--threads',
+        '--cpus',
+        help="Number of max CPU cores to run.",
+        default=1
+    )
+    parser_sub_scan.add_argument(
+        "--min-identity",
+        default = 0.9,
+        help ="Minimum identity to reference gene for reporting a match."
+    )
+    parser_sub_scan.add_argument(
+        "--min-coverage",
+        default = 0.5,
+        help ="Minimum coverage of the reference gene for reporting a complete match."
+    )
+    parser_sub_scan.add_argument(
+        '--force',
+        action='store_true',
+        help = "Set to override existing outputs of the same name."
+    )
+    parser_sub_scan.add_argument(
+        "--reportable-config",
+        "-rc",
+        default = f"{pathlib.Path(__file__).parent / 'configs' / 'abritamr_reporting.csv'}",
+        help = "Path to config that defines the criteria for highlighting relevant genes and mechanisms for reporting. Supplying a new config will override the default abritamr criteria."
+    )
+
+    parser_sub_llist = subparsers.add_parser('linelist', help='Generate a linelist report summarising genes observed by abritamr durgclass', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_sub_llist.add_argument(
+        '--amr',
+        '-a',
+        help = "result file(s) from 'abritamr scan'. Default stdin",
+        metavar='FILE', 
+        nargs='?',
+        default = sys.stdin
+    )
+# @click.option(
+#     '--format',
+#     '-f',
+#     help = "Output format",
+#     type = click.Choice(["csv", "tab"]),
+#     default = "csv",
+#     show_default = True
+# )
+# @click.option(
+#     '--output',
+#     '-o',
+#     help = "Filename to save output - default stdout.",
+#     default = "",
+#     show_default = True
+# )
+# @click.option(
+#     '--species',
+#     '-sp',
+#     help = "Species from which assemblies were derived. Must be supplied for SNP detection and inferrence.",
+#     default = "",
+#     show_default = True
+# )
+# @click.option(
+#     '--viewtype',
+#     '-vt',
+#     default = "full",
+#     show_default=True,
+#     type = click.Choice(["full", "compact"]),
+#     help = "Format of abritamr report. Only applicable if --summary is set. Default - full will output all results for the sequence. Compact will only output summarised results."
+# )
+# @click.option(
+#     '--genesonly',
+#     is_flag=True,
+#     default=False,
+#     show_default=True,
+#     help = "If only whole genes, not SNPs should be reported. Only applicable if --summary is set."
+# )
+# @click.option(
+#     "--min-identity",
+#     default = 0.9,
+#     help ="Minimum identity to reference gene for reporting a match.",
+#     show_default = True
+# )
+# @click.option(
+#     "--min-coverage",
+#     default = 0.5,
+#     help ="Minimum coverage of the reference gene for reporting a complete match.",
+#     show_default = True
+# )
+# @click.option(
+#     "--reportable-config",
+#     "-rc",
+#     default = f"{pathlib.Path(__file__).parent / 'configs' / 'abritamr_reporting.csv'}",
+#     help = "Path to config that defines the criteria for highlighting relevant genes and mechanisms for reporting. Supplying a new config will override the default abritamr criteria.",
+#     show_default = True
+# )
 
 
-cli.add_command(abritamr.run.run)
 
 
-
-
+    parser_sub_scan.set_defaults(func=run_scan)
+    parser_sub_llist.set_defaults(func = run_linelist)
+    # parser_update.set_defaults(func = update_db)
+    args = parser.parse_args()
+    
+    if len(sys.argv) < 2:
+        parser.print_help(sys.stderr)
+    elif len(sys.argv) <= 2 and sys.argv[1] == 'scan':
+        parser_sub_scan.print_help(sys.stderr)
+    # elif len(sys.argv) <= 2 and sys.argv[1] == 'report':
+    #     parser_mdu.print_help(sys.stderr)
+    else:
+        args.func(args)
+	
 if __name__ == '__main__':
     cli()

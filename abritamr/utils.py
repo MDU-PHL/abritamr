@@ -4,10 +4,20 @@ from abritamr.version import db
 import pandas as pd
 import sys
 import logging 
+import json
+from abritamr.abritamr_logging import log
+# logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
+# handler = logging.StreamHandler(sys.stderr)
 
-logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p') 
-log = logging.getLogger(__name__)
+# log = logging.getLogger(__name__)
+# log.addHandler(handler)
+# log.setLevel(logging.DEBUG)
 
+def check_path(pth:str) -> bool:
+    log.info(f"Checking path: {pth}")
+    if not pathlib.Path(pth).exists():
+        return True
+    return True
 
 def get_refgenes()-> pd.DataFrame:
 
@@ -50,7 +60,8 @@ def check_amrfinder()-> bool:
 def check_assembly(pth) -> bool:
     log.info(f"Checking assembly is in a correct format")
     if check_any2fasta():
-        try:
+        # try:
+            # print(f"any2fasta {pth}")
             proc = subprocess.run(f"any2fasta {pth}", shell = True, capture_output = True, encoding = "utf-8")
             if proc.returncode == 0:
                 log.info(f"{pth} is a valid assembly file. Will no proceed with running amrfinder.")
@@ -58,29 +69,41 @@ def check_assembly(pth) -> bool:
             else:
                 log.critical(f"Your assembly file appears to not be in the correct format. Please try again.")
                 raise SystemExit(1)
-        except Exception as e:
-            log.critical(f"Something has gone wrong with any2fasta checking your assembly. The following error was reported: {e}")
-            raise SystemExit(1)
+        # except Exception as e:
+        #     log.critical(f"Something has gone wrong with any2fasta checking your assembly. The following error was reported: {e}")
+        #     raise SystemExit(1)
 
 def wrangle_species(organism:str) -> tuple:
-    
-    if organism == "":
+
+    try:
+        with open(f"{pathlib.Path(__file__).parent / 'configs' / 'species_config.json'}") as j:
+            SPCFG = json.load(j)
+
+    except Exception as e:
+        log.critical(f"Something has gone very wrong : {e}.")
+        raise SystemExit
+
+    if not organism:
         log.info("No species specific criteria will be applied")
-        return "",""
+        return ""
 
     else:
-        og = organism.split("_")
-        
-        if len(og) == 1:
-            return "",og[0]
+        og = '_'.join(organism.split())
+        if og in SPCFG:
+            return og
+        elif og[0] in SPCFG:
+            return og[0]
         else:
-            return " ".join(og), og[0]
+            return ""
+
+def output_results(df:pd.DataFrame, output:str= "",_format:str="csv") -> bool:
 
 
-def output_results(amr:dict, output:str= "") -> bool:
+    dlm = "," if _format == 'csv' else '\t'
+    suf = 'csv' if _format == 'csv' else 'txt'
 
-
-    df = pd.DataFrame(amr)
-    if output == "":
-        df.to_csv(sys.stdout, index = False)
+    if not output:
+        df.to_csv(sys.stdout, sep = dlm,index = False)
+    else:
+        df.to_csv(f"{output}.{suf}", sep = dlm, index = False)
         

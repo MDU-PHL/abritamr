@@ -28,35 +28,13 @@ class Criteria:
             raise ValueError(f"You must supply one of status (reportable or not-reportable) or inferred (example resistant, R, susceptible)")
       
 
+def get_abritamr_configs(cfgtype:str, cfgpath:str) -> list:
+    reps = pd.read_csv(f"{cfgpath}")
 
-# reps = pd.read_csv(f"{pathlib.Path(__file__).parent / 'configs' / 'abritamr_reporting.csv'}")
+    abritamr_rep = []
+    for criteria in reps.to_dict(orient="records"):
+        # print(criteria)
+        rep = Criteria(**criteria)
+        abritamr_rep.append(rep)
 
-# test = pd.read_csv(f"{pathlib.Path(__file__).parent / 'configs' / 'abritamr_criteria_tests.csv'}")
-# abritamr_rep = []
-# for criteria in reps.to_dict(orient="records"):
-#     # print(criteria)
-#     rep = Criteria(**criteria)
-#     abritamr_rep.append(rep)
-
-# test_result = []
-# for row in test.to_dict(orient = "records"):
-
-#     for rep in abritamr_rep:
-#         res = evaluate(asdict(rep)['criteria'], row)
-#         if res:
-#             row['abritamr_AMR_reporting'] = asdict(rep)['status']
-#             row['criteria_id'] = asdict(rep)['criteria_id']
-#             row['criteria_version'] = asdict(rep)['criteria_version']
-#             if row['abritamr_AMR_reporting'] == row['test']:
-#                 tr = 'pass'
-#             else:
-#                 tr = 'fail'
-#             row['pass_fail'] = tr
-    
-#             test_result.append(row)
-
-#     # break
-
-# t = pd.DataFrame(test_result)
-# print(t)
-# t.to_csv("test_result.csv", index = False)
+    return abritamr_rep
