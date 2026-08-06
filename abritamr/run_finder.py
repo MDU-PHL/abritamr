@@ -3,7 +3,7 @@ import pandas as pd
 from abritamr.utils import check_amrfinder, check_any2fasta, check_assembly
 
 import logging
-from abritamr.abritamr_logging import log
+from abritamr.logger import log
 
 # logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p') 
 # log = logging.getLogger(__name__)

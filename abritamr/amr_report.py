@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 from abritamr.inferrence import infer
-from abritamr.abritamr_logging import log
+from abritamr.logger import log
 from abritamr.utils import get_refgenes
 import json
 import pathlib

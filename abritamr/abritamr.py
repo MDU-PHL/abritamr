@@ -4,7 +4,7 @@ import pathlib, argparse, sys, os, logging,json
 from abritamr.commands import scan,linelist,amr_status
 from abritamr.version import __version__, db
 from abritamr.utils import output_results
-from abritamr.abritamr_logging import log
+from abritamr.logger import log
 """
 abritamr is designed to implement AMRFinder and parse the results compatible for MDU use. It may also be used for other purposes where the format of output is compatible
 

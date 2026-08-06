@@ -5,7 +5,7 @@ import pandas as pd
 import sys
 import logging 
 import json
-from abritamr.abritamr_logging import log
+from abritamr.logger import log
 # logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
 # handler = logging.StreamHandler(sys.stderr)
 

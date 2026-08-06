@@ -9,14 +9,8 @@ from abritamr.utils import output_results, check_assembly, check_amrfinder, chec
 from abritamr.run_finder import run_amrf
 from abritamr.parse_finder import amrf2dict
 # from abritamr.parse_reportable import add_abritamr_results
-from abritamr.abritamr_classes import apply_classes
-# from abritamr.amr_report import summary
-
-logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
-handler = logging.StreamHandler(sys.stderr)
-
-log = logging.getLogger(__name__)
-log.addHandler(handler)
+from abritamr.drugclasses import apply_classes
+from abritamr.logger import log
 
 def generate_output(species:str,sample_id:str,amr:list)-> list:
     amr = apply_classes(amr = amr, species=species, sid = sample_id)

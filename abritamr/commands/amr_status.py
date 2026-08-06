@@ -12,7 +12,7 @@ from abritamr.utils import check_assembly, check_amrfinder, check_any2fasta, wra
 # from abritamr.parse_reportable import add_abritamr_results
 # from abritamr.parse_amrtype import get_amr_type
 # from abritamr.amr_report import summary
-from abritamr.abritamr_logging import log
+from abritamr.logger import log
 from abritamr.parse_reportable import add_abritamr_results
 
 

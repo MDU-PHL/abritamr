@@ -3,7 +3,7 @@ from dataclasses import dataclass, asdict
 from cel import evaluate
 import logging
 import sys
-from abritamr.abritamr_logging import log
+from abritamr.logger import log
 
 # logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
 # handler = logging.StreamHandler(sys.stderr)

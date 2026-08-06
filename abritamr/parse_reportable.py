@@ -4,7 +4,7 @@ import logging
 import json
 import pathlib
 import sys
-from abritamr.abritamr_logging import log
+from abritamr.logger import log
 from abritamr.utils import get_refgenes
 
 from abritamr.filter_reportable import construct_filter
