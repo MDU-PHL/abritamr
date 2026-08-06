@@ -3,6 +3,7 @@ import numpy as np
 
 from abritamr.inferrence import infer
 from abritamr.abritamr_logging import log
+from abritamr.utils import get_refgenes
 import json
 import pathlib
 import logging
@@ -12,7 +13,7 @@ import logging
 # log.setLevel(logging.DEBUG)
 
 
-def save_report(report: pd.DataFrame, outname:str= "abritamr_report", _format:str="csv") -> bool:
+def save_report(report: pd.DataFrame, outname:str= "", _format:str="csv") -> bool:
     
     dlm= ","
     if _format == "tab":
@@ -21,12 +22,18 @@ def save_report(report: pd.DataFrame, outname:str= "abritamr_report", _format:st
     
     report.to_csv(f'{outname}.{_format}', sep = dlm, index = False)
 
-def wrangle_cols(repdf:pd.DataFrame, repmechs:dict, cols:list) -> tuple:
-
-    for dc in repdf['abritamr_subclass'].unique().tolist():
-            tmp = repdf[repdf['abritamr_subclass'] == dc]
-            repmechs[dc] = ','.join(sorted(tmp['Element symbol'].unique().tolist()))
-            cols.append(dc)
+def wrangle_cols(repdf:pd.DataFrame, repmechs:dict, cols:list, simple:bool=True) -> tuple:
+    cols_final = sorted(repdf['abritamr_subclass'].unique().tolist())
+    if not simple:
+        refs = get_refgenes()
+        cols_final = sorted(refs['abritamr_subclass'].unique().tolist())
+    for dc in cols_final:
+        tmp = repdf[repdf['abritamr_subclass'] == dc]
+        if not tmp.empty:
+            repmechs[dc] = ';'.join(sorted(tmp['Element symbol'].unique().tolist()))
+        else:
+            repmechs[dc] = ""
+        cols.append(dc)
     
     return repmechs,cols
 
@@ -45,18 +52,19 @@ def summary(
     
     mincoverage = float(mincoverage)
     minidentity = float(minidentity)
+    results = results.fillna("")
     log.info(f"Generating report for {sid}")
     results['% Coverage of reference'] =  pd.to_numeric(results['% Coverage of reference'] , errors='coerce')
     results['% Identity to reference'] = pd.to_numeric(results['% Identity to reference'] , errors='coerce')
     repmechs = {'Sample_id':sid}
     reportable = results[
-        (results['abritamr_AMR_reporting'] == 'reportable') & 
+        (results['abritamr_AMR_reporting_status'] == 'reportable') & 
         (results['% Identity to reference']>=minidentity) &
         (results['% Coverage of reference']>=mincoverage)]
     if genesonly:
         reportable = reportable[~reportable['Subtype'].str.contains('POINT')]
     reportable_amr_low=results[
-        (results['abritamr_AMR_reporting'] == 'reportable') & 
+        (results['abritamr_AMR_reporting_status'] == 'reportable') & 
         (
             (results['% Identity to reference']<float(minidentity)) |
             (results['% Coverage of reference']<float(mincoverage))
@@ -68,16 +76,16 @@ def summary(
         (results['% Coverage of reference']>=float(mincoverage)) &
         (results['Type'] == 'AMR')]
     nonreportable_other=results[(results['Type'] != 'AMR')]
-    amrtype = results["abritamr AMR type"].unique().tolist()
+    amrtype = results["abritamr_AMR_type"].unique().tolist()
     repmechs['Reportable AMR mechansims']=  ','.join(sorted(reportable['Element symbol'].unique().tolist()))
-    if len(amrtype) == 1 and amrtype[0] == "No known type":
-        amrtype= "No known type"
+    if len(amrtype) == 1 and amrtype[0] == "":
+        amrtype= ""
     else:
-        amrtype = ", ".join([a for a in amrtype if a != "No known type"])
+        amrtype = ";".join([a for a in amrtype if a])
     cols = ['Sample_id','Reportable AMR mechansims', 'AMR type', 'Non-reportable AMR mechanisms','Reportable AMR mechanisms (low coverage/identity)','Non-reportable other','Species provided']
-    if not simple:
-        for df in [reportable, nonreportable_amr, nonreportable_other]:
-            repmechs,cols = wrangle_cols(df, repmechs, cols)
+    
+    for df in [reportable, nonreportable_amr, nonreportable_other]:
+        repmechs,cols = wrangle_cols(df, repmechs, cols, simple = simple)
         
     repmechs['Non-reportable AMR mechanisms']=','.join(sorted(nonreportable_amr['Element symbol'].unique().tolist()))
     repmechs['Reportable AMR mechanisms (low coverage/identity)'] = ','.join(sorted(reportable_amr_low['Element symbol'].unique().tolist()))

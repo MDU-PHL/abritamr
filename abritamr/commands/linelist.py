@@ -12,13 +12,7 @@ from abritamr.utils import check_assembly, check_amrfinder, check_any2fasta, wra
 # from abritamr.parse_reportable import add_abritamr_results
 # from abritamr.parse_amrtype import get_amr_type
 from abritamr.amr_report import summary
-
-
-logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
-handler = logging.StreamHandler(sys.stderr)
-
-log = logging.getLogger(__name__)
-log.addHandler(handler)
+from abritamr.abritamr_logging import log
 
 
 
@@ -26,9 +20,44 @@ def linelist(
     args
         ) -> dict:
 
-    # try:
-    # amr = pd.DataFrame(StringIO(args.amr.read()), sep = ",")
-    print(args.amr.read())
-    # except:
-    #     print('no input')
+    try:
+        amr = pd.read_csv(args.amr)
+        # amr = amr.to_dict(orient = "records")
+        # log.info("Opened input file.")
+    except:
+        
+        amrlist = args.amr.read().split('\n')
+        dlm = "," if "," in amrlist[0] else "\t"
+        amr = []
+        for a in amrlist:
+            amr.append(a.split(dlm))
+        amr = pd.DataFrame(amr[1:], columns=amr[0])
+
+    
+    if 'sample_id' in amr.columns.tolist() and 'species' in amr.columns.tolist() and 'abritamr_subclass' in amr.columns.tolist():
+        simple = True if args.viewtype == 'compact' else False
+        amr = summary(
+            results =amr, 
+            _format = args.format, 
+            simple = simple, 
+            genesonly = args.genesonly,
+            minidentity = args.min_identity,
+            mincoverage = args.min_coverage,
+            )
+    else:
+
+        log.critical(f"It looks like your input file is not correctly configured. Please run abritamr scan and amr_status to generate the appropriate inut file.")
+        raise SystemExit(1)
+
+    # results:pd.DataFrame,
+    # _format:str="csv",
+    # species:str="", 
+    # genus:str="", 
+    # simple:bool=False, 
+    # sid:str="abritamr", 
+    # genesonly:bool = False, 
+    # minidentity:float = 90, 
+    # mincoverage:float = 90,
+    # outname:str = "abritamr_report"
+    
     

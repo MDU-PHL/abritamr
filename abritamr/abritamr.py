@@ -1,23 +1,31 @@
 
 import pathlib, argparse, sys, os, logging,json
 
-from abritamr.commands import scan,linelist
+from abritamr.commands import scan,linelist,amr_status
 from abritamr.version import __version__, db
 from abritamr.utils import output_results
-
+from abritamr.abritamr_logging import log
 """
 abritamr is designed to implement AMRFinder and parse the results compatible for MDU use. It may also be used for other purposes where the format of output is compatible
 
 """
 def run_scan(args):
-
+    log.info(f"Running scan to identify genes and and drugclasses")
     amr = scan.scan(args)
     output_results(df = amr, output = args.output, _format = args.format)
 
 def run_linelist(args):
+    log.info(f"Running linelist to collate single sample results into a linelist for reporting.")
     # print('linelist')
     # print(args.amr)
     linelist.linelist(args)
+
+
+def run_status(args):
+    # print('linelist')
+    log.info(f"Determining the amr status of the sequence based on genes and drug classes.")
+    amr = amr_status.amr_status(args)
+    output_results(df = amr, output = args.output, _format = args.format)
 
 def cli():
 
@@ -83,18 +91,42 @@ def cli():
         default = 0.5,
         help ="Minimum coverage of the reference gene for reporting a complete match."
     )
-    parser_sub_scan.add_argument(
-        '--force',
-        action='store_true',
-        help = "Set to override existing outputs of the same name."
+    
+    
+    parser_sub_status = subparsers.add_parser('amr_status', help='Determine status of genes recovered from abritamr scan', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_sub_status.add_argument(
+        '--amr',
+        '-a',
+        help = "result file(s) from 'abritamr scan'. Default stdin",
+        # metavar='FILE', 
+        nargs='?',
+        default = sys.stdin
     )
-    parser_sub_scan.add_argument(
+    parser_sub_status.add_argument(
+        '--output',
+        '-o',
+        help = "Filename to save output - default stdout.",
+
+    )
+    parser_sub_status.add_argument(
+        '--format',
+        '-f',
+        help = "Output format",
+        choices=['csv', 'tab'],
+        default = "csv"
+    )
+    parser_sub_status.add_argument(
+        '--species',
+        '-sp',
+        help = "Species from which assemblies were derived. Must be supplied for SNP detection and inferrence.",
+       
+    )
+    parser_sub_status.add_argument(
         "--reportable-config",
         "-rc",
         default = f"{pathlib.Path(__file__).parent / 'configs' / 'abritamr_reporting.csv'}",
         help = "Path to config that defines the criteria for highlighting relevant genes and mechanisms for reporting. Supplying a new config will override the default abritamr criteria."
     )
-
     parser_sub_llist = subparsers.add_parser('linelist', help='Generate a linelist report summarising genes observed by abritamr durgclass', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_llist.add_argument(
         '--amr',
@@ -103,6 +135,41 @@ def cli():
         metavar='FILE', 
         nargs='?',
         default = sys.stdin
+    )
+    parser_sub_llist.add_argument(
+        '--output',
+        '-o',
+        help = "Filename to save output - default stdout.",
+
+    )
+    parser_sub_llist.add_argument(
+        '--format',
+        '-f',
+        help = "Output format",
+        choices=['csv', 'tab'],
+        default = "csv"
+    )
+    parser_sub_llist.add_argument(
+        '--viewtype',
+        '-vt',
+        help = "For line list, full will print out all drug classes available in the reference set, compact will only print out hat is detected.",
+        choices=['full', 'compact'],
+        default = 'compact'
+    )
+    parser_sub_llist.add_argument(
+        "--min-identity",
+        default = 0.9,
+        help ="Minimum identity to reference gene for reporting a match."
+    )
+    parser_sub_llist.add_argument(
+        "--min-coverage",
+        default = 0.5,
+        help ="Minimum coverage of the reference gene for reporting a complete match."
+    )
+    parser_sub_llist.add_argument(
+        '--genesonly',
+        action='store_true',
+        help = "Set to if you want to limit reportable to only be genes (excludes reporting of any SNPs)."
     )
 # @click.option(
 #     '--format',
@@ -165,6 +232,7 @@ def cli():
 
 
     parser_sub_scan.set_defaults(func=run_scan)
+    parser_sub_status.set_defaults(func = run_status)
     parser_sub_llist.set_defaults(func = run_linelist)
     # parser_update.set_defaults(func = update_db)
     args = parser.parse_args()

@@ -31,7 +31,7 @@ def scan(
         log.critical("You must supply an input file (assembly or amrfinder plus output). Exiting.")
         raise SystemExit(1)
     amr = []
-    
+    dbv = "unknown"
     if args.assembly:
         log.info("Assembly(ies) have been supplied.")
         organism = wrangle_species(organism = args.species)
@@ -39,6 +39,8 @@ def scan(
             
             log.info(f"Will now try to run amrfinderplus on supplied assembly {asm}")
             if check_path(pth = f"{asm}") and check_assembly(f"{asm}"):
+                dbv = check_amrfinder()
+
                 full_path = f"{pathlib.Path(f'{asm}').absolute()}"
                 sample_id = args.sample_id if args.sample_id else full_path
                 log.info(f"Running amrfinder plus")
@@ -74,6 +76,7 @@ def scan(
         # 'abritamr_AMR_type', 
         # 'criteria_id', 
         # 'criteria_version',
+        'species',
         'Element name', 
         'Scope', 
         'Type', 
@@ -81,6 +84,7 @@ def scan(
         'Method',
         'pmid', 
         'abritamr_class_version',
+        'amrfinderplus_db_version',
         'Target length', 
         'Reference sequence length',
         '% Coverage of reference', 
@@ -92,6 +96,7 @@ def scan(
         'HMM description',
         ]
     amr = pd.DataFrame(amr)
+    amr['amrfinderplus_db_version'] = dbv
     amr = amr[abritamr_cols]
     
 

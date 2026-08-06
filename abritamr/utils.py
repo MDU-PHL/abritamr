@@ -46,16 +46,17 @@ def check_amrfinder()-> bool:
         log.critical(f"Something is wrong with your environment. amrfinderplus is required for abritamr to run. Please follow installation instructions and try again.")
     else:
         dbv = [i for i in vrsn.stdout.split('\n') if 'Database version' in i]
-        dbv = dbv.splI(':')[-1].strip() if dbv != [] else ""
+        # print(dbv)
+        dbv = dbv[0].split(':')[-1].strip() if dbv != [] else ""
         if dbv == "":
             log.critical(f"It looks like the database version cannont be determined. There may be something wrong with your installation. Please check documentation and try again.")
             raise SystemExit(1)
         if db not in dbv:
             log.warning(f"Your amrfinder database is at {dbv}. This is different to what is expected ({db}). Please not unexpected behaviour may occur.")
-            return True
+            return dbv
         else:
             log.info(f"Your amrfinder installation is compatible with current abritamr.")
-            return True
+            return dbv
 
 def check_assembly(pth) -> bool:
     log.info(f"Checking assembly is in a correct format")
