@@ -1,7 +1,7 @@
 
 import pathlib, argparse, sys, os, logging,json
 
-from abritamr.commands import scan,linelist,amr_status
+from abritamr.commands import scan,linelist,amr_status,matrix
 from abritamr.version import __version__, db
 from abritamr.utils import output_results
 from abritamr.logger import log
@@ -13,6 +13,13 @@ def run_scan(args):
     log.info(f"Running scan to identify genes and and drugclasses")
     amr = scan.scan(args)
     output_results(df = amr, output = args.output, _format = args.format)
+
+
+def run_matrix(args):
+    log.info(f"Running matrix to collate single sample results into a matrix.")
+    result = matrix.matrix(args)
+    # print(linelist)
+    output_results(df = result, output = args.output, _format = args.format)
 
 def run_linelist(args):
     log.info(f"Running linelist to collate single sample results into a linelist for reporting.")
@@ -187,6 +194,12 @@ def cli():
 
     )
     parser_sub_matrix.add_argument(
+        '--facet',
+        help = "Feature to facet by for generating a matrix",
+        choices=['abritamr_subclass', 'abritamr_class', 'gene'],
+        default = "abritamr_subclass"
+    )
+    parser_sub_matrix.add_argument(
         '--format',
         '-f',
         help = "Output format",
@@ -266,7 +279,7 @@ def cli():
     parser_sub_scan.set_defaults(func=run_scan)
     parser_sub_status.set_defaults(func = run_status)
     parser_sub_llist.set_defaults(func = run_linelist)
-    # parser_update.set_defaults(func = update_db)
+    parser_sub_matrix.set_defaults(func = run_matrix)
     args = parser.parse_args()
     
     if len(sys.argv) < 2:

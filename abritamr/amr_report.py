@@ -98,9 +98,7 @@ def summary(
     
     report = pd.DataFrame(repmechs, index = [0])
     report=report[cols]
-    # print(report.T)
-    # log.info(f"Saving report.")
-    # save_report(report = report, _format = _format, outname = outname)
+
     return report
 
 
