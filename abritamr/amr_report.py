@@ -39,11 +39,9 @@ def wrangle_cols(repdf:pd.DataFrame, repmechs:dict, cols:list, simple:bool=True)
 
 def summary(
     results:pd.DataFrame,
-    _format:str="csv",
-    species:str="", 
-    genus:str="", 
+    _format:str="csv", 
     simple:bool=False, 
-    sid:str="abritamr", 
+    sid:str="", 
     genesonly:bool = False, 
     minidentity:float = 90, 
     mincoverage:float = 90,
@@ -56,7 +54,12 @@ def summary(
     log.info(f"Generating report for {sid}")
     results['% Coverage of reference'] =  pd.to_numeric(results['% Coverage of reference'] , errors='coerce')
     results['% Identity to reference'] = pd.to_numeric(results['% Identity to reference'] , errors='coerce')
-    repmechs = {'Sample_id':sid}
+    
+    species = results['species'].unique().tolist()
+    if len(species) >1:
+        log.critical(f"It seems that there is something wrong with your input files. There is more than one species value ({', '.join(species)})")
+        raise SystemExit(1)
+    repmechs = {'Sample_id':sid, 'Species provided': species[0] if species != [] else ""}
     reportable = results[
         (results['abritamr_AMR_reporting_status'] == 'reportable') & 
         (results['% Identity to reference']>=minidentity) &
@@ -82,7 +85,7 @@ def summary(
         amrtype= ""
     else:
         amrtype = ";".join([a for a in amrtype if a])
-    cols = ['Sample_id','Reportable AMR mechansims', 'AMR type', 'Non-reportable AMR mechanisms','Reportable AMR mechanisms (low coverage/identity)','Non-reportable other','Species provided']
+    cols = ['Sample_id','Reportable AMR mechansims', 'AMR type','Species provided', 'Non-reportable AMR mechanisms','Reportable AMR mechanisms (low coverage/identity)','Non-reportable other','Species provided']
     
     for df in [reportable, nonreportable_amr, nonreportable_other]:
         repmechs,cols = wrangle_cols(df, repmechs, cols, simple = simple)
@@ -96,9 +99,9 @@ def summary(
     report = pd.DataFrame(repmechs, index = [0])
     report=report[cols]
     # print(report.T)
-    log.info(f"Saving report.")
-    save_report(report = report, _format = _format, outname = outname)
-    return True
+    # log.info(f"Saving report.")
+    # save_report(report = report, _format = _format, outname = outname)
+    return report
 
 
 def infer_phenotype(amr:dict, species: str= "", genus:str="", default:str="Susceptible", sid:str="abritamr", output:str="abritamr_inferred_ast.csv") -> bool:
