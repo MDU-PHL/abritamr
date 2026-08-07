@@ -1,7 +1,7 @@
 
 import pathlib, argparse, sys, os, logging,json
 
-from abritamr.commands import scan,linelist,amr_status,matrix
+from abritamr.commands import scan,linelist,amr_status,matrix,complete
 from abritamr.version import __version__, db
 from abritamr.utils import output_results
 from abritamr.logger import log
@@ -15,6 +15,12 @@ def run_scan(args):
     output_results(df = amr, output = args.output, _format = args.format)
 
 
+def run_status(args):
+    
+    log.info(f"Determining the amr status of the sequence based on genes and drug classes.")
+    amr = amr_status.amr_status(args)
+    output_results(df = amr, output = args.output, _format = args.format)
+
 def run_matrix(args):
     log.info(f"Running matrix to collate single sample results into a matrix.")
     result = matrix.matrix(args)
@@ -27,11 +33,10 @@ def run_linelist(args):
     # print(linelist)
     output_results(df = result, output = args.output, _format = args.format)
 
-def run_status(args):
-    
-    log.info(f"Determining the amr status of the sequence based on genes and drug classes.")
-    amr = amr_status.amr_status(args)
-    output_results(df = amr, output = args.output, _format = args.format)
+def run_complete(args):
+    log.info(f"Running all amr modules. Please be patient this may take some time.")
+
+    result = complete.complete(args)
 
 def cli():
 
@@ -40,8 +45,80 @@ def cli():
     )
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
     
+
     subparsers = parser.add_subparsers(help="What would you like to do?")
-    parser_sub_scan = subparsers.add_parser('scan', help='Run amrfinder and apply reporting logic. Outputs a file with rows populated with per-gene information.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    
+    parser_sub_complete = subparsers.add_parser('complete', help='Run the complete suite of abritamr functions. This will generate a linelist report and inferred antibiogram (if supported for your species).', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_sub_complete.add_argument(
+        "--assembly",
+        "-asm",
+        default="",
+        help="Assembly file to use as input (*.fa*, *.gbk *.fa*.gz, *.gbk.gz). If you would like to run with more than one sample - please use the --multi option.",
+    )
+    parser_sub_complete.add_argument(
+        "--amrfinderplus",
+        "-afp",
+        default="",
+        help="EXPERIMENTAL - USE WITH CAUTION. AMR finder output file. Please note unexpected behaviour may result were versions and databases differ from abritamr. If you would like to run with more than one sample - please use the --multi option.",
+    )
+    parser_sub_complete.add_argument(
+        '--species',
+        '-sp',
+        help = "Species from which assemblies were derived. Must be supplied for SNP detection and inferrence. If you would like to run with more than one sample - please use the --multi option.",
+       
+    )
+    parser_sub_complete.add_argument(
+        '--sample-id',
+        '-s',
+        help = "sample identifier, this will be used to name output files and in line list reports. If you would like to run with more than one sample - please use the --multi option.",
+    )
+    parser_sub_complete.add_argument(
+        '--multi',
+        help = "Tab-delimited file with columns sample_id,assembly (or amrfinder) and species (optional).",
+        default = ""
+    )
+    parser_sub_complete.add_argument(
+        '--format',
+        '-f',
+        help = "Output format",
+        choices=['csv', 'tab'],
+        default = "csv"
+    )
+    parser_sub_complete.add_argument(
+        '--no-keep',
+        action='store_true',
+        help = "Set to if you DO NOT want to keep intermediate files."
+    )
+    parser_sub_complete.add_argument(
+        '--genesonly',
+        action='store_true',
+        help = "Set to if you want to limit reportable to only be genes (excludes reporting of any SNPs)."
+    )
+    parser_sub_complete.add_argument(
+        '--threads',
+        '--cpus',
+        help="Number of max CPU cores to run.",
+        default=1
+    )
+    parser_sub_complete.add_argument(
+        "--min-identity",
+        default = 0.9,
+        help ="Minimum identity to reference gene for reporting a match."
+    )
+    parser_sub_complete.add_argument(
+        "--min-coverage",
+        default = 0.5,
+        help ="Minimum coverage of the reference gene for reporting a complete match."
+    )
+    parser_sub_complete.add_argument(
+        "--reportable-config",
+        "-rc",
+        default = f"{pathlib.Path(__file__).parent / 'configs' / 'abritamr_reporting.csv'}",
+        help = "Path to config that defines the criteria for highlighting relevant genes and mechanisms for reporting. Supplying a new config will override the default abritamr criteria."
+    )
+    
+    
+    parser_sub_scan = subparsers.add_parser('scan', help='Run amrfinder and apply abritamr drug classes. Outputs a file with rows populated with per-gene information.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_scan.add_argument(
         "--assembly",
         "-asm",
@@ -99,7 +176,7 @@ def cli():
     )
     
     
-    parser_sub_status = subparsers.add_parser('amr_status', help='Determine status of genes recovered from abritamr scan', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_sub_status = subparsers.add_parser('amr_status', help='Determine status of genes recovered from abritamr scan.  Outputs a file with rows populated with per-gene information.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_status.add_argument(
         '--amr',
         '-a',
@@ -133,7 +210,7 @@ def cli():
         default = f"{pathlib.Path(__file__).parent / 'configs' / 'abritamr_reporting.csv'}",
         help = "Path to config that defines the criteria for highlighting relevant genes and mechanisms for reporting. Supplying a new config will override the default abritamr criteria."
     )
-    parser_sub_llist = subparsers.add_parser('linelist', help='Generate a linelist report summarising genes observed by abritamr durgclass', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_sub_llist = subparsers.add_parser('linelist', help='Generate a linelist report summarising genes observed by abritamr drugclass or criteria supplied.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_llist.add_argument(
         '--amr',
         '-a',
@@ -275,7 +352,7 @@ def cli():
 
 
 
-
+    parser_sub_complete.set_defaults(func = run_complete)
     parser_sub_scan.set_defaults(func=run_scan)
     parser_sub_status.set_defaults(func = run_status)
     parser_sub_llist.set_defaults(func = run_linelist)

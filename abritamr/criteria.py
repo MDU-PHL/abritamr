@@ -13,6 +13,8 @@ class Criteria:
     criteria_id: str
     criteria_version:str
     criteria: str
+    additional_status_criteria:str = None
+    additional_type_criteria: str = None
     status: str = None
     amrtype: str = None
     species: str = None
@@ -28,7 +30,7 @@ class Criteria:
             raise ValueError(f"You must supply one of status (reportable or not-reportable) or inferred (example resistant, R, susceptible)")
       
 
-def get_abritamr_configs(cfgtype:str, cfgpath:str) -> list:
+def get_abritamr_configs(cfgtype:str= "reportable", cfgpath:str= "") -> list:
     reps = pd.read_csv(f"{cfgpath}")
 
     abritamr_rep = []

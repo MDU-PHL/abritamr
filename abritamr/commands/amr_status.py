@@ -46,7 +46,7 @@ def amr_status(
         amr = generate_output(amr = amr, cfgpath = args.reportable_config)
     else:
 
-        log.critcal(f"It looks like your input file is not correctly configured. Please run abritamr scan to generate the appropriate inut file.")
+        log.critical(f"It looks like your input file is not correctly configured. Please run abritamr scan to generate the appropriate inut file.")
         raise SystemExit(1)
     # print(amr)
         

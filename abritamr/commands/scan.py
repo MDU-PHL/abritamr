@@ -88,6 +88,7 @@ def scan(
         'Closest reference name', 
         'HMM accession', 
         'HMM description',
+        'amrfinder_accession_field'
         ]
     amr = pd.DataFrame(amr)
     amr['amrfinderplus_db_version'] = dbv

@@ -37,13 +37,13 @@ def find_classes(refgenes:pd.DataFrame,accession:str) -> str:
             _class,_subclass,pmid,db_version = get_classes(key = key, val = accession,refgenes = refgenes)
             break
 
-    return _class,_subclass,pmid,db_version
+    return _class,_subclass,pmid,db_version,key
 
 def apply_classes(amr:dict, species:str, sid:str) -> dict:
 
     refgenes = get_refgenes()
     for row in amr:
-        _class,_subclass,pmid,db_version = find_classes(refgenes = refgenes, accession = row['Closest reference accession'])
+        _class,_subclass,pmid,db_version,key = find_classes(refgenes = refgenes, accession = row['Closest reference accession'])
 
         
         row['abritamr_class'] = _class
@@ -52,5 +52,6 @@ def apply_classes(amr:dict, species:str, sid:str) -> dict:
         row['sample_id'] = sid
         row['pmid'] = pmid
         row['abritamr_class_version'] = db_version
+        row['amrfinder_accession_field'] = key
     
     return amr

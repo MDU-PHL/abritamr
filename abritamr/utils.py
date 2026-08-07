@@ -21,7 +21,7 @@ def check_path(pth:str) -> bool:
 
 def get_refgenes()-> pd.DataFrame:
 
-    rf = pathlib.Path(__file__).parent / 'db' /'refgenes_latest.csv'
+    rf = pathlib.Path(__file__).parent / 'db' /'refgenes_v2.csv'
     if rf.exists():
         return pd.read_csv(rf)
     else:
