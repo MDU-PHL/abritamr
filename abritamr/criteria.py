@@ -8,6 +8,14 @@ import pathlib
 
 
 @dataclass(frozen=True)
+class ClassDefintion:
+    class_id:int
+    class_curation_id:str
+    defintion:str
+    _class:str = None
+    _subclass:str = None
+
+@dataclass(frozen=True)
 class Criteria:
     
     criteria_id: str
@@ -30,7 +38,7 @@ class Criteria:
             raise ValueError(f"You must supply one of status (reportable or not-reportable) or inferred (example resistant, R, susceptible)")
       
 
-def get_abritamr_configs(cfgtype:str= "reportable", cfgpath:str= "") -> list:
+def get_abritamr_reporting(cfgpath:str= "") -> list:
     reps = pd.read_csv(f"{cfgpath}")
 
     abritamr_rep = []
@@ -40,3 +48,13 @@ def get_abritamr_configs(cfgtype:str= "reportable", cfgpath:str= "") -> list:
         abritamr_rep.append(rep)
 
     return abritamr_rep
+
+def get_abritamr_defs(cfgpath:str= "") -> list:
+
+    defs = pd.read_csv(cfgpath)
+    abritamr_defs = []
+    for d in defs.to_dict(orient = "records"):
+        dfs = ClassDefintion(**d)
+        abritamr_defs.append(d)
+    
+    return abritamr_defs

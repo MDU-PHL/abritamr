@@ -1,0 +1,43 @@
+class_id,class_curation_id,definition,class,subclass
+1,cc.1.0001,(class == 'BETA-LACTAM') &&  ('AMR-SUSCEPTIBLE' == subtype),Beta-lactam,Beta-lactam (Susceptible)
+1,cc.1.0002,(class == 'BETA-LACTAM') &&  ( 'carbapenem-hydrolyzing' in product_name) && !('OXA-51' in product_name) ,Beta-lactam,Carbapenemase
+1,cc.1.0003,(class == 'BETA-LACTAM') &&  ('metallo-beta-lactamase' in product_name) && (subclass == 'CARBAPENEM'),Beta-lactam,Carbapenemase (MBL)
+1,cc.1.0004,(class == 'BETA-LACTAM') &&  (('OXA-51 family' in product_name) || (allele == 'OXA-51')),Beta-lactam,Carbapenemase (OXA-51)
+1,cc.1.0005,(class == 'BETA-LACTAM') &&  (gene_family == 'blaZ'),Beta-lactam,Penicillin resistance (Staphylococcus aureus)
+1,cc.1.0006,(class == 'BETA-LACTAM') &&  ('class C' in product_name),Beta-lactam,AmpC
+1,cc.1.0007,(class == 'BETA-LACTAM') &&  (gene_family == 'blaKPC') &&( subclass == 'CABAPENEM'),Beta-lactam,ESBL (KPC variant)
+1,cc.1.0008,(class == 'BETA-LACTAM') && !('class C' in product_name) && (('extended-spectrum' in product_name || ('extended spectrum' in product_name)),Beta-lactam,ESBL
+2,cc.2.0001,(gene_family == 'cfr') && (class == ''),Multidrug,
+3,cc.3.0001,(class == 'AMINOGLYCOSIDE') &&  ('rRNA' in product_name) && ('methyltransferase' in product_name),Aminoglycoside,Aminoglycosides (Ribosomal methyltransferase)
+4,cc.4.0001,(class == 'AMINOCOUMARIN'),Other antimicrobial,
+4,cc.4.0002,(class == 'AVILAMYCIN'),Other antimicrobial,
+4,cc.4.0003,(class == 'BACITRACIN'),Other antimicrobial,
+4,cc.4.0004,(class == 'BLEOMYCIN'),Other antimicrobial,
+4,cc.4.0005,(class == 'EDEINE'),Other antimicrobial,
+4,cc.4.0006,(class == 'FOSMIDOMYCIN'),Other antimicrobial,
+4,cc.4.0007,(class == 'ISONIAZID/TRICLOSAN'),Other antimicrobial,
+4,cc.4.0008,(class == 'PLEUROMUTILIN'),Other antimicrobial,
+4,cc.4.0009,(class == 'POLYKETIDE'),Other antimicrobial,
+4,cc.4.0010,(class == 'SPIROPYRIMIDINETRIONE'),Other antimicrobial,
+4,cc.4.0011,(class == 'STREPTOGRAMIN'),Other antimicrobial,
+4,cc.4.0012,(class == 'THIOSTREPTON'),Other antimicrobial,
+4,cc.4.0013,(class =='TETRACENOMYCIN'),Other antimicrobial,
+4,cc.4.0014,(class == 'IONOPHORE'),Other antimicrobial,
+5,cc.5.0001,(type == 'VIRULENCE') && (class == 'INTIMIN'),Virulence,Intimin_append
+5,cc.5.0002,(type == 'VIRULENCE') && (class == 'STX'),Virulence,
+5,cc.5.0003,(type == 'VIRULENCE') && (class == ''),Virulence,Other
+6,cc.6.0001,(class == 'ARSENIC'),Other non-antimicrobial,
+6,cc.6.0002,('CADMIUM' in class),Other non-antimicrobial,
+6,cc.6.0003,(class == 'CHROMATE'),Other non-antimicrobial,
+6,cc.6.0004,('COPPER' in class),Other non-antimicrobial,
+6,cc.6.0005,(class == 'FLOURIDE'),Other non-antimicrobial,
+6,cc.6.0006,('GOLD' in class),Other non-antimicrobial,
+6,cc.6.0007,('MERCURY' in class),Other non-antimicrobial,
+6,cc.6.0008,('NICKEL' in class),Other non-antimicrobial,
+6,cc.6.0009,('QUATERNARY AMMONIUM' in class),Other non-antimicrobial,
+6,cc.6.0010,('SILVER' in class),Other non-antimicrobial,
+6,cc.6.0011,('TELLURIUM' in class),Other non-antimicrobial,
+6,cc.6.0012,('TRICLOSAN' in class),Other non-antimicrobial,
+7,cc.7.0001,(class == 'MULTIDRUG'),Multidrug,
+7,cc.7.0002,('multidrug' in product_name) && ((class == '') && (subclass == '')),Multidrug,Other
+8,cc.8.0001,"(type != 'VIRULENCE') && (class == """") && (subclass == '')",Other ,Other
