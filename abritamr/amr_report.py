@@ -24,10 +24,13 @@ def save_report(report: pd.DataFrame, outname:str= "", _format:str="csv") -> boo
 
 def wrangle_cols(repdf:pd.DataFrame, repmechs:dict, cols:list, simple:bool=True) -> tuple:
     cols_final = sorted(repdf['abritamr_subclass'].unique().tolist())
+    # print(cols_final)
+    # cols_final = []
     if not simple:
         refs = get_refgenes()
         cols_final = sorted(refs['abritamr_subclass'].unique().tolist())
     for dc in cols_final:
+        
         tmp = repdf[repdf['abritamr_subclass'] == dc]
         if not tmp.empty:
             repmechs[dc] = ';'.join(sorted(tmp['Element symbol'].unique().tolist()))
@@ -85,10 +88,13 @@ def summary(
         amrtype= ""
     else:
         amrtype = ";".join([a for a in amrtype if a])
-    cols = ['Sample_id','Reportable AMR mechansims', 'AMR type','Species provided', 'Non-reportable AMR mechanisms','Reportable AMR mechanisms (low coverage/identity)','Non-reportable other','Species provided']
-    
-    for df in [reportable, nonreportable_amr, nonreportable_other]:
-        repmechs,cols = wrangle_cols(df, repmechs, cols, simple = simple)
+    cols = ['Sample_id','Reportable AMR mechansims', 'AMR type','Species provided', 'Non-reportable AMR mechanisms','Reportable AMR mechanisms (low coverage/identity)','Non-reportable other']
+    # print(cols)
+    # for df in [reportable, nonreportable_amr, nonreportable_other]:
+    df = results[
+        (results['% Identity to reference']>=minidentity) &
+        (results['% Coverage of reference']>=mincoverage)]
+    repmechs,cols = wrangle_cols(df, repmechs, cols, simple = simple)
         
     repmechs['Non-reportable AMR mechanisms']=','.join(sorted(nonreportable_amr['Element symbol'].unique().tolist()))
     repmechs['Reportable AMR mechanisms (low coverage/identity)'] = ','.join(sorted(reportable_amr_low['Element symbol'].unique().tolist()))
