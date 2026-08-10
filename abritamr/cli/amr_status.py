@@ -1,6 +1,6 @@
 import pathlib, argparse, sys, os, logging,json
 
-
+from abritamr.cli.basic_args import inputs, references, detection_args, basic_output
 
 
 def status_args(subparsers):
@@ -15,29 +15,13 @@ def status_args(subparsers):
         default = sys.stdin
     )
     parser_sub_status.add_argument(
-        '--output',
-        '-o',
-        help = "Filename to save output - default stdout.",
-
-    )
-    parser_sub_status.add_argument(
-        '--format',
-        '-f',
-        help = "Output format",
-        choices=['csv', 'tab'],
-        default = "csv"
-    )
-    parser_sub_status.add_argument(
         '--species',
         '-sp',
         help = "Species from which assemblies were derived. Must be supplied for SNP detection and inferrence.",
        
     )
-    parser_sub_status.add_argument(
-        "--reportable-config",
-        "-rc",
-        default = f"{pathlib.Path(__file__).parent / 'configs' / 'abritamr_reporting.csv'}",
-        help = "Path to config that defines the criteria for highlighting relevant genes and mechanisms for reporting. Supplying a new config will override the default abritamr criteria."
-    )
+    parser_sub_status = basic_output(parser = parser_sub_status)
+    parser_sub_status = detection_args(parser = parser_sub_status)
+    parser_sub_status = references(parser = parser_sub_status)
 
     return parser_sub_status

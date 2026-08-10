@@ -1,5 +1,5 @@
 import pathlib, argparse, sys, os, logging,json
-
+from abritamr.cli.basic_args import inputs, references, detection_args, basic_output
 
 
 
@@ -15,19 +15,7 @@ def llist_args(subparsers):
         nargs='?',
         default = sys.stdin
     )
-    parser_sub_llist.add_argument(
-        '--output',
-        '-o',
-        help = "Filename to save output - default stdout.",
-
-    )
-    parser_sub_llist.add_argument(
-        '--format',
-        '-f',
-        help = "Output format",
-        choices=['csv', 'tab'],
-        default = "csv"
-    )
+    parser_sub_llist = basic_output(parser = parser_sub_llist)
     parser_sub_llist.add_argument(
         '--viewtype',
         '-vt',
@@ -36,19 +24,10 @@ def llist_args(subparsers):
         default = 'compact'
     )
     parser_sub_llist.add_argument(
-        "--min-identity",
-        default = 0.9,
-        help ="Minimum identity to reference gene for reporting a match."
-    )
-    parser_sub_llist.add_argument(
-        "--min-coverage",
-        default = 0.5,
-        help ="Minimum coverage of the reference gene for reporting a complete match."
-    )
-    parser_sub_llist.add_argument(
         '--genesonly',
         action='store_true',
         help = "Set to if you want to limit reportable to only be genes (excludes reporting of any SNPs)."
     )
+    parser_sub_llist = detection_args(parser = parser_sub_llist)
 
     return parser_sub_llist

@@ -19,10 +19,11 @@ def check_path(pth:str) -> bool:
         return False
     return True
 
-def get_refgenes()-> pd.DataFrame:
+# this needs to be user defined!!
+def get_refgenes(pth)-> pd.DataFrame:
 
-    rf = pathlib.Path(__file__).parent / 'db' /'refgenes_v2.csv'
-    if rf.exists():
+    if check_path(pth = pth):
+        rf = pathlib.Path(pth)
         return pd.read_csv(rf)
     else:
         log.critical(f"Something is very wrong - the reference catalog is not present.")
