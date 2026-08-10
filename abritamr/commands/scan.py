@@ -12,8 +12,8 @@ from abritamr.parse_finder import amrf2dict
 from abritamr.drugclasses import apply_classes
 from abritamr.logger import log
 
-def generate_output(species:str,sample_id:str,amr:list)-> list:
-    amr = apply_classes(amr = amr, species=species, sid = sample_id)
+def generate_output(species:str,sample_id:str,amr:list,catalog:str)-> list:
+    amr = apply_classes(amr = amr, species=species, sid = sample_id, catalog = catalog)
     
     return amr
 
@@ -47,7 +47,7 @@ def scan(
                     )
                 
             # amr.extend(res)
-                res = generate_output(species = args.species, sample_id = sample_id, amr = res )
+                res = generate_output(species = args.species, sample_id = sample_id, amr = res, catalog =  args.reference_catalog)
                 
                 # print(res)
                 amr.extend(res)
@@ -58,17 +58,13 @@ def scan(
             log.info(f"Opening existing amrfinder plus output")
 
             res = amrf2dict(amrfinder = args.amrfinder)
-            res = generate_output(species = args.species, sample_id = sample_id, amr = res  )
-            amr.append(res)
+            res = generate_output(species = args.species, sample_id = sample_id, amr = res, catalog = args.reference_catalog )
+            amr.extend(res)
         
     abritamr_columns = abritamr_scan_columns()
     amr = pd.DataFrame(amr)
     amr['amrfinderplus_db_version'] = dbv
-    amr = amr[abritamr_cols]
+    amr = amr[abritamr_columns]
     
-
-    # print(pd.DataFrame(amr))
-    
-    # output_results(amr = amr, output = kwargs['output'])
 
     return amr

@@ -39,9 +39,9 @@ def find_classes(refgenes:pd.DataFrame,accession:str) -> str:
 
     return _class,_subclass,pmid,db_version,key
 
-def apply_classes(amr:dict, species:str, sid:str) -> dict:
+def apply_classes(amr:dict, species:str, sid:str, catalog:str) -> dict:
 
-    refgenes = get_refgenes()
+    refgenes = get_refgenes(pth = catalog)
     for row in amr:
         _class,_subclass,pmid,db_version,key = find_classes(refgenes = refgenes, accession = row['Closest reference accession'])
 

@@ -66,13 +66,6 @@ def cli():
     parser_sub_utils_level2 = parser_sub_utils.add_subparsers(dest = 'level2')
     parser_sub_utils_catalog = catalog_args(subparsers = parser_sub_utils_level2)
     
-    # parser_sub_utils_level2.add_parser('catalog', help='Generate the reference gene catalog for abritamr.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-# # ✅ Correct: Create subparsers for the 'remote' parser first
-#     remote_subparsers = parser_remote.add_subparsers(dest='remote_command')
-    
-#     # Second level: 'remote add'
-#     parser_add = remote_subparsers.add_parser('add', help='add remote')
-#     parser_add.add_argument('name', help='remote name')
     # tie parsers to functions
     parser_sub_complete.set_defaults(func = run_complete)
     parser_sub_scan.set_defaults(func=run_scan)
@@ -83,8 +76,8 @@ def cli():
     
     if len(sys.argv) < 2:
         parser.print_help(sys.stderr)
-    elif len(sys.argv) <= 2:
-        parser_sub_scan.print_help(sys.stderr)
+    # elif len(sys.argv) <= 2:
+    #     parser_sub_scan.print_help(sys.stderr)
     # elif len(sys.argv) <= 2 and sys.argv[1] == 'report':
     #     parser_mdu.print_help(sys.stderr)
     else:

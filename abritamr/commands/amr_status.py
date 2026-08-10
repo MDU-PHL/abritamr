@@ -17,8 +17,8 @@ from abritamr.parse_reportable import add_abritamr_results
 
 
 
-def generate_output(amr:dict,cfgpath:str)-> dict:
-    amr = add_abritamr_results(amr = amr,cfgpath=cfgpath)
+def generate_output(amr:dict,catalog:str)-> dict:
+    amr = add_abritamr_results(amr = amr,catalog = catalog)
     # add_abritamr_results(amr:dict, species: str= "", sid : str = "", cfgpath:str="") -> pd.DataFrame
     return amr
 
@@ -28,6 +28,7 @@ def amr_status(
 
     try:
         amr = pd.read_csv(args.amr)
+        # print(amr)
         # amr = amr.to_dict(orient = "records")
         # log.info("Opened input file.")
     except:
@@ -37,13 +38,15 @@ def amr_status(
         amr = []
         for a in amrlist:
             amr.append(a.split(dlm))
+        # print(amr[0])
         amr = pd.DataFrame(amr[1:], columns=amr[0])
+    # print(amr)
         # amr = amr.to_dict(orient = "records")
     log.info(f"Will now determine status of the AMR genes detected.")
 
     if 'sample_id' in amr.columns.tolist() and 'species' in amr.columns.tolist()  and 'abritamr_subclass' in amr.columns.tolist():
         amr = amr.to_dict(orient = "records")
-        amr = generate_output(amr = amr, cfgpath = args.reportable_config)
+        amr = generate_output(amr = amr, catalog = args.reference_catalog )
     else:
 
         log.critical(f"It looks like your input file is not correctly configured. Please run abritamr scan to generate the appropriate inut file.")

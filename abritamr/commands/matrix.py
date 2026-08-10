@@ -46,6 +46,7 @@ def matrix(
                 sid = sid,
                 minidentity = args.min_identity,
                 mincoverage = args.min_coverage,
+                refgenes = args.reference_catalog
                 )
             lines.append(line)
         linelist = pd.concat(lines)
