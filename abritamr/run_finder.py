@@ -21,6 +21,7 @@ def generate_cmd(min_identity:float, min_coverage:float, asm:str,threads:int, or
 
     return cmd
 
+
 def run_cmd(cmd:str) -> str:
     log.info(f"Running amrfinder: {cmd}")
     proc = subprocess.run(cmd, shell = True, capture_output = True, encoding = "utf-8")
@@ -41,7 +42,7 @@ def parse_output(results:str) -> dict:
     return pd.DataFrame(rows[1:], columns = rows[0]).to_dict(orient= "records")
 
 def run_amrf(min_identity:float, min_coverage:float, asm:str,threads:int, organism:str) -> dict:
-
+    
     cmd = generate_cmd(min_identity = min_identity, min_coverage = min_coverage, asm = asm, threads = threads, organism = organism)
     stdout = run_cmd(cmd = cmd) 
     amr = parse_output(results = stdout)

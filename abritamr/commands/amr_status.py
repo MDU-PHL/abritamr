@@ -6,7 +6,7 @@ import pandas as pd
 import sys
 from io import StringIO
 
-from abritamr.utils import check_assembly, check_amrfinder, check_any2fasta, wrangle_species, output_results
+from abritamr.utils import check_assembly, check_amrfinder, check_any2fasta, wrangle_species, output_results,abritamr_status_columns
 # from abritamr.run_finder import run_amrf
 # from abritamr.parse_finder import amrf2dict
 # from abritamr.parse_reportable import add_abritamr_results
@@ -49,35 +49,7 @@ def amr_status(
         log.critical(f"It looks like your input file is not correctly configured. Please run abritamr scan to generate the appropriate inut file.")
         raise SystemExit(1)
     # print(amr)
-        
-    abritamr_cols = [
-        'sample_id',
-        'Element symbol',
-        'abritamr_class', 
-        'abritamr_subclass', 
-        'abritamr_AMR_reporting_status',
-        'abritamr_AMR_type', 
-        'species',
-        'criteria_id', 
-        'criteria_version',
-        'Element name', 
-        'Scope', 
-        'Type', 
-        'Subtype',
-        'Method',
-        'pmid', 
-        'abritamr_class_version',
-        'amrfinderplus_db_version',
-        'Target length', 
-        'Reference sequence length',
-        '% Coverage of reference', 
-        '% Identity to reference',
-        'Alignment length', 
-        'Closest reference accession',
-        'Closest reference name', 
-        'HMM accession', 
-        'HMM description',
-        ]
+    abritamr_cols = abritamr_status_columns()
     amr = pd.DataFrame(amr)
     # amr['amrfinderplus_db_version'] = dbv
     amr = amr[abritamr_cols]

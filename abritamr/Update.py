@@ -35,7 +35,8 @@ def _get_vars():
     else:
         logger.critical(f"It seems that {cfg} does not exist. Please check your installation and try again.")
         raise SystemExit
-    
+
+# need to make this non abritamr - increase flexibility
 def _archive_old_ref_catalog():
     tdy = _get_date()
     og_ref = pathlib.Path(__file__).parent / "db" / "refgenes_latest.csv"

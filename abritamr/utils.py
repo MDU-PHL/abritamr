@@ -16,7 +16,7 @@ from abritamr.logger import log
 def check_path(pth:str) -> bool:
     log.info(f"Checking path: {pth}")
     if not pathlib.Path(pth).exists():
-        return True
+        return False
     return True
 
 def get_refgenes()-> pd.DataFrame:
@@ -38,6 +38,66 @@ def check_any2fasta()-> bool:
     else:
         log.critical(f"any2fasta is a dependency of abritamr. Please check your installation.")
         raise SystemExit(1)
+
+def abritamr_scan_columns() -> list:
+    return [
+        'sample_id',
+        'Element symbol',
+        'abritamr_class', 
+        'abritamr_subclass', 
+        # 'abritamr_AMR_reporting_status',
+        # 'abritamr_AMR_type', 
+        # 'criteria_id', 
+        # 'criteria_version',
+        'species',
+        'Element name', 
+        'Scope', 
+        'Type', 
+        'Subtype',
+        'Method',
+        'pmid', 
+        'abritamr_class_version',
+        'amrfinderplus_db_version',
+        'Target length', 
+        'Reference sequence length',
+        '% Coverage of reference', 
+        '% Identity to reference',
+        'Alignment length', 
+        'Closest reference accession',
+        'Closest reference name', 
+        'HMM accession', 
+        'HMM description',
+        'amrfinder_accession_field'
+        ]
+def abritamr_status_columns() -> list:
+    return [
+        'sample_id',
+        'Element symbol',
+        'abritamr_class', 
+        'abritamr_subclass', 
+        'abritamr_AMR_reporting_status',
+        'abritamr_AMR_type', 
+        'species',
+        'criteria_id', 
+        'criteria_version',
+        'Element name', 
+        'Scope', 
+        'Type', 
+        'Subtype',
+        'Method',
+        'pmid', 
+        'abritamr_class_version',
+        'amrfinderplus_db_version',
+        'Target length', 
+        'Reference sequence length',
+        '% Coverage of reference', 
+        '% Identity to reference',
+        'Alignment length', 
+        'Closest reference accession',
+        'Closest reference name', 
+        'HMM accession', 
+        'HMM description',
+        ]
 
 def check_amrfinder()-> bool:
     log.info(f"Checking that amrfinder plus is installed and database versions are compatible.")

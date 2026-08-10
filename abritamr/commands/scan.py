@@ -5,7 +5,7 @@ import logging
 import pandas as pd
 import sys
 
-from abritamr.utils import output_results, check_assembly, check_amrfinder, check_any2fasta, wrangle_species, output_results, check_path
+from abritamr.utils import output_results, check_assembly, check_amrfinder, check_any2fasta, wrangle_species, output_results, check_path, abritamr_scan_columns
 from abritamr.run_finder import run_amrf
 from abritamr.parse_finder import amrf2dict
 # from abritamr.parse_reportable import add_abritamr_results
@@ -61,35 +61,7 @@ def scan(
             res = generate_output(species = args.species, sample_id = sample_id, amr = res  )
             amr.append(res)
         
-    abritamr_cols = [
-        'sample_id',
-        'Element symbol',
-        'abritamr_class', 
-        'abritamr_subclass', 
-        # 'abritamr_AMR_reporting_status',
-        # 'abritamr_AMR_type', 
-        # 'criteria_id', 
-        # 'criteria_version',
-        'species',
-        'Element name', 
-        'Scope', 
-        'Type', 
-        'Subtype',
-        'Method',
-        'pmid', 
-        'abritamr_class_version',
-        'amrfinderplus_db_version',
-        'Target length', 
-        'Reference sequence length',
-        '% Coverage of reference', 
-        '% Identity to reference',
-        'Alignment length', 
-        'Closest reference accession',
-        'Closest reference name', 
-        'HMM accession', 
-        'HMM description',
-        'amrfinder_accession_field'
-        ]
+    abritamr_columns = abritamr_scan_columns()
     amr = pd.DataFrame(amr)
     amr['amrfinderplus_db_version'] = dbv
     amr = amr[abritamr_cols]
