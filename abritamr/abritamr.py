@@ -7,6 +7,7 @@ from abritamr.cli.scan import scan_args
 from abritamr.cli.amr_status import status_args
 from abritamr.cli.linelist import llist_args
 from abritamr.cli.matrix import matrix_args
+from abritamr.cli.utils_catalog import catalog_args
 from abritamr.version import __version__, db
 from abritamr.utils import output_results
 from abritamr.logger import log
@@ -59,6 +60,19 @@ def cli():
     parser_sub_llist = llist_args(subparsers = subparsers)
     parser_sub_matrix = matrix_args(subparsers = subparsers)
     
+    # utils modules sub sub parser
+
+    parser_sub_utils = subparsers.add_parser('utils', help='Utility functions for using AMR.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_sub_utils_level2 = parser_sub_utils.add_subparsers(dest = 'level2')
+    parser_sub_utils_catalog = catalog_args(subparsers = parser_sub_utils_level2)
+    
+    # parser_sub_utils_level2.add_parser('catalog', help='Generate the reference gene catalog for abritamr.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+# # ✅ Correct: Create subparsers for the 'remote' parser first
+#     remote_subparsers = parser_remote.add_subparsers(dest='remote_command')
+    
+#     # Second level: 'remote add'
+#     parser_add = remote_subparsers.add_parser('add', help='add remote')
+#     parser_add.add_argument('name', help='remote name')
     # tie parsers to functions
     parser_sub_complete.set_defaults(func = run_complete)
     parser_sub_scan.set_defaults(func=run_scan)
