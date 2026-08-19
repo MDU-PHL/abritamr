@@ -99,7 +99,7 @@ def check_multi(pth: str, workdir:pathlib.Path) -> bool:
 
 
 
-def complete(
+def run(
     args
         ) -> dict:
     

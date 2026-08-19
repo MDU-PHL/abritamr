@@ -29,7 +29,7 @@ def catalog_args(subparsers):
     )
     parser_sub_catalog.add_argument(
         "--previous-catalog",
-        default=f"{pathlib.Path(__file__).parent.parent / 'db' / 'refgenes_latest.csv'}",
+        default=f"{pathlib.Path(__file__).parent.parent / 'config' / 'abritamr_reference_catalog.csv'}",
         help="Path to were previous reference gene catalog. Used to identify updates or changes for checking."
     )
     parser_sub_catalog.add_argument(
@@ -37,3 +37,5 @@ def catalog_args(subparsers):
         default=f"{pathlib.Path.cwd() / 'refgenes.csv'}",
         help="Path to save you catalog. Please check this file for correctness."
     )
+    
+    return parser_sub_catalog

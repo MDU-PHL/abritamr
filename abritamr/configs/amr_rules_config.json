@@ -1,0 +1,27 @@
+{"species" : [
+    "Acinetobacter baumannii",
+    "Bordatella",
+    "Burkholderia pseudomallei",
+    "Campylobacter jejuni",
+    "Enterobacter",
+    "Enterococcus faecalis",
+    "Enterococcus faecium",
+    "Escherichia coli",
+    "Klebsiella oxytoca",
+    "Klebsiella pneumoniae",
+    "Legionella",
+    "Neisseria gonorrhoeae",
+    "Neisseria meningitidis",
+    "Proteus mirabilis",
+    "Pseudomonas aeruginosa",
+    "Shewanella",
+    "Staphylococcus aureus",
+    "Yersinia"
+],
+"grades": {
+        "very low":0,
+        "low":1,
+        "moderate":2,
+        "high":3
+    }
+}

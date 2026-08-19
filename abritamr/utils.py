@@ -70,6 +70,7 @@ def abritamr_scan_columns() -> list:
         'HMM description',
         'amrfinder_accession_field'
         ]
+
 def abritamr_status_columns() -> list:
     return [
         'sample_id',
@@ -99,6 +100,16 @@ def abritamr_status_columns() -> list:
         'HMM accession', 
         'HMM description',
         ]
+
+def check_sourmash() -> bool:
+    log.info(f"Checking that sourmash is installed.")
+    proc = subprocess.run("sourmash -v", shell = True, capture_output = True, encoding = "utf-8")
+    if proc.returncode == 0:
+        log.info("sourmash is installed.")
+        return True
+    else:
+        log.critical(f"sourmash is a dependency of abritamr. Please check your installation.")
+        raise SystemExit(1)
 
 def check_amrfinder()-> bool:
     log.info(f"Checking that amrfinder plus is installed and database versions are compatible.")

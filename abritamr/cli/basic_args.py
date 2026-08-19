@@ -4,8 +4,12 @@ import pathlib, argparse, sys, os, logging,json
 def references(parser):
 
     parser.add_argument(
+        "--reference-folder",
+        default = f"{pathlib.Path(__file__).parent.parent / 'configs' }",
+        help = "Path to catalog for applying classes and amr types"
+    )
+    arser.add_argument(
         "--reference-catalog",
-        "-rc",
         default = f"{pathlib.Path(__file__).parent.parent / 'configs' / 'abritamr_reference_catalog.csv'}",
         help = "Path to catalog for applying classes and amr types"
     )
@@ -16,8 +20,8 @@ def references(parser):
 def inputs(parser):
 
     parser.add_argument(
-        "--assembly",
-        "-asm",
+        "--contigs",
+        "-c",
         nargs="*",
         # default="",
         help="Assembly file to use as input (*.fa*, *.gbk *.fa*.gz, *.gbk.gz). Can be multiple or wildcard.",

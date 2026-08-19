@@ -1,17 +1,17 @@
-﻿criteria_id,criteria_version,criteria,species,drugname,inferred,source
-cidsalmo000001,0.0.1,('Colistin' in abritamr_subclass),Salmonella enterica,Colistin,Resistant,abritamr
-cidsalmo000002,0.0.1,('Aminoglycosides (Ribosomal methyltransferase)' in abritamr_subclass),Salmonella enterica,Aminoglycosides (RMT),Resistant,abritamr
+﻿rule_id,rule_version,rule,species,drugname,inferred,source
+cidsalmo000001,0.0.1,('Colistin' in abritamr_subclass),Salmonella enterica,Colistin,Resistant,abritamr (PMID:36599823)
+cidsalmo000002,0.0.1,('Aminoglycosides (Ribosomal methyltransferase)' in abritamr_subclass),Salmonella enterica,Aminoglycosides (RMT),Resistant,abriabritamr (PMID:36599823)tamr 
 cidsalmo000003,0.0.1,('henicol' in abrtiamr_subclass),Salmonella enterica,Chloramphenicol,Resistant,abritamr
-cidsalmo000004,0.0.1,('Trimethoprim' in abritamr_subclass && 'Sulfathiazole' in abritamr_subclass),Salmonella enterica,Trimeth-Sulpha,Resistant,abritamr
-cidsalmo000005,0.0.1,('Trimethoprim' in abritamr_subclass ),Salmonella enterica,Trimethoprim,Resistant,abritamr
-cidsalmo000006,0.0.1,('Sulfathiazole' in abritamr_subclass),Salmonella enterica,Sulfathiazole,Resistant,abritamr
-cidsalmo000007,0.0.1,('uinolone' in abritamr_subclass),Salmonella enterica,Ciproflxacin,Resistant,abritamr
-cidsalmo000008,0.0.1,('Tetracycline' in abritamr_subclass),Salmonella enterica,Tetracycline,Resistant,abritamr
-cidsalmo000009,0.0.1,('Streptomycin' in abritamr_subclass),Salmonella enterica,Streptomycin,Resistant,abritamr
-cidsalmo000010,0.0.1,('Kanamycin' in abritamr_subclass || 'Aminoglycosides (Ribosomal methyltransferase)' in abritamr_subclass),Salmonella enterica,Kanamycin,Resistant,abritamr
-cidsalmo000011,0.0.1,('Gentamicin' in abritamr_subclass || 'Aminoglycosides (Ribosomal methyltransferase)' in abritamr_subclass),Salmonella enterica,Gentamicin,Resistant,abritamr
-cidsalmo000012,0.0.1,('Macrolide' in abritamr_subclass || 'Lincosamide/Macrolide/Streptogramin' in abritamr_subclass || 'Azithromycin' in abritamr_subclass),Salmonella enterica,Azithromycin,Resistant,abritamr
-cidsalmo000013,0.0.1,('Carbapenemase' in abritamr_subclass),Salmonella enterica,Meropenem,Resistant,abritamr
-cidsalmo000014,0.0.1,('AmpC' in abritamr_subclass),Salmonella enterica,Cefotaxime (AmpC),Resistant,abritamr
-cidsalmo000015,0.0.1,('ESBL' in abritamr_subclass,Salmonella enterica,Cefotaxime (ESBL)),Resistant,abritamr
-cidsalmo000016,0.0.1,('Beta-lactam' in abritamr_subclass || 'ESBL' in abritamr_subclass || 'AmpC' in abritamr_subclass || 'Ampicillin' in abritamr_subclass),Salmonella enterica,Ampicillin,Resistant,abritamr
+cidsalmo000004,0.0.1,('Trimethoprim' in abritamr_subclass && 'Sulfathiazole' in abritamr_subclass),Salmonella enterica,Trimeth-Sulpha,Resistant,abritamr (PMID:36599823)
+cidsalmo000005,0.0.1,('Trimethoprim' in abritamr_subclass ),Salmonella enterica,Trimethoprim,Resistant,abritamr (PMID:36599823)
+cidsalmo000006,0.0.1,('Sulfathiazole' in abritamr_subclass),Salmonella enterica,Sulfathiazole,Resistant,abritamr (PMID:36599823)
+cidsalmo000007,0.0.1,('uinolone' in abritamr_subclass),Salmonella enterica,Ciproflxacin,Resistant,abritamr (PMID:36599823)
+cidsalmo000008,0.0.1,('Tetracycline' in abritamr_subclass),Salmonella enterica,Tetracycline,Resistant,abritamr (PMID:36599823)
+cidsalmo000009,0.0.1,('Streptomycin' in abritamr_subclass),Salmonella enterica,Streptomycin,Resistant,abritamr (PMID:36599823)
+cidsalmo000010,0.0.1,('Kanamycin' in abritamr_subclass || 'Aminoglycosides (Ribosomal methyltransferase)' in abritamr_subclass),Salmonella enterica,Kanamycin,Resistant,abritamr (PMID:36599823)
+cidsalmo000011,0.0.1,('Gentamicin' in abritamr_subclass || 'Aminoglycosides (Ribosomal methyltransferase)' in abritamr_subclass),Salmonella enterica,Gentamicin,Resistant,abritamr (PMID:36599823)
+cidsalmo000012,0.0.1,('Macrolide' in abritamr_subclass || 'Lincosamide/Macrolide/Streptogramin' in abritamr_subclass || 'Azithromycin' in abritamr_subclass),Salmonella enterica,Azithromycin,Resistant,abritamr (PMID:36599823)
+cidsalmo000013,0.0.1,('Carbapenemase' in abritamr_subclass),Salmonella enterica,Meropenem,Resistant,abritamr (PMID:36599823)
+cidsalmo000014,0.0.1,('AmpC' in abritamr_subclass),Salmonella enterica,Cefotaxime (AmpC),Resistant,abritamr (PMID:36599823)
+cidsalmo000015,0.0.1,('ESBL' in abritamr_subclass,Salmonella enterica,Cefotaxime (ESBL)),Resistant,abritamr (PMID:36599823)
+cidsalmo000016,0.0.1,('Beta-lactam' in abritamr_subclass || 'ESBL' in abritamr_subclass || 'AmpC' in abritamr_subclass || 'Ampicillin' in abritamr_subclass),Salmonella enterica,Ampicillin,Resistant,abritamr (PMID:36599823)

@@ -3,7 +3,7 @@ import pathlib, argparse, sys, os, logging,json
 from abritamr.cli.basic_args import inputs, references, detection_args
 
 
-def complete_args(subparsers):
+def run_args(subparsers):
     parser_sub_complete = subparsers.add_parser('complete', help='Run the complete suite of abritamr functions. This will create a folder for each sample and generate a linelist report and inferred antibiogram (if supported for your species).', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_complete = inputs(parser = parser_sub_complete)
     parser_sub_complete.add_argument(

@@ -7,13 +7,25 @@ import json
 import pathlib
 
 
+
+@dataclass(frozen=True)
+class InferRules:
+    drugname: str
+    species: str
+    rule_id:str
+    rule_version:str
+    rule:str
+    inferred:str
+    source:str = "not supplied"
+    
+
 @dataclass(frozen=True)
 class ClassDefintion:
     class_id:int
     class_curation_id:str
-    defintion:str
-    _class:str = None
-    _subclass:str = None
+    definition:str
+    abritamr_class:str = None
+    abritamr_subclass:str = None
 
 @dataclass(frozen=True)
 class Criteria:

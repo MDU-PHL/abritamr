@@ -1,12 +1,12 @@
-class_id,class_curation_id,definition,class,subclass
+class_id,class_curation_id,definition,abritamr_class,abritamr_subclass
 1,cc.1.0001,(class == 'BETA-LACTAM') &&  ('AMR-SUSCEPTIBLE' == subtype),Beta-lactam,Beta-lactam (Susceptible)
 1,cc.1.0002,(class == 'BETA-LACTAM') &&  ( 'carbapenem-hydrolyzing' in product_name) && !('OXA-51' in product_name) ,Beta-lactam,Carbapenemase
 1,cc.1.0003,(class == 'BETA-LACTAM') &&  ('metallo-beta-lactamase' in product_name) && (subclass == 'CARBAPENEM'),Beta-lactam,Carbapenemase (MBL)
-1,cc.1.0004,(class == 'BETA-LACTAM') &&  (('OXA-51 family' in product_name) || (allele == 'OXA-51')),Beta-lactam,Carbapenemase (OXA-51)
+1,cc.1.0004,(class == 'BETA-LACTAM') &&  (('OXA-51 family' in product_name) || (allele == 'OXA-51')),Beta-lactam,Carbapenemase (OXA-51 family)
 1,cc.1.0005,(class == 'BETA-LACTAM') &&  (gene_family == 'blaZ'),Beta-lactam,Penicillin resistance (Staphylococcus aureus)
 1,cc.1.0006,(class == 'BETA-LACTAM') &&  ('class C' in product_name),Beta-lactam,AmpC
-1,cc.1.0007,(class == 'BETA-LACTAM') &&  (gene_family == 'blaKPC') &&( subclass == 'CABAPENEM'),Beta-lactam,ESBL (KPC variant)
-1,cc.1.0008,(class == 'BETA-LACTAM') && !('class C' in product_name) && (('extended-spectrum' in product_name || ('extended spectrum' in product_name)),Beta-lactam,ESBL
+1,cc.1.0007,(class == 'BETA-LACTAM') &&  (gene_family == 'blaKPC') && !( 'CARBAPENEM' in subclass),Beta-lactam,ESBL (KPC variant)
+1,cc.1.0008,(class == 'BETA-LACTAM') && !('class C' in product_name) && (gene_family != 'blaKPC') && (('extended-spectrum' in product_name) || ('extended spectrum' in product_name)),Beta-lactam,ESBL
 2,cc.2.0001,(gene_family == 'cfr') && (class == ''),Multidrug,
 3,cc.3.0001,(class == 'AMINOGLYCOSIDE') &&  ('rRNA' in product_name) && ('methyltransferase' in product_name),Aminoglycoside,Aminoglycosides (Ribosomal methyltransferase)
 4,cc.4.0001,(class == 'AMINOCOUMARIN'),Other antimicrobial,
@@ -37,7 +37,7 @@ class_id,class_curation_id,definition,class,subclass
 6,cc.6.0009,('QUATERNARY AMMONIUM' in class),Other non-antimicrobial,
 6,cc.6.0010,('SILVER' in class),Other non-antimicrobial,
 6,cc.6.0011,('TELLURIUM' in class),Other non-antimicrobial,
-6,cc.6.0012,('TRICLOSAN' in class),Other non-antimicrobial,
+6,cc.6.0012,('TRICLOSAN' == class),Other non-antimicrobial,
 7,cc.7.0001,(class == 'MULTIDRUG'),Multidrug,
 7,cc.7.0002,('multidrug' in product_name) && ((class == '') && (subclass == '')),Multidrug,Other
-8,cc.8.0001,"(type != 'VIRULENCE') && (class == """") && (subclass == '')",Other ,Other
+8,cc.8.0001,"(type != 'VIRULENCE') && (class == '') && (subclass == '')",Other,Other
