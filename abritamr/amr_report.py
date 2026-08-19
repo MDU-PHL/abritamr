@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from abritamr.inferrence import infer
+# from abritamr.inferrence import infer
 from abritamr.logger import log
 from abritamr.utils import get_refgenes
 import json
