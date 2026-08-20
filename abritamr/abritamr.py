@@ -1,7 +1,7 @@
 
 import pathlib, argparse, sys, os, logging,json
 
-from abritamr.commands import scan,linelist,amr_status,matrix,run,update_catalog
+from abritamr.commands import scan,linelist,amr_status,matrix,run,update_database
 from abritamr.cli.run import run_args
 from abritamr.cli.scan import scan_args
 from abritamr.cli.amr_status import status_args
@@ -43,12 +43,12 @@ def run_linelist(args):
 def run_complete(args):
     log.info(f"Running all amr modules. Please be patient this may take some time.")
 
-    result = complete.complete(args)
+    result = run.complete(args)
 
 def _update_catalog(args):
     log.info(f"Will generate an abritamr compatible reference gene catalog.")
 
-    catalog = update_catalog.update_catalog(args)
+    catalog = update_database.generate_database(args)
 
 
 def cli():

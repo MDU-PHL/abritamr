@@ -6,7 +6,7 @@ import datetime
 import json
 import subprocess
 from dataclasses import asdict
-from logger import log
+from abritamr.logger import log
 # from abritamr.utils import get_refgenes
 # from abritamr.criteria import get_abritamr_reporting,get_abritamr_defs
 

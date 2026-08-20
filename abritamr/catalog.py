@@ -8,7 +8,7 @@ from dataclasses import asdict
 from abritamr.logger import log
 from abritamr.utils import get_refgenes
 from abritamr.criteria import get_abritamr_reporting,get_abritamr_defs
-from abritamr.cel_functions import class_contains,create_context,evaluate_rule
+from abritamr.cel_functions import contains_any,create_cel_context,evaluate_rule
 # from cel import evaluate
 import sys
 

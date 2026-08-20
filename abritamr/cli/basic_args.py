@@ -8,7 +8,7 @@ def references(parser):
         default = f"{pathlib.Path(__file__).parent.parent / 'configs' }",
         help = "Path to catalog for applying classes and amr types"
     )
-    arser.add_argument(
+    parser.add_argument(
         "--reference-catalog",
         default = f"{pathlib.Path(__file__).parent.parent / 'configs' / 'abritamr_reference_catalog.csv'}",
         help = "Path to catalog for applying classes and amr types"

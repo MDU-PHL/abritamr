@@ -7,7 +7,7 @@ import sys
 
 from abritamr.logger import log
 from abritamr.catalog import wrangle_catalog
-from abritamr.parse_gdstrules import add_rules_to_existing, get_rules_for_species as get_amrrules_for_species
+from abritamr.parse_gdstrules import add_rules_to_existing, get_amrrules_for_species
 
 
 def create_db_folder(pth:str) -> bool:
@@ -66,3 +66,9 @@ def update_rules(args) -> bool:
         except Exception as e:
             log.critical(f"Looks like something has gone wrong with generating the rules. The following error was reported : {e}. Please try again.")
             raise SystemExit(1) 
+
+
+def generate_database(args) -> bool:
+    update_catalog(args = args)
+    update_rules(args = args)
+    log.info(f"Database generation complete. Please check the output folder {args.output_dir} for the generated files.")
