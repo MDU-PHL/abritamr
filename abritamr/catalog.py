@@ -8,7 +8,8 @@ from dataclasses import asdict
 from abritamr.logger import log
 from abritamr.utils import get_refgenes
 from abritamr.criteria import get_abritamr_reporting,get_abritamr_defs
-from cel import evaluate
+from abritamr.cel_functions import class_contains,create_context,evaluate_rule
+# from cel import evaluate
 import sys
 
 
@@ -41,22 +42,16 @@ def catalog_df(catalog:str,src:str = 'abritamr') -> pd.DataFrame: # will need to
     new_catalog = catalog
     if catalog == "":
         new_catalog = _get_new_catalog()
-        print(new_catalog)
-    # if catalog != "":
-    #     src = "user_supplied"
+        
     refs = pd.read_csv(new_catalog, sep = "\t")
-    # print(refs)
+   
+    refs['gene'] = refs['allele'].fillna(refs['gene_family'])
+    refs = refs.fillna("")
+    refs = _make_key(df = refs)
     
-    if src == "abritamr":
-        refs['gene'] = refs['allele'].fillna(refs['gene_family'])
-        refs = refs.fillna("")
-        refs = _make_key(df = refs)
     
-    # refs = refs.to_dict(orient = "records")
-    # print(refs)
     return refs
 
-# abritamr specific
 def _capitalise(x):
 
     a = x.split('/')
@@ -64,13 +59,6 @@ def _capitalise(x):
     _list = list(map(lambda x: x.replace('Carbapenem','Carbapenemase'), a))
  
     return '/'.join(_list)
-# abritamr specific
-def _get_rename()-> dict:
-
-    cfg = pathlib.Path(__file__).parent / "configs" / "update_vars.json"
-    if cfg.exists():
-        with open(f"{cfg}", "r") as j:
-            return json.load(j)
 
 def get_current(pth:str) -> pd.DataFrame:
 
@@ -93,11 +81,8 @@ def get_class_criteria(cfgpath:str) -> dict:
 
 
 def _updated_entries(new_catalog, previous_catalog) -> pd.DataFrame:
-    # print(previous_catalog)
     previous_catalog = previous_catalog.rename(columns = {"class_new": "class_prev", "subclass_new":"subclass_prev"})
-    # new_catalog = new_catalog.rename(columns = {"class":"class_new", "subclass": "subclass_new"})
     _tmp= new_catalog.merge(previous_catalog, on = ['abritamr_accession_key'])
-    # print(_tmp.columns)
     _tmp['changed'] = numpy.where((_tmp['class_prev'] != _tmp['class']) , 'updated', '')
     _tmp['changed'] = numpy.where((_tmp['subclass_prev'] != _tmp['subclass']) , 'updated', _tmp['changed'])
     
@@ -141,9 +126,7 @@ def _compare_to_existing(new_catalog, previous_catalog) -> pd.DataFrame:
 def construct_refgenes_starter(catalog:str, previous_catalog:str, src:str= "abritamr") -> list:
 
     refs = catalog_df(catalog = catalog)
-    # print(refs)
     crnt = get_current(pth = previous_catalog)
-    # print(crnt)
     refs = _compare_to_existing(new_catalog = refs, previous_catalog = crnt)
     refs = refs.fillna("")
     refgenes = refs.to_dict(orient= "records")
@@ -151,29 +134,14 @@ def construct_refgenes_starter(catalog:str, previous_catalog:str, src:str= "abri
     return refgenes
 
 
-def _rename(rename_key, row):
-
-    _cls = _capitalise(row['class']) if row['class'] not in ['FLUOROQUINOLONE',"NITROFURAN"] else rename_key[row['class']]
-    sbcls = rename_key[row['subclass']] if row['subclass'] in rename_key else _capitalise(row['subclass'])
-
-    return _cls,sbcls
-
-
 def apply_classes(class_definitions: list, refgenes : list, src: str = 'abritamr') -> list:
-    rename = _get_rename()
+    # rename = _get_rename()
     rows = []
     for row in refgenes:
-        # print(row)
-        # abritamr specific logic around renaming - may not be used in other future formats
-        if src == 'abritamr':
-            for k in rename:
-                if k in row['class']:
-                    row['abritamr_class'], row['abritamr_subclass'] = _rename(rename,row)
-
+        ctx = create_context(data = row, name = 'row')
         for c in class_definitions:
-            # print(c)
-            # crt = c
-            rs = evaluate(c['definition'], row)
+            rs = evaluate_rule(c['definition'], ctx)
+            # rs = evaluate(c['definition'], ctx)
             if rs:
                 # print(c)
                 row['abritamr_class'] = c['abritamr_class'] if c['abritamr_class'] else _capitalise(row['abritamr_class'])
@@ -201,14 +169,14 @@ def apply_amrtyping(amrtyping_definitions:list,refgenes:list, dflt_rs: str= 'not
     rows = []
     for row in refgenes:
         row['reportable_status'] = dflt_rs
-        # print(row)
+        
+        ctx = create_context(data = row, name = 'row')
         for cr in amrtyping_definitions:
             crt = asdict(cr)
-            # print(crt)
-            rs = evaluate(crt['criteria'], row)
+            
+            rs = evaluate_rule(crt['criteria'], ctx)
             if rs:
-                # print(row)
-                # print(crt['status'])
+                
                 row['reportable_status'] = crt['status']
                 row['amrtype'] = crt['amrtype']
                 row['criteria_id'] = crt['criteria_id']
@@ -219,26 +187,26 @@ def apply_amrtyping(amrtyping_definitions:list,refgenes:list, dflt_rs: str= 'not
                 row['additional_type_criteria'] = crt['additional_type_criteria'] if crt['additional_type_criteria'] else ""
                 break
                 
-            # else:
-            #     row['reportable_status'] = dflt_rs
+            
         rows.append(row)
     
     return rows
 
+
 def wrangle_catalog(catalog:str, previous_catalog:str, amrtyping_definitions:str, class_definitions:str, output:str, src:str = "abritamr") -> bool:
 
     refgenes = construct_refgenes_starter(catalog = catalog, previous_catalog=previous_catalog, src = src)
-    # for r in refgenes:
-    #     if 'van' in r['gene']:
-    #         print(r)
+   
     ccdict = get_class_criteria(cfgpath = class_definitions)
     refgenes = apply_classes(class_definitions = ccdict, refgenes = refgenes)
     
     rcdict = get_abritamr_reporting(cfgpath =amrtyping_definitions)
+    if rcdict == []:
+        log.warning(f"No amr typing rules found in {amrtyping_definitions}. No typing will be captured and amrtyping will not be able to be undertaken using this catalogue.")
+
     refgenes = apply_amrtyping(amrtyping_definitions = rcdict, refgenes= refgenes)
-    # for r in refgenes:
-    #         if 'van' in r['gene']:
-    #             print(r)
-    pd.DataFrame(refgenes).to_csv(f"{output}", index = False)
+
     
-    return True
+    # pd.DataFrame(refgenes).to_csv(f"{output}", index = False)
+    
+    return refgenes

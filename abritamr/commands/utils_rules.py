@@ -6,7 +6,7 @@ import pandas as pd
 import sys
 
 from abritamr.logger import log
-from abritamr.rules import generate_rules
+from abritamr.parse_amrrules import generate_rules
 from abritamr.utils import check_path
 
 

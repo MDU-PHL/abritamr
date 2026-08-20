@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from dataclasses import asdict
-from cel import evaluate
 from typing import Optional,Literal
 import pandas as pd
 import json
@@ -51,9 +50,13 @@ class Criteria:
       
 
 def get_abritamr_reporting(cfgpath:str= "") -> list:
-    reps = pd.read_csv(f"{cfgpath}")
 
     abritamr_rep = []
+    try:
+        reps = pd.read_csv(f"{cfgpath}")
+    except Exception as e:
+        raise RuntimeError(f"Error reading abritamr reporting rules: {e}")
+
     for criteria in reps.to_dict(orient="records"):
         # print(criteria)
         rep = Criteria(**criteria)
@@ -63,10 +66,14 @@ def get_abritamr_reporting(cfgpath:str= "") -> list:
 
 def get_abritamr_defs(cfgpath:str= "") -> list:
 
-    defs = pd.read_csv(cfgpath)
     abritamr_defs = []
+    try:
+        defs = pd.read_csv(f"{cfgpath}")
+    except Exception as e:
+        raise RuntimeError(f"Error reading abritamr class definitions: {e}")
+    
     for d in defs.to_dict(orient = "records"):
         dfs = ClassDefintion(**d)
-        abritamr_defs.append(d)
+        abritamr_defs.append(dfs)
     
     return abritamr_defs

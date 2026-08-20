@@ -1,15 +1,15 @@
 ﻿criteria_id,criteria_version,criteria,additional_status_criteria,status,additional_type_criteria,amrtype
-cid00001,0.0.1,('Carbapenemase' == abritamr_subclass),,reportable,,Possible CPO
-cid00002,0.0.1,abritamr_subclass == 'ESBL (KPC variant)',,reportable,,
-cid00003,0.0.1,abritamr_subclass == 'Aminoglycosides (Ribosomal methyltransferase)',,reportable,,
-cid00004,0.0.1,(abritamr_subclass == 'Colistin') && (gene != 'mcr9'),,reportable,,
-cid00005,0.0.1,(abritamr_subclass == 'Carbapenemase (OXA-51 family)') ,!('Acinetobacter' in species),reportable,,Possible CPO
-cid00006,0.0.1,(abritamr_subclass == 'Carbapenemase (MBL)' ) && (gene != 'blaLI'),!(species == 'Stenotrophomonas maltophilia'),reportable,,Possible CPO
-cid00007,,(abritamr_subclass == 'Carbapenemase (MBL)') && (gene == 'blaLI'),,reportable,,Possible CPO
-cid00008,0.0.1,"(abritamr_subclass == ""ESBL"") ",('Salmonella' in species || 'Shigella' in species),reportable,,
-cid00009,0.0.1,"(abritamr_subclass == ""AmpC"") && (gene == 'blaEC')",('Salmonella' in species),reportable,,
-cid00010,0.0.1,"(abritamr_subclass == ""AmpC"") && (gene != 'blaEC') ",('Salmonella' in species || 'Shigella' in species) ,reportable,,
-cid00011,0.0.1,"(abritamr_subclass == 'Vancomycin') && (gene in ['vanA','vanB','vanC','vanD','vanE','vanE','vanG','vanL','vanM','vanN'])",,reportable,,Possible VRE
-cid00012,0.0.1,"(abritamr_subclass == 'Methicillin')  && (gene in ['mecI','mecR'])",,reportable,(species == 'Staphylococcus aureus'),Possible MRSA
-cid00013,0.0.1,('Oxazolidinone' in abritamr_subclass),"(species in ['Staphylococcus aureus','Staphylococcus argenteus'] || 'Enterococcus' in species)",reportable,,
-cid00014,0.0.1,('Linezolid' in abritamr_subclass),"(species in ['Staphylococcus aureus','Staphylococcus argenteus'] || 'Enterococcus' in species)",reportable,,
+cid00001,0.0.1,('Carbapenemase' == row.abritamr_subclass),,reportable,,Possible CPO
+cid00002,0.0.1,row.abritamr_subclass == 'ESBL (KPC variant)',,reportable,,
+cid00003,0.0.1,row.abritamr_subclass == 'Aminoglycosides (Ribosomal methyltransferase)',,reportable,,
+cid00004,0.0.1,(row.abritamr_subclass == 'Colistin') && (row.gene != 'mcr9'),,reportable,,
+cid00005,0.0.1,(row.abritamr_subclass == 'Carbapenemase (OXA-51 family)'),!('Acinetobacter' in row.species),reportable,,Possible CPO
+cid00006,0.0.1,(row.abritamr_subclass == 'Carbapenemase (MBL)' ) && (row.gene != 'blaLI'),!(row.species == 'Stenotrophomonas maltophilia'),reportable,,Possible CPO
+cid00007,,(row.abritamr_subclass == 'Carbapenemase (MBL)') && (row.gene == 'blaLI'),,reportable,,Possible CPO
+cid00008,0.0.1,"(row.abritamr_subclass == 'ESBL') ",('Salmonella' in row.species || 'Shigella' in row.species),reportable,,
+cid00009,0.0.1,"(row.abritamr_subclass == 'AmpC') && (row.gene == 'blaEC')",('Salmonella' in row.species),reportable,,
+cid00010,0.0.1,"(row.abritamr_subclass == 'AmpC') && (row.gene != 'blaEC') ",('Salmonella' in row.species || 'Shigella' in row.species) ,reportable,,
+cid00011,0.0.1,"(row.abritamr_subclass == 'Vancomycin') && (row.gene in ['vanA','vanB','vanC','vanD','vanE','vanE','vanG','vanL','vanM','vanN'])",,reportable,,Possible VRE
+cid00012,0.0.1,"(row.abritamr_subclass == 'Methicillin')  && (row.gene in ['mecI','mecR'])",,reportable,"(row.species == 'Staphylococcus aureus')",Possible MRSA
+cid00013,0.0.1,"(contains_any(row.abritamr_subclass,'Oxazolidinone'))","(row.species in ['Staphylococcus aureus','Staphylococcus argenteus'] || 'Enterococcus' in row.species)",reportable,,
+cid00014,0.0.1,"(contains_any(row.abritamr_subclass,'Linezolid'))","(row.species in ['Staphylococcus aureus','Staphylococcus argenteus'] || 'Enterococcus' in row.species)",reportable,,

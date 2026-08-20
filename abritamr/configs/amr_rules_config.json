@@ -1,13 +1,13 @@
 {"species" : [
     "Acinetobacter baumannii",
-    "Bordatella",
+    "Bordetella",
     "Burkholderia pseudomallei",
     "Campylobacter jejuni",
     "Enterobacter",
     "Enterococcus faecalis",
     "Enterococcus faecium",
     "Escherichia coli",
-    "Klebsiella oxytoca",
+    "Klebsiella oxytoca complex",
     "Klebsiella pneumoniae",
     "Legionella",
     "Neisseria gonorrhoeae",
@@ -19,9 +19,17 @@
     "Yersinia"
 ],
 "grades": {
+        "-":-1,
         "very low":0,
         "low":1,
         "moderate":2,
         "high":3
+    },
+"clinical_category":{
+    "R":"Resistant",
+    "S":"Susceptible",
+    "I":"Intermediate",
+    "U":"Unknown",
+    "-":"Unknown"
     }
 }

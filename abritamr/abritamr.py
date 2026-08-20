@@ -7,7 +7,7 @@ from abritamr.cli.scan import scan_args
 from abritamr.cli.amr_status import status_args
 from abritamr.cli.linelist import llist_args
 from abritamr.cli.matrix import matrix_args
-from abritamr.cli.utils_catalog import catalog_args
+from abritamr.cli.utils_database import catalog_args
 from abritamr.cli.utils_rules import  rules_args
 from abritamr.version import __version__, db
 from abritamr.utils import output_results
