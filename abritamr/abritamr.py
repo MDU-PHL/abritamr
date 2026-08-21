@@ -1,14 +1,15 @@
 
 import pathlib, argparse, sys, os, logging,json
 
-from abritamr.commands import scan,linelist,amr_status,matrix,run,update_database
+from abritamr.commands import scan,linelist,amr_status,matrix,run,update_database,utils_catalog,utils_rules
 from abritamr.cli.run import run_args
 from abritamr.cli.scan import scan_args
 from abritamr.cli.amr_status import status_args
 from abritamr.cli.linelist import llist_args
 from abritamr.cli.matrix import matrix_args
-from abritamr.cli.utils_database import catalog_args
+from abritamr.cli.utils_database import database_args
 from abritamr.cli.utils_rules import  rules_args
+from abritamr.cli.utils_catalog import catalog_args
 from abritamr.version import __version__, db
 from abritamr.utils import output_results
 from abritamr.logger import log
@@ -45,11 +46,23 @@ def run_complete(args):
 
     result = run.complete(args)
 
-def _update_catalog(args):
+def _update_databases(args):
     log.info(f"Will generate an abritamr compatible reference gene catalog.")
 
     catalog = update_database.generate_database(args)
 
+
+def _update_catalog(args):
+    log.info(f"Will generate an abritamr compatible reference gene and rules catalog.")
+
+    catalog = utils_catalog.catalog(args)
+
+
+
+def _update_rules(args):
+    log.info(f"Will generate an abritamr compatible rules catalog.")
+
+    catalog = utils_rules.rules(args)
 
 def cli():
 
@@ -71,8 +84,10 @@ def cli():
 
     parser_sub_utils = subparsers.add_parser('utils', help='Utility functions for using AMR.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_utils_level2 = parser_sub_utils.add_subparsers(dest = 'level2')
+    parser_sub_utils_database = database_args(subparsers = parser_sub_utils_level2)
+    parser_sub_utils_rules = rules_args(subparsers = parser_sub_utils_level2)   
     parser_sub_utils_catalog = catalog_args(subparsers = parser_sub_utils_level2)
-    parser_sub_utils_rules = rules_args(subparsers = parser_sub_utils_level2)
+
     
     # tie parsers to functions
     parser_sub_run.set_defaults(func = run_complete)
@@ -80,6 +95,8 @@ def cli():
     parser_sub_status.set_defaults(func = run_status)
     parser_sub_llist.set_defaults(func = run_linelist)
     parser_sub_matrix.set_defaults(func = run_matrix)
+    parser_sub_utils_database.set_defaults(func = _update_databases)
+    parser_sub_utils_rules.set_defaults(func = _update_rules)
     parser_sub_utils_catalog.set_defaults(func = _update_catalog)
     args = parser.parse_args()
     

@@ -9,7 +9,7 @@ with open(f"{pathlib.Path(__file__).parent.parent / 'configs'/ 'amr_rules_config
 spcs.extend(sp['species'])
 
 
-def catalog_args(subparsers):
+def database_args(subparsers):
     # parser_sub_utils_catalog = subparsers.add_parser('catalog', help='Generate the reference gene catalog for abritamr.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_database = subparsers.add_parser('database', help='Create a reference gene catalogue for abritamr and genomic DST rules from the latest sources. This will download latest versions of the amrfinder gene catalog and genomic DST rules from the AMRrules github.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_database.add_argument(
