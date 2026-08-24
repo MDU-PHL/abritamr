@@ -39,7 +39,7 @@ class Criteria:
     species: str = None
     drugname:str = None
     inferred: str = None
-    
+    translation: str = None
 
     def __post_init__(self):
         

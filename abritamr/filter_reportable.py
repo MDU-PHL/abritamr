@@ -9,7 +9,7 @@ from abritamr.utils import get_refgenes
 
 
 def construct_filter(result:dict, refgenes:pd.DataFrame):
-    result['abritamr_AMR_reporting_status'] = "not-reportable"
+    result['abritamr_priority_status'] = "not-reportable"
     result['criteria_id'] = ""
     result['criteria_version'] = ""
     result['abritamr_AMR_type'] = ""
@@ -21,7 +21,7 @@ def construct_filter(result:dict, refgenes:pd.DataFrame):
     row = refgenes[refgenes[result['amrfinder_accession_field']] == result['Closest reference accession']]
     if not row.empty:
         rw = row.to_dict(orient = "records")[0]
-        sts = rw['reportable_status']
+        sts = rw['priority_status']
         tpe = rw["amrtype"]
         cid = rw['criteria_id']
         civ = rw['criteria_version']
@@ -35,7 +35,7 @@ def construct_filter(result:dict, refgenes:pd.DataFrame):
             trpt = evaluate(tpe_criteria, result)
             if not trpt:
                 tpe = ""
-        result['abritamr_AMR_reporting_status'] = sts
+        result['abritamr_priority_status'] = sts
         result['criteria_id'] = cid
         result['criteria_version'] = civ
         result['abritamr_AMR_type'] = tpe

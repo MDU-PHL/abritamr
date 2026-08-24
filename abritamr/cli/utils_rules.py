@@ -11,7 +11,7 @@ spcs.extend(sp['species'])
 
 def rules_args(subparsers):
     # parser_sub_utils_catalog = subparsers.add_parser('catalog', help='Generate the reference gene catalog for abritamr.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser_sub_rules = subparsers.add_parser('rules', help='Generate abritamr compatible rules for reporting genomic DST.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_sub_rules = subparsers.add_parser('generate_rules', help='Generate ONLY abritamr compatible rules for reporting genomic DST.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_rules.add_argument(
         "--catalog",
         "-c",

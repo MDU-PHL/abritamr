@@ -7,6 +7,7 @@ import json
 import subprocess
 from dataclasses import asdict
 from abritamr.logger import log
+from abritamr.utils import _get_date
 # from abritamr.utils import get_refgenes
 # from abritamr.criteria import get_abritamr_reporting,get_abritamr_defs
 
@@ -27,32 +28,28 @@ def url_stub() ->str:
     return "https://raw.githubusercontent.com/AMRverse/AMRrules/refs/heads/main/rules/"
 
 
-def get_rules(species:str ) -> dict:
+def get_rules(species:str, output_dir:str) -> dict:
 
     sfx = "_".join(species.split(" "))
     url = url_stub()
-    p = subprocess.run(f"wget {url}{sfx}.tsv", shell = True, capture_output = True, encoding = "utf-8")
-    if p.returncode == 0:
+    p = subprocess.run(f"wget -nc -O {output_dir}/amr_rules_{sfx}.tsv {url}{sfx}.tsv", shell = True, capture_output = True, encoding = "utf-8")
+    if pathlib.Path(f"{output_dir}/amr_rules_{sfx}.tsv").exists():
         log.info(f"AMR rule downloaded for {species}.")
-        return f"{sfx}.tsv"
+        return f"{output_dir}/amr_rules_{sfx}.tsv"
     else:
         log.critical(f"Something went wrong with the download of rules. {p.stderr}.")
         raise SystemExit
-
+    
 def open_rules(pth:str) -> dict:
 
     try:
         df = pd.read_csv(pth, sep = "\t")
-        return df.to_dict(orient = "records")
+        return df.fillna("").to_dict(orient = "records")
     except Exception as e:
         print(f"Something went wrong opening the rules file. The following error occured : {e}")
         raise SystemExit(1)
 
 
-
-def _get_date():
-
-    return datetime.datetime.today().strftime('%Y-%m-%d')
 
      
 
@@ -81,15 +78,16 @@ def get_simple_rules(rules:list) -> list:
     return simple_rules
         
 
-def wrangle_the_rules(rules:list, simple_rules:dict, species:str, cfg:dict, evidence_grade:str = 0) -> list:
+def wrangle_the_rules(rules:list, simple_rules:dict, species:str, cfg:dict, evidence_grade:str = 'very low') -> list:
 
     grades = cfg['grades']
     ccl = cfg['clinical_category']
     row = []
     for rule in rules:
         
-        ev = grades[rule['evidence grade'].strip()]
-        if ev >= evidence_grade:
+        ev = int(grades[rule['evidence grade'].strip()])
+        yev = int(grades[evidence_grade.strip()])
+        if ev >= yev:
             dr = rule['drug'].capitalize() if rule['drug'] != '-' else rule['drug class'].capitalize()
             rule_id = f"AMRrules-{rule['ruleID']}"
             rule_version = f"AMRrules-downloaded-{_get_date()}"
@@ -111,16 +109,17 @@ def wrangle_the_rules(rules:list, simple_rules:dict, species:str, cfg:dict, evid
     return row
 
 
-def generate_rules(species:str, evidence_grade:int, cfg:dict) -> list:
 
-    rule_file = get_rules(species = species)
+def generate_rules(species:str, evidence_grade:int, cfg:dict, output_dir:str) -> list:
+
+    rule_file = get_rules(species = species, output_dir = output_dir)
     rules = open_rules(pth = rule_file)
     simple_rules = get_simple_rules(rules = rules)
     results = wrangle_the_rules(rules = rules, simple_rules = simple_rules, species = species, evidence_grade = evidence_grade, cfg = cfg)
     # print(results)
     return results
 
-def get_amrrules_for_species(evidence_grade:int, species:str="all", rules_dict:dict={}) -> list:
+def get_amrrules_for_species(evidence_grade:int,output_dir:str, species:str="all", rules_dict:dict={}) -> list:
     cfg = get_cfg()
     species_list = cfg['species']
     
@@ -128,14 +127,14 @@ def get_amrrules_for_species(evidence_grade:int, species:str="all", rules_dict:d
         
         for sp in species_list:
             # print(sp)
-            rules = generate_rules(species = sp, evidence_grade = evidence_grade, cfg = cfg)
+            rules = generate_rules(species = sp, evidence_grade = evidence_grade, cfg = cfg, output_dir = output_dir)
             rules_dict[sp] = rules
     else:
         if species not in species_list:
             log.critical(f"Species {species} is not supported by AMRverse rules. Please check your input.")
             raise SystemExit(1)
         else:
-            rules = generate_rules(species = species, evidence_grade = evidence_grade, cfg = cfg)
+            rules = generate_rules(species = species, evidence_grade = evidence_grade, cfg = cfg, output_dir = output_dir)
             rules_dict[species] = rules
 
     return rules_dict

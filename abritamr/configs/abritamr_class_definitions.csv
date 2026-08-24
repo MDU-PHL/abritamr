@@ -40,4 +40,4 @@ class_id,class_curation_id,definition,abritamr_class,abritamr_subclass
 6,cc.6.0012,('TRICLOSAN' == row.class),Other non-antimicrobial,
 7,cc.7.0001,(row.class == 'MULTIDRUG'),Multidrug,
 7,cc.7.0002,('multidrug' in row.product_name) && ((row.class == '') && (row.subclass == '')),Multidrug,Other
-8,cc.8.0001,"(row.type != 'VIRULENCE') && (row.class == '') && (row.subclass == '')",Other,Other
+8,cc.8.0001,(row.type != 'VIRULENCE') && (row.class == '') && (row.subclass == ''),Other,Other

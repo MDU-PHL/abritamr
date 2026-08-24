@@ -1,3 +1,4 @@
+from datetime import datetime
 import pathlib
 import subprocess
 from abritamr.version import db
@@ -12,6 +13,11 @@ from abritamr.logger import log
 # log = logging.getLogger(__name__)
 # log.addHandler(handler)
 # log.setLevel(logging.DEBUG)
+
+def _get_date():
+
+    return datetime.today().strftime('%Y-%m-%d')
+
 
 def check_path(pth:str) -> bool:
     log.info(f"Checking path: {pth}")
@@ -46,7 +52,7 @@ def abritamr_scan_columns() -> list:
         'Element symbol',
         'abritamr_class', 
         'abritamr_subclass', 
-        # 'abritamr_AMR_reporting_status',
+        # 'abritamr_priority_status',
         # 'abritamr_AMR_type', 
         # 'criteria_id', 
         # 'criteria_version',
@@ -77,7 +83,7 @@ def abritamr_status_columns() -> list:
         'Element symbol',
         'abritamr_class', 
         'abritamr_subclass', 
-        'abritamr_AMR_reporting_status',
+        'abritamr_priority_status',
         'abritamr_AMR_type', 
         'species',
         'criteria_id', 

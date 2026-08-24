@@ -9,13 +9,9 @@ from abritamr.logger import log
 from abritamr.utils import get_refgenes
 from abritamr.criteria import get_abritamr_reporting,get_abritamr_defs
 from abritamr.cel_functions import contains_any,create_cel_context,evaluate_rule
-# from cel import evaluate
-import sys
+from abritamr.parse_gdstrules import get_cfg,get_rules,open_rules,_get_date
+from abritamr.utils import _get_date
 
-
-def _get_date():
-
-    return datetime.datetime.today().strftime('%Y-%m-%d')
 
 
 def _get_new_catalog() -> str:
@@ -138,21 +134,22 @@ def apply_classes(class_definitions: list, refgenes : list, src: str = 'abritamr
     # rename = _get_rename()
     rows = []
     for row in refgenes:
-        ctx = create_context(data = row, name = 'row')
+        ctx = create_cel_context(data = row, name = 'row')
         for c in class_definitions:
-            rs = evaluate_rule(c['definition'], ctx)
+            cl = asdict(c)
+            rs = evaluate_rule(cl['definition'], ctx)
             # rs = evaluate(c['definition'], ctx)
             if rs:
                 # print(c)
-                row['abritamr_class'] = c['abritamr_class'] if c['abritamr_class'] else _capitalise(row['abritamr_class'])
-                if f"{c['abritamr_subclass']}"  != "nan" and 'append' not in f"{c['abritamr_subclass']}":
-                    # log.info(f"criteria subclass is : {c['abritamr_subclass']}")
-                    row['abritamr_subclass'] = c['abritamr_subclass']
-                elif f"{c['abritamr_subclass']}"  != "nan"  and 'append' in f"{c['abritamr_subclass']}":
-                    row['abritamr_subclass'] = c['abritamr_subclass'].replace('append', row['subclass'].lower())
+                row['abritamr_class'] = cl['abritamr_class'] if cl['abritamr_class'] else _capitalise(row['abritamr_class'])
+                if f"{cl['abritamr_subclass']}"  != "nan" and 'append' not in f"{cl['abritamr_subclass']}":
+                    # log.info(f"criteria subclass is : {cl['abritamr_subclass']}")
+                    row['abritamr_subclass'] = cl['abritamr_subclass']
+                elif f"{cl['abritamr_subclass']}"  != "nan"  and 'append' in f"{cl['abritamr_subclass']}":
+                    row['abritamr_subclass'] = cl['abritamr_subclass'].replace('append', row['subclass'].lower())
                 else:
                     row['abritamr_subclass'] = _capitalise(row['subclass'])
-                row['abritamr_class_definition'] = c['class_curation_id']
+                row['abritamr_class_definition'] = cl['class_curation_id']
             
             # else:
         
@@ -163,28 +160,56 @@ def apply_classes(class_definitions: list, refgenes : list, src: str = 'abritamr
         rows.append(row)
     return rows
 
-def apply_amrtyping(amrtyping_definitions:list,refgenes:list, dflt_rs: str= 'not-reportable') -> list:
+
+def get_amrrules(output_dir:str) -> dict:
+    cfg = get_cfg()
+    species_list = cfg['species']
+    rules_dict = {}
+    for sp in species_list:
+        rule_file = get_rules(species = sp, output_dir = output_dir)
+        rules_dict[sp] = open_rules(pth = rule_file)
+
+    return rules_dict
+
+def apply_amrrule_genecontext(output_dir:str, rows:list, dflt_rs: str= '-', dflt_hg : str = 'high') -> list:
+
+    rules_dict = get_amrrules(output_dir = output_dir)
+    for row in rows:
+        if row['priority_status'] != dflt_hg:
+            ar = set()
+            for sp,rule in rules_dict.items():
+                for rl in rule:
+                    acc = rl['protein accession'] if rl['protein accession'] != '-' else ""
+                    if acc == row['abritamr_accession_key']:
+                        row['priority_status'] = rl['gene context'] if rl['gene context'] != '-' else dflt_rs
+                        ar.add(f"('{sp}' in row.species)")
+                        row['criteria_id'] = f"AMRrules{rl['ruleID']}"
+                        row['criteria_version'] = f"AMRrules-downloaded-{_get_date()}"
+            row['additional_status_criteria'] = " | ".join(ar)
+    return rows
+
+
+def apply_amrtyping(amrtyping_definitions:list,refgenes:list, dflt_rs: str= '-') -> list:
 
 
     rows = []
     for row in refgenes:
-        row['reportable_status'] = dflt_rs
+        row['priority_status'] = dflt_rs
         
-        ctx = create_context(data = row, name = 'row')
+        ctx = create_cel_context(data = row, name = 'row')
         for cr in amrtyping_definitions:
             crt = asdict(cr)
             
             rs = evaluate_rule(crt['criteria'], ctx)
             if rs:
                 
-                row['reportable_status'] = crt['status']
+                row['priority_status'] = crt['status']
                 row['amrtype'] = crt['amrtype']
                 row['criteria_id'] = crt['criteria_id']
                 row['criteria_version'] = crt['criteria_version']
                 row['additional_status_criteria'] = crt['additional_status_criteria'] if crt['additional_status_criteria'] else ""
-                row['additional_status_criteria'] = crt['additional_status_criteria'] if crt['additional_status_criteria'] else ""
                 row['additional_type_criteria'] = crt['additional_type_criteria'] if crt['additional_type_criteria'] else ""
-                row['additional_type_criteria'] = crt['additional_type_criteria'] if crt['additional_type_criteria'] else ""
+                
                 break
                 
             
@@ -193,7 +218,7 @@ def apply_amrtyping(amrtyping_definitions:list,refgenes:list, dflt_rs: str= 'not
     return rows
 
 
-def wrangle_catalog(catalog:str, previous_catalog:str, amrtyping_definitions:str, class_definitions:str, output:str, src:str = "abritamr") -> bool:
+def wrangle_catalog(catalog:str, previous_catalog:str, amrtyping_definitions:str, class_definitions:str, output_dir:str, src:str = "abritamr") -> bool:
 
     refgenes = construct_refgenes_starter(catalog = catalog, previous_catalog=previous_catalog, src = src)
    
@@ -205,7 +230,7 @@ def wrangle_catalog(catalog:str, previous_catalog:str, amrtyping_definitions:str
         log.warning(f"No amr typing rules found in {amrtyping_definitions}. No typing will be captured and amrtyping will not be able to be undertaken using this catalogue.")
 
     refgenes = apply_amrtyping(amrtyping_definitions = rcdict, refgenes= refgenes)
-
+    refgenes = apply_amrrule_genecontext(output_dir = output_dir, rows = refgenes)
     
     # pd.DataFrame(refgenes).to_csv(f"{output}", index = False)
     

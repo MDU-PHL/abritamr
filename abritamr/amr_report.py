@@ -64,31 +64,47 @@ def summary(
         raise SystemExit(1)
     repmechs = {'Sample_id':sid, 'Species provided': species[0] if species != [] else ""}
     reportable = results[
-        (results['abritamr_AMR_reporting_status'] == 'reportable') & 
+        (results['abritamr_priority_status'] == 'high') & 
         (results['% Identity to reference']>=minidentity) &
         (results['% Coverage of reference']>=mincoverage)]
     if genesonly:
         reportable = reportable[~reportable['Subtype'].str.contains('POINT')]
     reportable_amr_low=results[
-        (results['abritamr_AMR_reporting_status'] == 'reportable') & 
+        (results['abritamr_priority_status'] == 'high') & 
         (
             (results['% Identity to reference']<float(minidentity)) |
             (results['% Coverage of reference']<float(mincoverage))
         ) &
         (results['Type'] == 'AMR')]
-    nonreportable_amr = results[
+    acq_results = results[
+         (results['abritamr_priority_status'] == 'acquired') & 
         (~results['Element symbol'].isin(reportable['Element symbol'].unique().tolist())) & 
         (results['% Identity to reference']>=float(minidentity)) &
         (results['% Coverage of reference']>=float(mincoverage)) &
         (results['Type'] == 'AMR')]
+    
+    core_results = results[
+        (results['abritamr_priority_status'] == 'core') & 
+        (~results['Element symbol'].isin(reportable['Element symbol'].unique().tolist())) & 
+        (results['% Identity to reference']>=float(minidentity)) &
+        (results['% Coverage of reference']>=float(mincoverage)) &
+        (results['Type'] == 'AMR')]
+    nonreportable_amr=results[
+        (results['abritamr_priority_status'] == '-') & 
+        (results['Type'] == 'AMR') &
+        (~results['Element symbol'].isin(reportable['Element symbol'].unique().tolist())) &
+        (~results['Element symbol'].isin(acq_results['Element symbol'].unique().tolist()))
+        ]
     nonreportable_other=results[(results['Type'] != 'AMR')]
     amrtype = results["abritamr_AMR_type"].unique().tolist()
-    repmechs['Reportable AMR mechansims']=  ','.join(sorted(reportable['Element symbol'].unique().tolist()))
+    repmechs['Priority AMR mechansims']=  ','.join(sorted(reportable['Element symbol'].unique().tolist()))
+    repmechs['Other acquired AMR mechansims']=  ','.join(sorted(acq_results['Element symbol'].unique().tolist()))
+    repmechs['Other core AMR mechansims']=  ','.join(sorted(core_results['Element symbol'].unique().tolist()))
     if len(amrtype) == 1 and amrtype[0] == "":
         amrtype= ""
     else:
         amrtype = ";".join([a for a in amrtype if a])
-    cols = ['Sample_id','Reportable AMR mechansims', 'AMR type','Species provided', 'Non-reportable AMR mechanisms','Reportable AMR mechanisms (low coverage/identity)','Non-reportable other']
+    cols = ['Sample_id','Priority AMR mechansims', 'AMR type','Species provided', 'Other acquired AMR mechansims','Priority AMR mechanisms (low coverage/identity)','Other core AMR mechansims','Other AMR mechanisms','Other']
     # print(cols)
     # for df in [reportable, nonreportable_amr, nonreportable_other]:
     df = results[
@@ -96,9 +112,9 @@ def summary(
         (results['% Coverage of reference']>=mincoverage)]
     repmechs,cols = wrangle_cols(df, repmechs, cols, simple = simple)
         
-    repmechs['Non-reportable AMR mechanisms']=','.join(sorted(nonreportable_amr['Element symbol'].unique().tolist()))
-    repmechs['Reportable AMR mechanisms (low coverage/identity)'] = ','.join(sorted(reportable_amr_low['Element symbol'].unique().tolist()))
-    repmechs['Non-reportable other']=','.join(sorted(nonreportable_other['Element symbol'].unique().tolist()))
+    repmechs['Other AMR mechanisms']=','.join(sorted(nonreportable_amr['Element symbol'].unique().tolist()))
+    repmechs['Priority AMR mechanisms (low coverage/identity)'] = ','.join(sorted(reportable_amr_low['Element symbol'].unique().tolist()))
+    repmechs['Other']=','.join(sorted(nonreportable_other['Element symbol'].unique().tolist()))
     repmechs["Species provided"] = species
     repmechs["AMR type"] = amrtype
     
@@ -108,7 +124,7 @@ def summary(
     return report
 
 
-def infer_phenotype(amr:dict, species: str= "", genus:str="", default:str="Susceptible", sid:str="abritamr", output:str="abritamr_inferred_ast.csv") -> bool:
+def infer_phenotype(amr:dict,sid:str, species: str= "", genus:str="", default:str="Susceptible",  output:str="abritamr_inferred_ast.csv") -> bool:
     
     colorder = ["seq_id"]
     inferred = infer(amr = amr, species=species, default = default)
