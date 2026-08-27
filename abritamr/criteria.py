@@ -15,6 +15,7 @@ class InferRules:
     rule_version:str
     rule:str
     inferred:str
+    original_rule:str = None
     source:str = "not supplied"
     
 

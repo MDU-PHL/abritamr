@@ -1,3 +1,4 @@
+from abritamr.amr_infer import gdst
 import click
 import pathlib
 import json
@@ -15,6 +16,7 @@ from abritamr.logger import log
 from abritamr.parse_reportable import add_abritamr_results
 from abritamr.amr_report import summary
 from abritamr.amr_matrix import summary as matrix_summary
+from abritamr.amr_infer import gdst_results_to_df_long, gdst_results_to_df_wide
 
 def save_output(workdir:str,sample_id:str,result:pd.DataFrame, outname:str, _format:str="csv", no_keep:bool = False)-> bool:
     
@@ -125,6 +127,7 @@ def run(
         inputs = check_multi(pth=args.multi, workdir = pathlib.Path(args.workdir))
     linelists = []
     matrices = []
+    infers = []
     for i in inputs:
         amr = []
         dbv = "unknown"
@@ -167,6 +170,13 @@ def run(
             mincoverage = args.min_coverage,
             )
         linelists.append(linelist)
+        infers = gdst(
+            results =scanned, 
+            species = wrangle_species(i['species']),
+            reference_folder = args.reference_folder,
+            dflt_result = args.dflt_result
+            )
+        infers.extend(infers)
         # print(linelist.columns.tolist())
         save_output(workdir=f"{args.workdir}",sample_id=i['sample_id'],result = linelist, outname = "abritamr_linelist", _format=args.format, no_keep = False)
         matrix = matrix_summary(

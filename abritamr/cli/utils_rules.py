@@ -19,9 +19,14 @@ def rules_args(subparsers):
         help="Path to reference gene catalogue to use. If none supplied the version compatible with your version of abritamr will be downloaded."
     )
     parser_sub_rules.add_argument(
-        "--amrrules",
+            "--inference-definitions",
+            default=f"{pathlib.Path(__file__).parent.parent / 'configs' / 'abritamr_inference.csv'}",
+            help="Path to criteria for AMR AST inference. This file may contain rules for multiple species (please see documentation for the correct format)."
+    )
+    parser_sub_rules.add_argument(
+        "--no-amrrules",
         action='store_true',
-        help = "Set to if you would like to generate rules from AMR rules (https://github.com/AMRverse/AMRrules)"
+        help = "Set to if you DO NOT want to generate rules from AMR rules (https://github.com/AMRverse/AMRrules)"
     )
     parser_sub_rules.add_argument(
         "--species",
@@ -36,5 +41,9 @@ def rules_args(subparsers):
         help="Minimum evidence grade to include.",
         default = "very low"
     )
-
+    parser_sub_rules.add_argument(
+            "--output-dir",
+            default=f"{pathlib.Path.cwd() / 'abritamr_db'}",
+            help="Path to save the abritamr configuration files."
+        )
     return parser_sub_rules

@@ -7,6 +7,7 @@ import sys
 import logging 
 import json
 from abritamr.logger import log
+from abritamr.run_sourmash import run_sourmash_search
 # logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
 # handler = logging.StreamHandler(sys.stderr)
 
@@ -52,6 +53,7 @@ def abritamr_scan_columns() -> list:
         'Element symbol',
         'abritamr_class', 
         'abritamr_subclass', 
+        'abritamr_mechanism',
         # 'abritamr_priority_status',
         # 'abritamr_AMR_type', 
         # 'criteria_id', 
@@ -74,7 +76,8 @@ def abritamr_scan_columns() -> list:
         'Closest reference name', 
         'HMM accession', 
         'HMM description',
-        'amrfinder_accession_field'
+        'abritamr_accession_key',
+        'amrrules_mutation'
         ]
 
 def abritamr_status_columns() -> list:
@@ -83,6 +86,7 @@ def abritamr_status_columns() -> list:
         'Element symbol',
         'abritamr_class', 
         'abritamr_subclass', 
+        'abritamr_mechanism',
         'abritamr_priority_status',
         'abritamr_AMR_type', 
         'species',
@@ -105,6 +109,8 @@ def abritamr_status_columns() -> list:
         'Closest reference name', 
         'HMM accession', 
         'HMM description',
+        'abritamr_accession_key',
+        'amrrules_mutation'
         ]
 
 def check_sourmash() -> bool:
@@ -152,21 +158,42 @@ def check_assembly(pth) -> bool:
         #     log.critical(f"Something has gone wrong with any2fasta checking your assembly. The following error was reported: {e}")
         #     raise SystemExit(1)
 
-def wrangle_species(organism:str) -> tuple:
+def guess_species(asm:str, sid:str="abritamr") -> str:
+    """
+    Guess the species of a given assembly using sourmash.
+
+    Parameters
+    ----------
+    asm : str
+        Path to the assembly file (e.g., FASTA or FASTQ).
+    sid : str, optional
+        Sample ID for the query signature. Default is "abritamr".
+
+    Returns
+    -------
+    str
+        The guessed species name.
+    """
+    sp = run_sourmash_search(query_filename = asm, SBT_filename = f"{pathlib.Path(__file__).parent / 'species_db' / 'abritamrdb.sbt.zip'}", sid = sid)
+    return sp
+
+def wrangle_species(organism:str, asm:str, sid:str="abritamr", check_species:bool = True) -> tuple:
 
     try:
-        with open(f"{pathlib.Path(__file__).parent / 'configs' / 'species_config.json'}") as j:
+        with open(f"{pathlib.Path(__file__).parent / 'configs' / 'amrfinder_species.json'}") as j:
             SPCFG = json.load(j)
 
     except Exception as e:
         log.critical(f"Something has gone very wrong : {e}.")
         raise SystemExit
 
-    if not organism:
-        log.info("No species specific criteria will be applied")
-        return ""
+    if not organism and check_species:
+        log.info("No species supplied - will use sourmash to try to guess the best match for AMR classification.")
 
-    else:
+        organism = guess_species(asm, sid=sid)
+
+
+    if organism != "":
         og = '_'.join(organism.split())
         if og in SPCFG:
             return og

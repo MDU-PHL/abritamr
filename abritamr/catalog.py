@@ -1,8 +1,11 @@
+import re
+
 import pandas as pd
 import pathlib
 import datetime
 import numpy
 import json
+import re
 import subprocess
 from dataclasses import asdict
 from abritamr.logger import log
@@ -161,6 +164,69 @@ def apply_classes(class_definitions: list, refgenes : list, src: str = 'abritamr
     return rows
 
 
+def mutant_nomenclature_converter() -> dict:
+    converter = {'G': 'Gly', 'A': 'Ala', 'S': 'Ser', 'P': 'Pro', 'T': 'Thr', 'C': 'Cys', 'V': 'Val', 'L': 'Leu', 'I': 'Ile', 
+                 'M': 'Met', 'N': 'Asn', 'Q': 'Gln', 'K': 'Lys', 'R': 'Arg', 'H': 'His', 'D': 'Asp', 'E': 'Glu', 'W': 'Trp', 
+                 'Y': 'Tyr', 'F': 'Phe'}
+    return converter
+
+def sub_aa_del(ref:str, pos:int, alt:str, xtr:str) -> str:
+    cvt = mutant_nomenclature_converter()
+    pos1 = f"{pos}"
+    pos2 = f"{pos+len(ref)-1}"
+    ref1= ref[0]
+    ref2 = ref[-1]
+    res = f"{ref1}{pos1}_{ref2}{pos2}{alt}{xtr}"
+    for c in cvt:
+        res= res.replace(c, cvt[c])
+        # alt = alt.replace(c, cvt[c])
+    # var = f"p.{ref}{pos}del{alt}{xtr}"
+    return f"p.{res}"
+
+def sub_aa_mutations(ref:str,pos:int, alt:str, xtr:str) -> str:
+    reqa = len(ref) == len(alt) # check if it is a deletion or mutli substitution
+    if 'del' in alt and reqa == False:
+        # alt = f"del{alt.replace('del','')}"
+        return sub_aa_del(ref = ref, pos = pos, alt = alt, xtr = xtr)
+        # ref = f"{ref[0]}"
+
+    cvt = mutant_nomenclature_converter()
+    if len(alt) > 1 and 'Ter' not in alt:
+        # ref = ""
+        pos = f"{pos}_{pos+len(alt)-1}"
+    
+    for c in cvt:
+        ref = ref.replace(c, cvt[c])
+        if 'Ter' not in alt:
+            alt = alt.replace(c, cvt[c])
+
+    var = f"p.{ref}{pos}{alt}{xtr},p.{pos}{alt}{xtr}"
+    return var
+
+def sub_nt_mutations(ref:str, pos:int, alt:str, promoter: bool = False) -> str:
+    var = f"c.{pos}{ref}>{alt}" if promoter else f"c.[{pos}{ref}>{alt}]"
+    return var
+
+def parse_snps_for_amrrules(refgenes:list) -> list:
+    rgx = re.compile(r'(\D+)(-?\d+)(\D+)(.*)')
+    for row in refgenes:
+        if "POINT" == row['subtype']:
+            # print(f"Parsing SNP for {row['allele']}")
+            try:
+                ref,pos,alt,xtr = rgx.match(row['allele'].split("_")[-1]).groups()
+                if "promoter" not in row["product_name"] and "ribosomal RNA" not in row["product_name"]:
+                    row['amrrules_mutation'] = sub_aa_mutations(ref = ref, pos = int(pos), alt = alt, xtr = xtr)
+                elif "promoter" in row["product_name"]:
+                    row['amrrules_mutation'] = sub_nt_mutations(ref = ref, pos = int(pos), alt = alt, promoter = True)
+                elif "ribosomal RNA" in row["product_name"]:
+                    row['amrrules_mutation'] = sub_nt_mutations(ref = ref, pos = int(pos), alt = alt, promoter = False)
+                else:
+                    row['amrrules_mutation'] = row['allele'].split("_")[-1]
+            except Exception as e:
+                log.warning(f"Could not parse SNP for {row['allele']}. The following error occured : {e}")
+                row['amrrules_mutation'] = row['allele'].split("_")[-1]
+    return refgenes
+
 def get_amrrules(output_dir:str) -> dict:
     cfg = get_cfg()
     species_list = cfg['species']
@@ -231,6 +297,7 @@ def wrangle_catalog(catalog:str, previous_catalog:str, amrtyping_definitions:str
 
     refgenes = apply_amrtyping(amrtyping_definitions = rcdict, refgenes= refgenes)
     refgenes = apply_amrrule_genecontext(output_dir = output_dir, rows = refgenes)
+    refgenes = parse_snps_for_amrrules(refgenes = refgenes)
     
     # pd.DataFrame(refgenes).to_csv(f"{output}", index = False)
     

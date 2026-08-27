@@ -124,7 +124,7 @@ def summary(
     return report
 
 
-def infer_phenotype(amr:dict,sid:str, species: str= "", genus:str="", default:str="Susceptible",  output:str="abritamr_inferred_ast.csv") -> bool:
+def infer_phenotype(amr:dict,sid:str, species: str= "", genus:str="", default:str="Susceptible",  output:str="") -> bool:
     
     colorder = ["seq_id"]
     inferred = infer(amr = amr, species=species, default = default)

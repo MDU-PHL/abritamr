@@ -1,7 +1,7 @@
 
 import pathlib, argparse, sys, os, logging,json
 
-from abritamr.commands import scan,linelist,amr_status,matrix,run,update_database,utils_catalog,utils_rules
+from abritamr.commands import scan,linelist,amr_status,matrix,run,update_database,utils_catalog,utils_rules,infer
 from abritamr.cli.run import run_args
 from abritamr.cli.scan import scan_args
 from abritamr.cli.amr_status import status_args
@@ -41,6 +41,12 @@ def run_linelist(args):
     # print(linelist)
     output_results(df = result, output = args.output, _format = args.format)
 
+def run_gdst(args):
+    log.info(f"Running gDST to collate single sample results into a gDST report.")
+    result = infer.abritamr_gdst(args)
+    # print(gdst)
+    output_results(df = result, output = args.output, _format = args.format)
+
 def run_complete(args):
     log.info(f"Running all amr modules. Please be patient this may take some time.")
 
@@ -77,6 +83,7 @@ def cli():
     parser_sub_run = run_args(subparsers = subparsers)
     parser_sub_scan = scan_args(subparsers = subparsers)
     parser_sub_status = status_args(subparsers = subparsers)
+    
     parser_sub_llist = llist_args(subparsers = subparsers)
     parser_sub_matrix = matrix_args(subparsers = subparsers)
     

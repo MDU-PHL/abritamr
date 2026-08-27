@@ -54,7 +54,18 @@ def run_args(subparsers):
         action='store_true',
         help = "Set to if you want to limit reportable to only be genes (excludes reporting of any SNPs)."
     )
-    
+    parser_sub_complete.add_argument(
+            '--dflt_result',
+            help = "Default result to report if no rules are matched. Default is 'Susceptible (default)'.",
+            default = "Susceptible (default)"
+    )
+    parser_sub_complete.add_argument(
+                '--reporttype',
+                '-rt',
+                help = "For gDST report, long will print out the drugs available for the species as rows, wide will print out the drugs available for the species as columns.",
+                choices=['long', 'wide'],
+                default = 'long'
+        )
     parser_sub_complete = detection_args(parser = parser_sub_complete)
     parser_sub_catalog = references(parser = parser_sub_complete)
     

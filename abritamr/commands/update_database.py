@@ -44,31 +44,30 @@ def update_rules(args) -> bool:
     
     if create_db_folder(args.output_dir):
         log.info(f"Database folder created at {args.output_dir}")
+        log.info(f"Generating rules for {args.species} with evidence grade {args.evidence_grade}")
+        
+        rules_dict = {}
+        if not args.no_amrrules:
+            # try:
+            rules_dict = get_amrrules_for_species(
+                evidence_grade = args.evidence_grade,
+                species = args.species,
+                rules_dict = rules_dict,
+                output_dir = args.output_dir)
+            # except Exception as e:
+            #     log.critical(f"Looks like something has gone wrong with generating the AMR rules. The following error was reported : {e}. Please try again.")
+            #     raise SystemExit(1)
 
-        try:
-            rules_dict = {}
-            if not args.no_amrrules:
-                
-                rules_dict = get_amrrules_for_species(
-                    evidence_grade = args.evidence_grade,
-                    species = args.species,
-                    rules_dict = rules_dict,
-                    output_dir = args.output_dir)
+        rules_dict = add_rules_to_existing(
+            rules = rules_dict,
+            additional_rules = args.inference_definitions
+        )
+        for sp in rules_dict:
+            fn = sp.replace(" ", "_")
+            pd.DataFrame(rules_dict[sp]).to_csv(f"{args.output_dir}/02_abritamr_{fn}_rules.csv", index = False)
+            log.info(f"Rules for {sp} have been created: {args.output_dir}/02_abritamr_{fn}_rules.csv")
 
-            rules_dict = add_rules_to_existing(
-                rules = rules_dict,
-                additional_rules = args.inference_definitions
-            )
-            for sp in rules_dict:
-                fn = sp.replace(" ", "_")
-                pd.DataFrame(rules_dict[sp]).to_csv(f"{args.output_dir}/02_abritamr_{fn}_rules.csv", index = False)
-                log.info(f"Rules for {sp} have been created: {args.output_dir}/02_abritamr_{fn}_rules.csv")
-
-            
-        except Exception as e:
-            log.critical(f"Looks like something has gone wrong with generating the rules. The following error was reported : {e}. Please try again.")
-            raise SystemExit(1) 
-
+        
 
 def generate_database(args) -> bool:
     update_catalog(args = args)

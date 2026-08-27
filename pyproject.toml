@@ -30,7 +30,9 @@ classifiers = [
 dependencies = [
     "pandas",
     "xlsxwriter",
-    "pycel"
+    "pycel",
+    "sourmash",
+    "screed"
 ]
 
 [project.scripts]
