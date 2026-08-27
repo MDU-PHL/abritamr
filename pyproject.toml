@@ -47,5 +47,12 @@ path = "abritamr/version.py"
 [tool.hatch.build.targets.sdist]
 include = [
     "/abritamr",
-    "/abritamr/*"
+    "/abritamr/*",
+    "/abritamr/cli/*",
+    "/abritamr/commands/*",
+    "/abritamr/configs/*.csv",
+    "/abritamr/configs/*.json",
+    "/abritamr/db/*.csv",
+    "/abritamr/species_db/*.sbt.zip"
+
 ]

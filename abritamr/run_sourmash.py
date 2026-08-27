@@ -75,13 +75,13 @@ def run_sourmash_search(query_filename:str, SBT_filename:str, sid:str):
     # # Perform the search
     results = tree.search(query_sig, threshold=0.1)
 
-    for similarity, found_sig, filename in tree.search(query_sig, threshold=0.01):
+    for similarity, found_sig, filename in tree.search(query_sig, threshold=0.0):
         qname = query_sig
         sp = f"{found_sig}"
         sim = similarity*1000
         print(f"Query: {qname}, Found: {' '.join(sp.split('_'))}, Similarity: {sim}")
 
-    return sp
+    return ' '.join(sp.split('_'))
     # return results
 
 
