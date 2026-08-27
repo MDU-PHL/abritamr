@@ -5,7 +5,7 @@ import logging
 import pandas as pd
 import sys
 
-from abritamr.utils import output_results, check_assembly, check_amrfinder, check_any2fasta, wrangle_species, output_results, check_path, abritamr_scan_columns
+from abritamr.utils import output_results, check_assembly, check_amrfinder, check_any2fasta,guess_species, wrangle_species, output_results, check_path, abritamr_scan_columns
 from abritamr.run_finder import run_amrf
 from abritamr.parse_finder import amrf2dict
 # from abritamr.parse_reportable import add_abritamr_results
@@ -28,37 +28,36 @@ def scan(
     dbv = "unknown"
     if args.assembly:
         log.info("Assembly(ies) have been supplied.")
-        organism = wrangle_species(organism = args.species)
+        
         for asm in args.assembly:  
             
             log.info(f"Will now try to run amrfinderplus on supplied assembly {asm}")
             if check_path(pth = f"{asm}") and check_assembly(f"{asm}"):
+                species = args.species if args.species else guess_species(asm = asm, sid = args.sample_id if args.sample_id else "abritamr")
                 dbv = check_amrfinder()
-
+    
                 full_path = f"{pathlib.Path(f'{asm}').absolute()}"
                 sample_id = args.sample_id if args.sample_id else full_path
                 log.info(f"Running amrfinder plus")
                 res = run_amrf(
                     min_identity = args.min_identity, 
-                    min_coverage = args.min_identity, 
+                    min_coverage = args.min_coverage,
                     asm=asm,
                     threads=args.threads, 
-                    organism=organism
+                    organism=species
                     )
-                
-            # amr.extend(res)
-                res = generate_output(species = args.species, sample_id = sample_id, amr = res, catalog =  args.reference_catalog)
-                
-                # print(res)
+                res = generate_output(species = species, sample_id = sample_id, amr = res, catalog =  args.reference_catalog)
                 amr.extend(res)
     if args.amrfinderplus:
         for afp in args.amrfinderplus:
             sample_id = args.sample_id if args.sample_id else full_path
-            full_path = f"{pathlib.Path(f'{args.afp}').absolute()}"
+            species = args.species if args.species else ""
+            # organism = wrangle_species(organism = species, sid = args.sample_id if args.sample_id else "abritamr")
+            full_path = f"{pathlib.Path(f'{afp}').absolute()}"
             log.info(f"Opening existing amrfinder plus output")
 
-            res = amrf2dict(amrfinder = args.amrfinder)
-            res = generate_output(species = args.species, sample_id = sample_id, amr = res, catalog = args.reference_catalog )
+            res = amrf2dict(amrfinder = afp)
+            res = generate_output(species = species, sample_id = sample_id, amr = res, catalog = args.reference_catalog )
             amr.extend(res)
         
     abritamr_columns = abritamr_scan_columns()

@@ -1,7 +1,6 @@
 import subprocess
 import pandas as pd
-from abritamr.utils import check_amrfinder, check_any2fasta, check_assembly
-
+from abritamr.utils import check_amrfinder, check_any2fasta, check_assembly,  wrangle_species
 import logging
 from abritamr.logger import log
 
@@ -15,7 +14,8 @@ from abritamr.logger import log
 def generate_cmd(min_identity:float, min_coverage:float, asm:str,threads:int, organism:str) -> str:
     spc = ""
     if organism != "":
-        spc= f"-O {organism}"
+        spc = wrangle_species(organism = organism, asm = asm, sid = "abritamr")
+        spc= f"-O {spc}"
     
     cmd = f"amrfinder -n {asm} --plus --ident_min {min_identity} --coverage_min {min_coverage} --threads {threads} {spc}"
 

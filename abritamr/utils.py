@@ -177,7 +177,7 @@ def guess_species(asm:str, sid:str="abritamr") -> str:
     sp = run_sourmash_search(query_filename = asm, SBT_filename = f"{pathlib.Path(__file__).parent / 'species_db' / 'abritamrdb.sbt.zip'}", sid = sid)
     return sp
 
-def wrangle_species(organism:str, asm:str, sid:str="abritamr", check_species:bool = True) -> tuple:
+def wrangle_species(organism:str, asm:str="", sid:str="abritamr", check_species:bool = True) -> tuple:
 
     try:
         with open(f"{pathlib.Path(__file__).parent / 'configs' / 'amrfinder_species.json'}") as j:
@@ -187,7 +187,7 @@ def wrangle_species(organism:str, asm:str, sid:str="abritamr", check_species:boo
         log.critical(f"Something has gone very wrong : {e}.")
         raise SystemExit
 
-    if not organism and check_species:
+    if not organism and check_species and asm != "":
         log.info("No species supplied - will use sourmash to try to guess the best match for AMR classification.")
 
         organism = guess_species(asm, sid=sid)

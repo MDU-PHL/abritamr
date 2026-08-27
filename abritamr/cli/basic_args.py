@@ -42,7 +42,7 @@ def inputs(parser):
     parser.add_argument(
         '--species',
         '-sp',
-        help = "Species from which assemblies were derived. Must be supplied for SNP detection and inferrence.",
+        help = "Species from which assemblies were derived. If not supplied, will be guessed using sourmash and used for SNP detection and inference.",
        
     )
     parser.add_argument(

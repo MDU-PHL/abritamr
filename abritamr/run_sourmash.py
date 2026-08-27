@@ -1,11 +1,9 @@
-import subprocess
-# from abritamr.logger import log
-# from abritamr.utils import check_sourmash
 
 
 import sourmash
+import pathlib
 import screed
-
+import pandas as pd
 
 def load_sourmash_index(SBT_filename:str):
     """
@@ -85,3 +83,22 @@ def run_sourmash_search(query_filename:str, SBT_filename:str, sid:str):
 
     return sp
     # return results
+
+
+df = pd.read_csv("contigs.tab", header = None, names = ["ID","asm"], sep = "\t")
+
+res = []
+for row in df.iterrows():
+    asm = row[1]['asm']
+    sid = row[1]['ID']
+    sp = run_sourmash_search(query_filename = asm, SBT_filename = f"{pathlib.Path(__file__).parent / 'species_db' / 'abritamrdb.sbt.zip'}", sid = sid)
+    res.append({"ISOLATE": sid, "species": sp})
+
+
+rslt = pd.DataFrame(res)
+
+comp = pd.read_csv("mdu.data.txt", sep = "\t")
+
+tab = pd.merge(comp, rslt, how = "left", left_on = "ISOLATE", right_on = "ISOLATE")
+
+tab.to_csv("mdu.data.sourmash.txt", sep = "\t", index = False)

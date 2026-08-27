@@ -6,7 +6,7 @@ import logging
 import pandas as pd
 import sys
 
-from abritamr.utils import output_results, check_assembly, check_amrfinder, check_any2fasta, wrangle_species, output_results, check_path,abritamr_scan_columns,abritamr_status_columns
+from abritamr.utils import output_results, check_assembly, check_amrfinder, check_any2fasta, guess_species, wrangle_species, output_results, check_path,abritamr_scan_columns,abritamr_status_columns
 from abritamr.run_finder import run_amrf
 from abritamr.parse_finder import amrf2dict
 # from abritamr.parse_reportable import add_abritamr_results
@@ -82,9 +82,12 @@ def check_multi(pth: str, workdir:pathlib.Path) -> bool:
                             d[ip] = row[1][f"{ip}"]
                 
                 
-                # print(sids)
-                orgs = wrangle_species(row[1]['species'])
-                d['species'] = orgs
+                if row[1]['species'] != "":
+                    guess = guess_species(asm = row[1]['assembly'], sid = row[1]['sample_id']) if row[1]['assembly'] != "" else ""
+                else:
+                    guess = row[1]['species']
+                
+                d['species'] = guess
                 
                 lines.append(d)
                 
@@ -131,13 +134,13 @@ def run(
     for i in inputs:
         amr = []
         dbv = "unknown"
-        print(i)
+        # print(i)
         if 'assembly' in i and i['assembly'] != "":
             if check_path(pth = f"{i['assembly']}") and check_assembly(f"{i['assembly']}"):
                 dbv = check_amrfinder()
                 res = run_amrf(
                     min_identity = args.min_identity, 
-                    min_coverage = args.min_identity, 
+                    min_coverage = args.min_coverage,
                     asm=i['assembly'],
                     threads=args.threads, 
                     organism=i['species']
