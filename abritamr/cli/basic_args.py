@@ -71,6 +71,12 @@ def detection_args(parser):
 def basic_output(parser):
 
     parser.add_argument(
+        '--workdir',
+        '-w',
+        help = "Working directory for output files.",
+        default = f"{pathlib.Path.cwd()}"
+    )
+    parser.add_argument(
         '--output',
         '-o',
         help = "Filename to save output - default stdout.",

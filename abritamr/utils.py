@@ -202,7 +202,7 @@ def wrangle_species(organism:str, asm:str="", sid:str="abritamr", check_species:
         else:
             return ""
 
-def output_results(df:pd.DataFrame, output:str= "",_format:str="csv") -> bool:
+def output_results(df:pd.DataFrame, output:str= "",_format:str="csv", workdir:str=f"{pathlib.Path.cwd()}") -> bool:
 
 
     dlm = "," if _format == 'csv' else '\t'
@@ -211,5 +211,6 @@ def output_results(df:pd.DataFrame, output:str= "",_format:str="csv") -> bool:
     if not output:
         df.to_csv(sys.stdout, sep = dlm,index = False)
     else:
-        df.to_csv(f"{output}.{suf}", sep = dlm, index = False)
+        p = pathlib.Path(workdir / f"{output}.{suf}")
+        df.to_csv(p, sep = dlm, index = False)
         

@@ -56,10 +56,7 @@ def abritamr_gdst(
                 log.critical(f"Reporttype {args.reporttype} is not recognized. Please use 'long' or 'wide'.")
                 raise SystemExit(1)
 
-        if args.output:
-            linelist.to_csv(args.output, index = False)
-        else:
-            print(linelist.to_csv(index = False))
+        
 
         return linelist
     else:

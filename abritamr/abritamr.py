@@ -21,32 +21,32 @@ abritamr is designed to implement AMRFinder and parse the results for reporting 
 def run_scan(args):
     log.info(f"Running scan to identify genes and and drugclasses")
     amr = scan.scan(args)
-    output_results(df = amr, output = args.output, _format = args.format)
+    output_results(df = amr, output = args.output, _format = args.format, workdir = args.workdir)
 
 
 def run_status(args):
     
     log.info(f"Determining the amr status of the sequence based on genes and drug classes.")
     amr = amr_status.amr_status(args)
-    output_results(df = amr, output = args.output, _format = args.format)
+    output_results(df = amr, output = args.output,  _format = args.format)
 
 def run_matrix(args):
     log.info(f"Running matrix to collate single sample results into a matrix.")
     result = matrix.matrix(args)
     # # print(linelist)
-    output_results(df = result, output = args.output, _format = args.format)
+    output_results(df = result, output = args.output, _format = args.format, workdir = args.workdir)
 
 def run_linelist(args):
     log.info(f"Running linelist to collate single sample results into a linelist for reporting.")
     result = linelist.linelist(args)
     # # print(linelist)
-    output_results(df = result, output = args.output, _format = args.format)
+    output_results(df = result, output = args.output, _format = args.format, workdir = args.workdir)
 
 def run_gdst(args):
     log.info(f"Running gDST to collate single sample results into a gDST report.")
     result = infer.abritamr_gdst(args)
     # # print(gdst)
-    output_results(df = result, output = args.output, _format = args.format)
+    output_results(df = result, output = args.output, _format = args.format, workdir = args.workdir)
 
 def run_complete(args):
     log.info(f"Running all amr modules. Please be patient this may take some time.")
