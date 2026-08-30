@@ -115,7 +115,7 @@ def run(
         raise SystemExit(1)
     if not args.multi:
         if not args.sample_id: 
-            log.critical(f"You must supply a sample_id column. Please check your inputs and try again.")
+            log.critical(f"You must supply a sample_id. Please add --sample_id to your command and try again.")
             raise SystemExit(1)
         species = guess_species(asm = args.contigs[0], sid = args.sample_id) if args.contigs else ""
         inputs = [
