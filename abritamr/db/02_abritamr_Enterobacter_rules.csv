@@ -1,0 +1,3 @@
+drugname,species,rule_id,rule_version,rule,original_rule,inferred,source
+Fosfomycin,Enterobacter,AMRrules-ECC010,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_038415208.1'))",fosA,Unknown (wildtype),AMRrules (PMID: 28851843)
+Fosfomycin,Enterobacter,AMRrules-ECC020,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_038415208.1'))",fosA,Unknown (wildtype),AMRrules (PMID: 28851843)

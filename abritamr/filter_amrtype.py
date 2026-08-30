@@ -2,7 +2,7 @@ from abritamr.criteria import get_abritamr_configs
 from dataclasses import dataclass, asdict
 from cel import evaluate
 
-# print(criterias)
+# # print(criterias)
 
 
 def filter_string(crt:dict, dlm:str = " && ")-> str:
@@ -35,7 +35,7 @@ def construct_filter(result:dict, cfgpath:str=""):
     listofamrtypes = get_abritamr_configs(cfgtype = "amr_type", cfgpath = cfgpath)
     for criteria in listofamrtypes:
        
-        # print(criteria)
+        # # print(criteria)
         crt = extract_amrtype(criteria = criteria)
         amrtp = {k: str(v) for k, v in asdict(criteria).items() if k == "amrtype"}
         primary_filter = filter_string(crt)

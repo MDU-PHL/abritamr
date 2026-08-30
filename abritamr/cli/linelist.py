@@ -19,7 +19,7 @@ def llist_args(subparsers):
     parser_sub_llist.add_argument(
         '--viewtype',
         '-vt',
-        help = "For line list, full will print out all drug classes available in the reference set, compact will only print out hat is detected.",
+        help = "For line list, full will # print out all drug classes available in the reference set, compact will only # print out hat is detected.",
         choices=['full', 'compact'],
         default = 'compact'
     )

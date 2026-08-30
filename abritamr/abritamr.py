@@ -7,6 +7,7 @@ from abritamr.cli.scan import scan_args
 from abritamr.cli.amr_status import status_args
 from abritamr.cli.linelist import llist_args
 from abritamr.cli.matrix import matrix_args
+from abritamr.cli.infer import infer_args
 from abritamr.cli.utils_database import database_args
 from abritamr.cli.utils_rules import  rules_args
 from abritamr.cli.utils_catalog import catalog_args
@@ -32,25 +33,25 @@ def run_status(args):
 def run_matrix(args):
     log.info(f"Running matrix to collate single sample results into a matrix.")
     result = matrix.matrix(args)
-    # print(linelist)
+    # # print(linelist)
     output_results(df = result, output = args.output, _format = args.format)
 
 def run_linelist(args):
     log.info(f"Running linelist to collate single sample results into a linelist for reporting.")
     result = linelist.linelist(args)
-    # print(linelist)
+    # # print(linelist)
     output_results(df = result, output = args.output, _format = args.format)
 
 def run_gdst(args):
     log.info(f"Running gDST to collate single sample results into a gDST report.")
     result = infer.abritamr_gdst(args)
-    # print(gdst)
+    # # print(gdst)
     output_results(df = result, output = args.output, _format = args.format)
 
 def run_complete(args):
     log.info(f"Running all amr modules. Please be patient this may take some time.")
 
-    result = run.complete(args)
+    result = run.run(args)
 
 def _update_databases(args):
     log.info(f"Will generate an abritamr compatible reference gene catalog.")
@@ -83,7 +84,7 @@ def cli():
     parser_sub_run = run_args(subparsers = subparsers)
     parser_sub_scan = scan_args(subparsers = subparsers)
     parser_sub_status = status_args(subparsers = subparsers)
-    
+    parser_sub_infer = infer_args(subparsers = subparsers)
     parser_sub_llist = llist_args(subparsers = subparsers)
     parser_sub_matrix = matrix_args(subparsers = subparsers)
     
@@ -101,6 +102,7 @@ def cli():
     parser_sub_scan.set_defaults(func=run_scan)
     parser_sub_status.set_defaults(func = run_status)
     parser_sub_llist.set_defaults(func = run_linelist)
+    parser_sub_infer.set_defaults(func = run_gdst)
     parser_sub_matrix.set_defaults(func = run_matrix)
     parser_sub_utils_database.set_defaults(func = _update_databases)
     parser_sub_utils_rules.set_defaults(func = _update_rules)
@@ -110,9 +112,9 @@ def cli():
     if len(sys.argv) < 2:
         parser.print_help(sys.stderr)
     # elif len(sys.argv) <= 2:
-    #     parser_sub_scan.print_help(sys.stderr)
-    # elif len(sys.argv) <= 2 and sys.argv[1] == 'report':
-    #     parser_mdu.print_help(sys.stderr)
+    #     parser_sub_scan.# print_help(sys.stderr)
+    elif len(sys.argv) <= 2 and sys.argv[1] == 'utils':
+        parser_sub_utils.print_help(sys.stderr)
     else:
         args.func(args)
 	

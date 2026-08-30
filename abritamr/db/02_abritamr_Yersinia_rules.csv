@@ -1,0 +1,37 @@
+drugname,species,rule_id,rule_version,rule,original_rule,inferred,source
+Streptomycin,Yersinia,AMRrules-YER0001,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_000480972.1'))",aph(6)-Id,Resistant (nonwildtype),AMRrules (PMID: 28830739)
+Streptomycin,Yersinia,AMRrules-YER0002,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_071846263.1'))",ant(3'')-Ia,Resistant (nonwildtype),AMRrules (PMID: 28830739)
+Amoxicillin,Yersinia,AMRrules-YER0004,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_001007673.1'))",blaOXA-2,Resistant (nonwildtype),AMRrules
+Amoxicillin,Yersinia,AMRrules-YER0005,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAR25033.1'))",blaTEM-1,Resistant (nonwildtype),AMRrules (PMID: 28830739)
+Ticarcillin,Yersinia,AMRrules-YER0006,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAR25033.1'))",blaTEM-1,Resistant (nonwildtype),AMRrules (PMID: 28830739)
+Trimethoprim,Yersinia,AMRrules-YER0007,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_000777554.1'))",dfrA1,Resistant (nonwildtype),AMRrules (PMID: 28830739)
+Trimethoprim,Yersinia,AMRrules-YER0008,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_021529707.1'))",dfrA14,Resistant (nonwildtype),AMRrules (PMID: 28830739)
+Tetracycline,Yersinia,AMRrules-YER0011,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'CAD57192.1'))",tetA(A),Resistant (nonwildtype),AMRrules (PMID: 28830739)
+Tetracycline,Yersinia,AMRrules-YER0012,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAL75563.1'))",tetA(D),Resistant (nonwildtype),AMRrules (PMID: 28830739)
+Chloramphenicol,Yersinia,AMRrules-YER0013,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_011751353.1'))",catA2,Resistant (nonwildtype),AMRrules (PMID: 28830739)
+Nalidixic acid,Yersinia,AMRrules-YER0014,AMRrules-downloaded-2026-08-28,"(contains_any(row.amrrules_mutation, 'p.Gly81Cys') &&   contains_any(row.abritamr_accession_key,'WP_013650157.1'))",gyrA,Resistant (nonwildtype),AMRrules (PMID: 15117921)
+Nalidixic acid,Yersinia,AMRrules-YER0015,AMRrules-downloaded-2026-08-28,"(contains_any(row.amrrules_mutation, 'p.Asp82Ser83Gly') &&   contains_any(row.abritamr_accession_key,'WP_013650157.1'))",gyrA,Resistant (nonwildtype),AMRrules
+Nalidixic acid,Yersinia,AMRrules-YER0016,AMRrules-downloaded-2026-08-28,"(contains_any(row.amrrules_mutation, 'p.Ser83Ile') &&   contains_any(row.abritamr_accession_key,'WP_013650157.1'))",gyrA,Resistant (nonwildtype),AMRrules (PMID: 15117921)
+Nalidixic acid,Yersinia,AMRrules-YER0017,AMRrules-downloaded-2026-08-28,"(contains_any(row.amrrules_mutation, 'p.Ser83Arg') &&   contains_any(row.abritamr_accession_key,'WP_013650157.1'))",gyrA,Resistant (nonwildtype),AMRrules (PMID: 15117921)
+Nalidixic acid,Yersinia,AMRrules-YER0018,AMRrules-downloaded-2026-08-28,"(contains_any(row.amrrules_mutation, 'p.Ser83Cys') &&   contains_any(row.abritamr_accession_key,'WP_013650157.1'))",gyrA,Resistant (nonwildtype),AMRrules (PMID: 15117921)
+Nalidixic acid,Yersinia,AMRrules-YER0019,AMRrules-downloaded-2026-08-28,"(contains_any(row.amrrules_mutation, 'p.Val85Ile') &&   contains_any(row.abritamr_accession_key,'WP_013650157.1'))",gyrA,Resistant (nonwildtype),AMRrules (PMID: 15117921)
+Nalidixic acid,Yersinia,AMRrules-YER0020,AMRrules-downloaded-2026-08-28,"(contains_any(row.amrrules_mutation, 'p.Asp87Gly') &&   contains_any(row.abritamr_accession_key,'WP_013650157.1'))",gyrA,Resistant (nonwildtype),AMRrules (PMID: 15117921)
+Nalidixic acid,Yersinia,AMRrules-YER0021,AMRrules-downloaded-2026-08-28,"(contains_any(row.amrrules_mutation, 'p.Asp87Asn') &&   contains_any(row.abritamr_accession_key,'WP_013650157.1'))",gyrA,Resistant (nonwildtype),AMRrules (PMID: 15117921)
+Nalidixic acid,Yersinia,AMRrules-YER0022,AMRrules-downloaded-2026-08-28,"(contains_any(row.amrrules_mutation, 'p.Asp87Tyr') &&   contains_any(row.abritamr_accession_key,'WP_013650157.1'))",gyrA,Resistant (nonwildtype),AMRrules (PMID: 12682183)
+Gentamicin,Yersinia,AMRrules-YER0023,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_001199192.1'))",aac(3)-IVa,Resistant (nonwildtype),AMRrules
+Tobramycin,Yersinia,AMRrules-YER0024,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_001199192.1'))",aac(3)-IVa,Resistant (nonwildtype),AMRrules
+Gentamicin,Yersinia,AMRrules-YER0025,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_000742814.1'))",aph(4)-Ia,Resistant (nonwildtype),AMRrules
+Tobramycin,Yersinia,AMRrules-YER0026,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_000742814.1'))",aph(4)-Ia,Resistant (nonwildtype),AMRrules
+Ertapenem,Yersinia,AMRrules-YER0027,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_015059991.1'))",blaOXA-48,Resistant (nonwildtype),AMRrules
+Trimethoprim,Yersinia,AMRrules-YER0028,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_000777554.1'))",dfrA1,Resistant (nonwildtype),AMRrules
+Trimethoprim,Yersinia,AMRrules-YER0029,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_021529707.1'))",dfrA14,Resistant (nonwildtype),AMRrules
+Trimethoprim,Yersinia,AMRrules-YER0030,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_000442373.1'))",dfrB1,Resistant (nonwildtype),AMRrules
+Tetracycline,Yersinia,AMRrules-YER0033,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_000804064.1'))",tet(A),Resistant (nonwildtype),AMRrules
+Tetracycline,Yersinia,AMRrules-YER0034,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_012881330.1'))",tet(B),Resistant (nonwildtype),AMRrules
+Tetracycline,Yersinia,AMRrules-YER0035,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_001297013.1'))",tet(C),Resistant (nonwildtype),AMRrules
+Tetracycline,Yersinia,AMRrules-YER0036,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_006248867.1'))",tet(H),Resistant (nonwildtype),AMRrules
+Cefoxitin,Yersinia,AMRrules-YER0043,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'CBY26916.1'))",ampC,Resistant (wildtype),AMRrules (PMID: 20547799)
+Amoxicillin,Yersinia,AMRrules-YER0044,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_000027060.1'))",blaTEM-181,Resistant (nonwildtype),AMRrules
+Nalidixic acid,Yersinia,AMRrules-YER0048,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_012954666.1'))",qnrB19,Resistant (nonwildtype),AMRrules
+Kanamycin a,Yersinia,AMRrules-YER0049,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'CAA23892.1'))",aph(3')-IIa,Resistant (nonwildtype),AMRrules
+Streptogramin antibiotic,Yersinia,AMRrules-YER0050,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_005164767.1'))",vat(F),Resistant (wildtype),AMRrules (PMID: 38176093)

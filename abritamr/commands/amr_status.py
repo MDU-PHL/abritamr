@@ -28,7 +28,7 @@ def amr_status(
 
     try:
         amr = pd.read_csv(args.amr)
-        # print(amr)
+        # # print(amr)
         # amr = amr.to_dict(orient = "records")
         # log.info("Opened input file.")
     except:
@@ -38,9 +38,9 @@ def amr_status(
         amr = []
         for a in amrlist:
             amr.append(a.split(dlm))
-        # print(amr[0])
+        # # print(amr[0])
         amr = pd.DataFrame(amr[1:], columns=amr[0])
-    # print(amr)
+    # # print(amr)
         # amr = amr.to_dict(orient = "records")
     log.info(f"Will now determine status of the AMR genes detected.")
 
@@ -51,7 +51,7 @@ def amr_status(
 
         log.critical(f"It looks like your input file is not correctly configured. Please run abritamr scan to generate the appropriate inut file.")
         raise SystemExit(1)
-    # print(amr)
+    # # print(amr)
     abritamr_cols = abritamr_status_columns()
     amr = pd.DataFrame(amr)
     # amr['amrfinderplus_db_version'] = dbv

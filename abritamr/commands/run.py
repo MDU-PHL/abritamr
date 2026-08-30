@@ -1,4 +1,4 @@
-from abritamr.amr_infer import gdst
+
 import click
 import pathlib
 import json
@@ -16,7 +16,7 @@ from abritamr.logger import log
 from abritamr.parse_reportable import add_abritamr_results
 from abritamr.amr_report import summary
 from abritamr.amr_matrix import summary as matrix_summary
-from abritamr.amr_infer import gdst_results_to_df_long, gdst_results_to_df_wide
+from abritamr.amr_infer import gdst_results_to_df_long, gdst_results_to_df_wide,gdst
 
 def save_output(workdir:str,sample_id:str,result:pd.DataFrame, outname:str, _format:str="csv", no_keep:bool = False)-> bool:
     
@@ -100,7 +100,7 @@ def check_multi(pth: str, workdir:pathlib.Path) -> bool:
     else:
         log.critical(f"{workdir} is not a valid path. Please provide a valid working directory.")
         raise SystemExit(1)
-                # print(line)
+                # # print(line)
 
 
 
@@ -110,56 +110,63 @@ def run(
     
     simple = True if args.viewtype == 'compact' else False
     # dbv = "unknown"
-    if not args.assembly and not args.amrfinderplus and not args.multi:
+    if not args.contigs and not args.amrfinderplus and not args.multi:
         log.critical("You must supply an input file (input file with multiple samples OR as single assembly or single amrfinder plus output). Exiting.")
         raise SystemExit(1)
     if not args.multi:
         if not args.sample_id: 
             log.critical(f"You must supply a sample_id column. Please check your inputs and try again.")
             raise SystemExit(1)
+        species = guess_species(asm = args.contigs[0], sid = args.sample_id) if args.contigs else ""
         inputs = [
             {
             'sample_id' : args.sample_id,
-            'assembly' : args.assembly if args.assembly else "",
+            'assembly' : args.contigs if args.contigs else "",
             'amrfinder': args.amrfinderplus if args.amrfinderplus else "",
-            'species': args.species
+            'species': species
 
         }
         ]
     else:
         inputs = check_multi(pth=args.multi, workdir = pathlib.Path(args.workdir))
+    # # print(inputs)
     linelists = []
     matrices = []
     infers = []
     for i in inputs:
         amr = []
         dbv = "unknown"
-        # print(i)
+        # # print(i)
+        res = []
+        
         if 'assembly' in i and i['assembly'] != "":
-            if check_path(pth = f"{i['assembly']}") and check_assembly(f"{i['assembly']}"):
+            if check_path(pth = f"{i['assembly'][0]}") and check_assembly(f"{i['assembly'][0]}"):
                 dbv = check_amrfinder()
+                log.info(f"Running amrfinder plus on supplied assembly {i['assembly'][0]} with {args.threads} threads.")
                 res = run_amrf(
                     min_identity = args.min_identity, 
                     min_coverage = args.min_coverage,
-                    asm=i['assembly'],
+                    asm=i['assembly'][0],
                     threads=args.threads, 
                     organism=i['species']
                     )
 
         elif 'amrfinder' in i and i['amrfinder'] != "":
-            res = amrf2dict(amrfinder = args.amrfinder)           
+            res = amrf2dict(amrfinder = i['amrfinder'])
         for r in res:
             r['amrfinderplus_db_version'] = dbv
-
-        # res = generate_output(species =  amr = res )
+        # # print(i)
+        # res = generate_output(species = i['species'], amr = res )
         amr = apply_classes(amr = res, species =  i['species'], sid = i['sample_id'],catalog = args.reference_catalog)
-        # amr.extend(res)
-        
+    #     # amr.extend(res)
+        # # print(amr)
         scanned = pd.DataFrame(amr)
-        # scanned['amrfinderplus_db_version'] = dbv
+        # # print(scanned.columns.tolist())
+    #     # scanned['amrfinderplus_db_version'] = dbv
         scanned_cols = abritamr_scan_columns()
         save_output(workdir=f"{args.workdir}",sample_id=i['sample_id'],result = scanned[scanned_cols], outname = "abritamr_scan", _format=args.format, no_keep = args.no_keep)
         amr = add_abritamr_results(amr = amr,catalog = args.reference_catalog)
+        # # print(amr)
         typed = pd.DataFrame(amr)
         typed_cols = abritamr_status_columns()
         save_output(workdir=f"{args.workdir}",sample_id=i['sample_id'],result = typed[typed_cols], outname = "abritamr_typed", _format=args.format, no_keep = args.no_keep)
@@ -173,15 +180,21 @@ def run(
             mincoverage = args.min_coverage,
             )
         linelists.append(linelist)
-        infers = gdst(
+        save_output(workdir=f"{args.workdir}",sample_id=i['sample_id'],result = linelist, outname = "abritamr_linelist", _format=args.format, no_keep = False)
+        infer = gdst(
             results =scanned, 
-            species = wrangle_species(i['species']),
+            species = species,
             reference_folder = args.reference_folder,
             dflt_result = args.dflt_result
             )
-        infers.extend(infers)
-        # print(linelist.columns.tolist())
-        save_output(workdir=f"{args.workdir}",sample_id=i['sample_id'],result = linelist, outname = "abritamr_linelist", _format=args.format, no_keep = False)
+        if infer != []:
+            if args.reporttype == 'long':
+                gdstlinelist = gdst_results_to_df_long(infer)
+            elif args.reporttype == 'wide':
+                gdstlinelist = gdst_results_to_df_wide(infer)
+            infers.extend(gdstlinelist)
+        # # print(linelist.columns.tolist())
+            save_output(workdir=f"{args.workdir}",sample_id=i['sample_id'],result = gdstlinelist, outname = "abritamr_gdst", _format=args.format, no_keep = False)
         matrix = matrix_summary(
             results =typed, 
             facet =  args.facet,
@@ -190,11 +203,11 @@ def run(
             mincoverage = args.min_coverage,
             refgenes = args.reference_catalog
             )
-            # print(res)
+            # # print(res)
         matrices.append(matrix)
         save_output(workdir=f"{args.workdir}",sample_id=i['sample_id'],result = matrix, outname = "abritamr_matrix", _format=args.format, no_keep = False)
-        # print(amr)
-    # print(pd.concat(linelists, axis = 0, ignore_index=True))
+        # # print(amr)
+    # # print(pd.concat(linelists, axis = 0, ignore_index=True))
     log.info(f"Saving a single file for output of linelist.")
     save_output(workdir=f"{args.workdir}",sample_id="",result = pd.concat(linelists).reset_index(drop=True), outname = f"{args.prefix}_linelist", _format=args.format, no_keep = False)
     

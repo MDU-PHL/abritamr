@@ -1,0 +1,5 @@
+drugname,species,rule_id,rule_version,rule,original_rule,inferred,source
+Ciprofloxacin,Klebsiella oxytoca complex,AMRrules-KOX0007,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_002914189.1'))",oqxA,Susceptible (wildtype),AMRrules (PMID: 30834112)
+Ciprofloxacin,Klebsiella oxytoca complex,AMRrules-KOX0008,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_002914189.1'))",oqxA,Susceptible (wildtype),AMRrules (PMID: 30834112)
+Ciprofloxacin,Klebsiella oxytoca complex,AMRrules-KOX0009,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_002914189.1'))",oqxA,Susceptible (wildtype),AMRrules (PMID: 30834112)
+Ciprofloxacin,Klebsiella oxytoca complex,AMRrules-KOX0010,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_002914189.1'))",oqxA,Susceptible (wildtype),AMRrules (PMID: 30834112)

@@ -43,25 +43,26 @@ def find_classes(refgenes:pd.DataFrame,accession:str) -> str:
 
     return _class,_subclass
 
-def add_abritamr_results(amr:dict, species: str= "", sid : str = "", catalog:str = "") -> pd.DataFrame:
+def add_abritamr_results(amr:dict, sid : str = "", catalog:str = "") -> pd.DataFrame:
     log.info(f"Adding abritamr classes and determining gene status.")
+    # # print(amr)
     refgenes = get_refgenes(pth = catalog)
     for row in amr:
-        _class,_subclass = find_classes(refgenes = refgenes, accession = row['Closest reference accession'])
+        # _class,_subclass = find_classes(refgenes = refgenes, accession = row['Closest reference accession'])
 
         if row['sample_id'] == "":
             log.critcal(f"You must have a sample_id value.")
             raise SystemExit(1)
-        row['abritamr_class'] = _class
-        row['abritamr_subclass'] = _subclass
-        row['species']= species
+        # row['abritamr_class'] = _class
+        # row['abritamr_subclass'] = _subclass
+        # row['species']= species
         # row['sample_id'] = sid
-        row['gene'] = row['Element symbol']
+        row['gene'] = row['abritamr_mechanism']
         row = construct_filter( result = row , refgenes = refgenes)
         
         
         
-        # print(row)
+        # # print(row)
     return amr
 
 

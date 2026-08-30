@@ -130,7 +130,7 @@ def check_amrfinder()-> bool:
         log.critical(f"Something is wrong with your environment. amrfinderplus is required for abritamr to run. Please follow installation instructions and try again.")
     else:
         dbv = [i for i in vrsn.stdout.split('\n') if 'Database version' in i]
-        # print(dbv)
+        # # print(dbv)
         dbv = dbv[0].split(':')[-1].strip() if dbv != [] else ""
         if dbv == "":
             log.critical(f"It looks like the database version cannont be determined. There may be something wrong with your installation. Please check documentation and try again.")
@@ -146,7 +146,7 @@ def check_assembly(pth) -> bool:
     log.info(f"Checking assembly is in a correct format")
     if check_any2fasta():
         # try:
-            # print(f"any2fasta {pth}")
+            # # print(f"any2fasta {pth}")
             proc = subprocess.run(f"any2fasta {pth}", shell = True, capture_output = True, encoding = "utf-8")
             if proc.returncode == 0:
                 log.info(f"{pth} is a valid assembly file. Will no proceed with running amrfinder.")

@@ -59,7 +59,7 @@ def get_abritamr_reporting(cfgpath:str= "") -> list:
         raise RuntimeError(f"Error reading abritamr reporting rules: {e}")
 
     for criteria in reps.to_dict(orient="records"):
-        # print(criteria)
+        # # print(criteria)
         rep = Criteria(**criteria)
         abritamr_rep.append(rep)
 

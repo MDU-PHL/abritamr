@@ -4,7 +4,7 @@ from abritamr.cli.basic_args import inputs, references, detection_args
 
 
 def run_args(subparsers):
-    parser_sub_complete = subparsers.add_parser('complete', help='Run the complete suite of abritamr functions. This will create a folder for each sample and generate a linelist report and inferred antibiogram (if supported for your species).', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_sub_complete = subparsers.add_parser('run', help='Run the complete suite of abritamr functions. This will create a folder for each sample and generate a linelist report and inferred antibiogram (if supported for your species).', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_complete = inputs(parser = parser_sub_complete)
     parser_sub_complete.add_argument(
         '--prefix',
@@ -28,7 +28,7 @@ def run_args(subparsers):
     parser_sub_complete.add_argument(
         '--viewtype',
         '-vt',
-        help = "For line list, full will print out all drug classes available in the reference set, compact will only print out hat is detected.",
+        help = "For line list, full will # print out all drug classes available in the reference set, compact will only # print out hat is detected.",
         choices=['full', 'compact'],
         default = 'compact'
     )
@@ -62,7 +62,7 @@ def run_args(subparsers):
     parser_sub_complete.add_argument(
                 '--reporttype',
                 '-rt',
-                help = "For gDST report, long will print out the drugs available for the species as rows, wide will print out the drugs available for the species as columns.",
+                help = "For gDST report, long will # print out the drugs available for the species as rows, wide will # print out the drugs available for the species as columns.",
                 choices=['long', 'wide'],
                 default = 'long'
         )

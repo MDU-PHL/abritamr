@@ -25,9 +25,10 @@ def infer_args(subparsers):
     parser_sub_infer.add_argument(
             '--reporttype',
             '-rt',
-            help = "For gDST report, long will print out the drugs available for the species as rows, wide will print out the drugs available for the species as columns.",
+            help = "For gDST report, long will # print out the drugs available for the species as rows, wide will # print out the drugs available for the species as columns.",
             choices=['long', 'wide'],
             default = 'long'
     )
     parser_sub_infer = detection_args(parser = parser_sub_infer)
 
+    return parser_sub_infer

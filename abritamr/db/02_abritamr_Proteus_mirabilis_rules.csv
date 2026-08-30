@@ -1,0 +1,3 @@
+drugname,species,rule_id,rule_version,rule,original_rule,inferred,source
+Tetracycline,Proteus mirabilis,AMRrules-PRM0001,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_063856079.1'))",tet(J),Resistant (wildtype),AMRrules (PMID: 9838156)
+Chloramphenicol,Proteus mirabilis,AMRrules-PRM0002,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_063843208.1'))",catA,Susceptible (wildtype),AMRrules (PMID: 3900034)

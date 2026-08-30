@@ -24,7 +24,7 @@ def save_report(report: pd.DataFrame, outname:str= "", _format:str="csv") -> boo
 
 def wrangle_cols(repdf:pd.DataFrame, repmechs:dict, cols:list, simple:bool=True) -> tuple:
     cols_final = sorted(repdf['abritamr_subclass'].unique().tolist())
-    # print(cols_final)
+    # # print(cols_final)
     # cols_final = []
     if not simple:
         refs = get_refgenes()
@@ -105,7 +105,7 @@ def summary(
     else:
         amrtype = ";".join([a for a in amrtype if a])
     cols = ['Sample_id','Priority AMR mechansims', 'AMR type','Species provided', 'Other acquired AMR mechansims','Priority AMR mechanisms (low coverage/identity)','Other core AMR mechansims','Other AMR mechanisms','Other']
-    # print(cols)
+    # # print(cols)
     # for df in [reportable, nonreportable_amr, nonreportable_other]:
     df = results[
         (results['% Identity to reference']>=minidentity) &

@@ -25,7 +25,7 @@ def generate_cmd(min_identity:float, min_coverage:float, asm:str,threads:int, or
 def run_cmd(cmd:str) -> str:
     log.info(f"Running amrfinder: {cmd}")
     proc = subprocess.run(cmd, shell = True, capture_output = True, encoding = "utf-8")
-    # print(proc)
+    # # print(proc)
     if proc.returncode != 0:
         err = proc.stderr.split("\n")
         log.critical(f"The following error was reported:")

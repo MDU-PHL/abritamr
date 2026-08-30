@@ -5,12 +5,12 @@ def references(parser):
 
     parser.add_argument(
         "--reference-folder",
-        default = f"{pathlib.Path(__file__).parent.parent / 'configs' }",
+        default = f"{pathlib.Path(__file__).parent.parent / 'db' }",
         help = "Path to catalog for applying classes and amr types"
     )
     parser.add_argument(
         "--reference-catalog",
-        default = f"{pathlib.Path(__file__).parent.parent / 'configs' / 'abritamr_reference_catalog.csv'}",
+        default = f"{pathlib.Path(__file__).parent.parent / 'db' / '01_abritamr_reference_gene_catalog.csv'}",
         help = "Path to catalog for applying classes and amr types"
     )
 

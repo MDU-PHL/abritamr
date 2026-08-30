@@ -1,0 +1,47 @@
+site_name: abritamr
+site_url: https://mduphl.github.io/abritamr/
+
+nav:
+  - About: index.md
+  - Installation: installation.md
+  - Cookbook:
+      - How do I?: cookbook/how_to.md
+      - Troubleshooting: cookbook/faq.md
+  - Usage:
+      - Quick guide: usage/quickguide.md
+      - Inputs: usage/inputs.md
+      - Species detection: usage/species.md
+      - Outputs: usage/outputs.md
+  
+  
+#   - Contributing: contributing.md
+  - License: license.md
+theme:
+  name: material
+  logo: images/logo.svg
+  palette:
+      primary: blue grey
+  icon:
+      repo: fontawesome/brands/github-alt
+  
+features:
+    - content.code.copy
+    - content.code.select
+
+repo_url: https://github.com/MDU-PHL/abritamr
+repo_name: MDU-PHL/abritamr
+extra:
+  social:
+    - icon: fontawesome/brands/github 
+      link: https://github.com/MDU-PHL/abritamr
+
+markdown_extensions:
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format

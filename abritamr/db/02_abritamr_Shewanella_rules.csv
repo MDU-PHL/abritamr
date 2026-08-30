@@ -1,0 +1,6 @@
+drugname,species,rule_id,rule_version,rule,original_rule,inferred,source
+Penicillin beta-lactam,Shewanella,AMRrules-SHW0001,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_063864256.1'))",blaOXA-55_fam,Resistant (wildtype),"AMRrules (PMID: 30809393, 15105119)"
+Imipenem,Shewanella,AMRrules-SHW0002,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_063864256.1'))",blaOXA-55_fam,Resistant (wildtype),"AMRrules (PMID: 30809393, 15105119)"
+Sulfonamide antibiotic,Shewanella,AMRrules-SHW0003,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_392374812'))",sul1,Resistant (nonwildtype),AMRrules (PMID: 34732312)
+Fluoroquinolone antibiotic,Shewanella,AMRrules-SHW0004,AMRrules-downloaded-2026-08-28,"(contains_any(row.amrrules_mutation, 'p.Ser83Val') &&   contains_any(row.abritamr_accession_key,'WP_425283034'))",gyrA ,Resistant (nonwildtype),AMRrules (PMID: 32507618)
+Fluoroquinolone antibiotic,Shewanella,AMRrules-SHW0005,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'NG_068040'))",qnrA,Susceptible (wildtype),AMRrules (PMID: 32507618)

@@ -1,12 +1,14 @@
  # for now - will need to be cleverer/cleaner/better 
 from dataclasses import dataclass, asdict
 import json
+from logging import log
 
-from cel_functions import create_cel_context, evaluate_rule
-from criteria import InferRules
+from abritamr.cel_functions import create_cel_context, evaluate_rule
+from abritamr.criteria import InferRules
 import pandas as pd
+from abritamr.logger import log
 import pathlib
-# print(criterias)
+# # print(criterias)
 
 def priority_gdst() -> dict:
 
@@ -27,7 +29,7 @@ def combine_results( result: list) -> dict:
         # 'gene':[],
        
     }
-    # print(result)
+    # # print(result)
     for row in result:
         for col in to_test:
             if col in row:
@@ -35,7 +37,7 @@ def combine_results( result: list) -> dict:
         
     
     # for k in to_test:
-    #     # print(to_test[k])
+    #     # # print(to_test[k])
     #     val = ','.join(to_test[k]) if to_test[k] != [] else "None"
         
     #     res[k] = val
@@ -51,20 +53,22 @@ def find_rules(species:str, reference_folder:str) -> dict:
         sp = json.load(s)
 
     spcs = sp['species']
-    # print(spcs)
+    # # print(spcs)
     rules = []
     for s in spcs:
+        # print(s)
+        # print(species)
         if species in s or s in species:
-            print(f"Found rules for {species} in {reference_folder}/02_abritamr_{s.replace(' ', '_')}_rules.csv")
+            log.info(f"Found rules for {species} in {reference_folder}/02_abritamr_{s.replace(' ', '_')}_rules.csv")
             # try:
             ruleset = pd.read_csv(f"{reference_folder}/02_abritamr_{s.replace(' ', '_')}_rules.csv")
-            print(ruleset)
+            
             rules.append(ruleset.fillna(""))
             # except Exception as e:
-            #     print(f"Could not find rules for {species} in {reference_folder}/02_abritamr_{s}_rules.csv. The following error was reported : {e}. Please check the rules file exists and is formatted correctly.")
-    # print(rules)
+            #     # print(f"Could not find rules for {species} in {reference_folder}/02_abritamr_{s}_rules.csv. The following error was reported : {e}. Please check the rules file exists and is formatted correctly.")
+    # # print(rules)
     if rules == []:
-        print(f"Could not find rules for {species} in {reference_folder}. Please check the rules file exists and is formatted correctly.")
+        log.warning(f"Could not find rules for {species} in {reference_folder}. Please check the rules file exists and is formatted correctly.")
         return {}
     else:
         rules = pd.concat(rules)
@@ -79,20 +83,20 @@ def create_rules(species:str, reference_folder:str) -> list:
     try:
         rules = [InferRules(**r) for r in rules]
     except Exception as e:
-        print(f"No rules available for {species} in {reference_folder}: {e}")
+        log.warning(f"No rules available for {species} in {reference_folder}: {e}")
         rules = []
     return rules
 
 def gdst(results:pd.DataFrame, species:str, reference_folder:str, dflt_result:str = "Susceptible (default)") -> list:
     # results = pd.read_csv(results)
-    # print(results)
+    # # print(results)
     sid = results.iloc[0].get("sample_id", "unknown")
     resultsmooshed = combine_results(result = results.to_dict(orient = "records"))
-    # print(resultsmooshed)
+    # # print(resultsmooshed)
     rules = create_rules(species = species, reference_folder = reference_folder)
-    # print(rules)
+    # # print(rules)
     if rules == []:
-        print(f"No gDST will be provided for {sid}. There are no rules available for {species}.")
+        log.info(f"No gDST will be provided for {sid}. There are no rules available for {species}.")
         return []
     gdst_final = []
     for row in  resultsmooshed:
@@ -103,18 +107,31 @@ def gdst(results:pd.DataFrame, species:str, reference_folder:str, dflt_result:st
         for rule in rules:
             if rule.drugname not in rlt:
                 rlt[rule.drugname] = {'drugname': rule.drugname, 'mechanisms': [], 'inferred': [], 'rule_id': [], 'rule_version': [], 'source': []}
-            # print(f"Evaluating rule {rule.rule_id} for {rule.drugname} with rule {rule.rule}")
+            # # print(f"Evaluating rule {rule.rule_id} for {rule.drugname} with rule {rule.rule}")
             if evaluate_rule(rule = rule.rule, ctx = ctx):
-                print(f"Rule {rule.rule_id} evaluated to True for {rule.drugname}. Inferred value: {rule.inferred}")
+                # log.info(f"Rule {rule.rule_id} evaluated to True for {rule.drugname}. Inferred value: {rule.inferred}")
                 mechs = []
                 for key in row:
+                    # # print(f"Checking if {key} in {rule.rule}")
                     if key in rule.rule:
-                        print(f"Key {key} triggered {rule.rule}")
-                        vals = results[key].unique().tolist()
+                        # log.info(f"Key {key} triggered {rule.rule}")
+                        vals = row[key] if isinstance(row[key], list) else [row[key]]
+                        # # print(f"Vals: {vals}")
                         keys = [i for i in vals if i in rule.rule]
-                        print(f"Keys {keys} triggered {rule.rule}")
-                        mech = results[results[key].isin(keys)]['abritamr_mechanism'].unique().tolist()
-                        mechs.extend(mech)
+                        keys = []
+                        for i in vals:
+                            for j in i.split('_'):
+                                if j in rule.rule:
+                                    keys.append(j)
+                        # # print(f"Keys: {keys}")
+                        mechs = []
+                        for k in keys:
+                            # # print(k)
+                            tmp = results[results['abritamr_accession_key'].str.contains(k, na=False)]['abritamr_mechanism'].unique().tolist()
+                            # # print(f"Mechanisms for {k}: {tmp}")
+                            mechs.extend(tmp)
+                # mechs = list(set(mechs))
+                        # # print(f"Mechanisms: {mechs}")
                 rlt[rule.drugname]['mechanisms'].extend(mechs)
                 rlt[rule.drugname]['inferred'].append(rule.inferred)
                 rlt[rule.drugname]['rule_id'].append(rule.rule_id)
@@ -124,15 +141,15 @@ def gdst(results:pd.DataFrame, species:str, reference_folder:str, dflt_result:st
             if rlt[drug]['inferred'] == []:
                 rlt[drug]['inferred'] = [dflt_result]
             else:       
-                # print(f"Prioritizing {rlt[drug]['inferred']} for {drug}")
+                # # print(f"Prioritizing {rlt[drug]['inferred']} for {drug}")
                 rlt[drug]['inferred'] = [sorted(rlt[drug]['inferred'], key = lambda x: priority_gdst()[x[0].upper()] if x[0].upper() in priority_gdst() else -1, reverse = True)[0]]
-            # print(f"Prioritized {rlt[drug]['inferred']} for {drug}")
+            # # print(f"Prioritized {rlt[drug]['inferred']} for {drug}")
             for key in ['mechanisms', 'rule_id', 'rule_version', 'source', 'inferred']:
-                # print(f"Joining {key} for {drug}: {rlt[drug][key]}")
-                rs = ','.join(rlt[drug][key]) if rlt[drug][key] != [] else "-"
-                # print(f"Joined {key} for {drug}: {rs}")
+                # # print(f"Joining {key} for {drug}: {rlt[drug][key]}")
+                rs = ';'.join(rlt[drug][key]) if rlt[drug][key] != [] else "-"
+                # # print(f"Joined {key} for {drug}: {rs}")
                 rlt[drug][key] = rs
-            # print(rlt[drug])
+            # log.info(f"{rlt[drug]}")
                 
         gdst_results = {'sample_id': sid, 'species': species, 'results': list(rlt.values())}
         gdst_final.append(gdst_results)
@@ -174,10 +191,10 @@ def gdst_results_to_df_long(gdst_results: list) -> pd.DataFrame:
             }
             rows.append(row)
     # for row in rows:
-    #     print(row)
+    #     # print(row)
     cols_long = ['sample_id', 'species', 'drugname', 'mechanisms', 'gDST', 'rule_id', 'rule_version', 'source']
 
     return pd.DataFrame(rows)[cols_long].sort_values(by = ['drugname'])
 
-    # print(gdst_results)
+    # # print(gdst_results)
 

@@ -1,0 +1,8 @@
+drugname,species,rule_id,rule_version,rule,original_rule,inferred,source
+Penicillin beta-lactam,Klebsiella pneumoniae,AMRrules-KPN0001,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_419672855.1'))",blaSHV,Resistant (wildtype),AMRrules (PMID: 32284385)
+Ciprofloxacin,Klebsiella pneumoniae,AMRrules-KPN0002,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_419141451.1'))",oqxA,Susceptible (wildtype),AMRrules (PMID: 30834112)
+Ciprofloxacin,Klebsiella pneumoniae,AMRrules-KPN0003,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_419388593.1'))",oqxB,Susceptible (wildtype),AMRrules (PMID: 30834112)
+Fosfomycin,Klebsiella pneumoniae,AMRrules-KPN0004,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_417645943.1'))",fosA5_fam,Susceptible (wildtype),AMRrules (PMID: 33128341)
+Fosfomycin,Klebsiella pneumoniae,AMRrules-KPN0005,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_012579083.1'))",fosA5,Susceptible (wildtype),AMRrules (PMID: 25441705)
+Fosfomycin,Klebsiella pneumoniae,AMRrules-KPN0006,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_069174570.1'))",fosA6,Susceptible (wildtype),AMRrules (PMID: 27261267)
+Fosfomycin,Klebsiella pneumoniae,AMRrules-KPN0007,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_004214174.1'))",fosA10,Susceptible (wildtype),AMRrules (PMID: 32431524)

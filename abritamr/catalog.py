@@ -13,7 +13,7 @@ from abritamr.utils import get_refgenes
 from abritamr.criteria import get_abritamr_reporting,get_abritamr_defs
 from abritamr.cel_functions import contains_any,create_cel_context,evaluate_rule
 from abritamr.parse_gdstrules import get_cfg,get_rules,open_rules,_get_date
-from abritamr.utils import _get_date
+from abritamr.utils import _get_date,check_path
 
 
 
@@ -31,8 +31,9 @@ def _get_new_catalog() -> str:
 
 def _make_key(df):
     if 'abritamr_accession_key' not in list(df.columns):
-        df['mut_acc'] = df[['allele','whitelisted_taxa','refseq_nucleotide_accession']].apply( lambda x: '_'.join(x), axis = 1)
-        df['abritamr_accession_key'] = numpy.where(df['refseq_protein_accession'] == '',df['genbank_protein_accession'],df['refseq_protein_accession'])
+        df['abritamr_accession_key'] =df[['refseq_protein_accession','genbank_protein_accession', 'refseq_nucleotide_accession', 'genbank_nucleotide_accession']].apply(lambda x: '_'.join([i for i in x if i != '']), axis = 1)
+        df['mut_acc'] = df[['allele','whitelisted_taxa','refseq_protein_accession','genbank_protein_accession', 'refseq_nucleotide_accession', 'genbank_nucleotide_accession']].apply( lambda x: '_'.join([i for i in x if i != '']), axis = 1)
+        # df['abritamr_accession_key'] = numpy.where(df['refseq_protein_accession'] == '',df['genbank_protein_accession'],df['refseq_protein_accession'])
         df['abritamr_accession_key'] = numpy.where(df['subtype'] == 'POINT', df['mut_acc'], df['abritamr_accession_key'])
     return df
 
@@ -61,16 +62,18 @@ def _capitalise(x):
 
 def get_current(pth:str) -> pd.DataFrame:
 
-    current = get_refgenes(pth)
-    current = current.fillna("")
-    return current
+    if check_path(pth):
+        current = pd.read_csv(pth)
+        current = current.fillna("")
+        return current
+    return pd.DataFrame()
 
 
 def get_reportable_criteria(cfgpath: str) -> dict:
 
     rcdict = get_abritamr_reporting(cfgpath = cfgpath)
 
-    return dict
+    return rcdict
 
 def get_class_criteria(cfgpath:str) -> dict:
 
@@ -143,7 +146,7 @@ def apply_classes(class_definitions: list, refgenes : list, src: str = 'abritamr
             rs = evaluate_rule(cl['definition'], ctx)
             # rs = evaluate(c['definition'], ctx)
             if rs:
-                # print(c)
+                # # print(c)
                 row['abritamr_class'] = cl['abritamr_class'] if cl['abritamr_class'] else _capitalise(row['abritamr_class'])
                 if f"{cl['abritamr_subclass']}"  != "nan" and 'append' not in f"{cl['abritamr_subclass']}":
                     # log.info(f"criteria subclass is : {cl['abritamr_subclass']}")
@@ -156,10 +159,10 @@ def apply_classes(class_definitions: list, refgenes : list, src: str = 'abritamr
             
             # else:
         
-        # print(row)
+        # # print(row)
             row['abritamr_class'] = row['abritamr_class'] if 'abritamr_class' in row else _capitalise(row['class'])
             row['abritamr_subclass']= row['abritamr_subclass'] if 'abritamr_subclass' in row else _capitalise(row['subclass'])
-        # print(row)
+        # # print(row)
         rows.append(row)
     return rows
 
@@ -211,7 +214,7 @@ def parse_snps_for_amrrules(refgenes:list) -> list:
     rgx = re.compile(r'(\D+)(-?\d+)(\D+)(.*)')
     for row in refgenes:
         if "POINT" == row['subtype']:
-            # print(f"Parsing SNP for {row['allele']}")
+            # # print(f"Parsing SNP for {row['allele']}")
             try:
                 ref,pos,alt,xtr = rgx.match(row['allele'].split("_")[-1]).groups()
                 if "promoter" not in row["product_name"] and "ribosomal RNA" not in row["product_name"]:
@@ -237,7 +240,7 @@ def get_amrrules(output_dir:str) -> dict:
 
     return rules_dict
 
-def apply_amrrule_genecontext(output_dir:str, rows:list, dflt_rs: str= '-', dflt_hg : str = 'high') -> list:
+def apply_amrrule_genecontext(output_dir:str, rows:list, dflt_rs: str= 'low', dflt_hg : str = 'high') -> list:
 
     rules_dict = get_amrrules(output_dir = output_dir)
     for row in rows:
@@ -283,6 +286,11 @@ def apply_amrtyping(amrtyping_definitions:list,refgenes:list, dflt_rs: str= '-')
     
     return rows
 
+def abritamr_mechanism(refgenes:list) -> list:
+
+    for row in refgenes:
+        row['abritamr_mechanism'] = row['allele'] if row['allele'] != "" else row['gene_family']
+    return refgenes
 
 def wrangle_catalog(catalog:str, previous_catalog:str, amrtyping_definitions:str, class_definitions:str, output_dir:str, src:str = "abritamr") -> bool:
 
@@ -298,7 +306,7 @@ def wrangle_catalog(catalog:str, previous_catalog:str, amrtyping_definitions:str
     refgenes = apply_amrtyping(amrtyping_definitions = rcdict, refgenes= refgenes)
     refgenes = apply_amrrule_genecontext(output_dir = output_dir, rows = refgenes)
     refgenes = parse_snps_for_amrrules(refgenes = refgenes)
-    
+    refgenes = abritamr_mechanism(refgenes = refgenes)
     # pd.DataFrame(refgenes).to_csv(f"{output}", index = False)
     
     return refgenes

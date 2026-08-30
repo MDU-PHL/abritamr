@@ -1,0 +1,27 @@
+drugname,species,rule_id,rule_version,rule,original_rule,inferred,source
+Amikacin,Enterococcus faecium,AMRrules-EFM0001,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_008265821.1'))",aac(6')-I,Resistant (wildtype),"AMRrules (PMID: 21159796, 8239603)"
+Gentamicin,Enterococcus faecium,AMRrules-EFM0002,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_008265821.1'))",aac(6')-I,Unknown (wildtype),"AMRrules (PMID: 21159796, 8239603)"
+Kanamycin a,Enterococcus faecium,AMRrules-EFM0003,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_008265821.1'))",aac(6')-I,Resistant (wildtype),"AMRrules (PMID: 21159796, 8239603)"
+Netilmicin,Enterococcus faecium,AMRrules-EFM0004,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_008265821.1'))",aac(6')-I,Resistant (wildtype),"AMRrules (PMID: 21159796, 8239603)"
+Tobramycin,Enterococcus faecium,AMRrules-EFM0005,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_008265821.1'))",aac(6')-I,Resistant (wildtype),"AMRrules (PMID: 21159796, 8239603)"
+Amikacin,Enterococcus faecium,AMRrules-EFM0006,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64318.1'))",efmM,Resistant (wildtype),"AMRrules (PMID: 21159796, 8239603)"
+Gentamicin,Enterococcus faecium,AMRrules-EFM0007,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64318.1'))",efmM,Unknown (wildtype),"AMRrules (PMID: 21159796, 8239603)"
+Kanamycin a,Enterococcus faecium,AMRrules-EFM0008,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64318.1'))",efmM,Resistant (wildtype),"AMRrules (PMID: 21159796, 8239603)"
+Netilmicin,Enterococcus faecium,AMRrules-EFM0009,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64318.1'))",efmM,Resistant (wildtype),"AMRrules (PMID: 21159796, 8239603)"
+Tobramycin,Enterococcus faecium,AMRrules-EFM0010,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64318.1'))",efmM,Resistant (wildtype),"AMRrules (PMID: 21159796, 8239603)"
+Azithromycin,Enterococcus faecium,AMRrules-EFM0011,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64749.1'))",msr(C),Resistant (wildtype),AMRrules (PMID: 11120975)
+Erythromycin,Enterococcus faecium,AMRrules-EFM0012,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64749.1'))",msr(C),Resistant (wildtype),AMRrules (PMID: 11120975)
+Quinupristin,Enterococcus faecium,AMRrules-EFM0013,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64749.1'))",msr(C),Resistant (wildtype),AMRrules (PMID: 11120975)
+Tylosin,Enterococcus faecium,AMRrules-EFM0014,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64749.1'))",msr(C),Resistant (wildtype),AMRrules (PMID: 11120975)
+Cefepime,Enterococcus faecium,AMRrules-EFM0015,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AZV36500.1'))",pbp5,Resistant (wildtype),AMRrules (PMID: 19304851)
+Ceftobiprole,Enterococcus faecium,AMRrules-EFM0016,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AZV36500.1'))",pbp5,Unknown (wildtype),AMRrules (PMID: 19917749)
+Ceftriaxone,Enterococcus faecium,AMRrules-EFM0017,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AZV36500.1'))",pbp5,Resistant (wildtype),"AMRrules (PMID: 3734749, 19304851)"
+Ceftriaxone,Enterococcus faecium,AMRrules-EFM0018,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AZV36123.1'))",pbpA,Resistant (wildtype),AMRrules (PMID: 32041714)
+Cefepime,Enterococcus faecium,AMRrules-EFM0019,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64635.1'))",pbpF,Resistant (wildtype),AMRrules (PMID: 19304851)
+Ceftriaxone,Enterococcus faecium,AMRrules-EFM0020,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64635.1'))",pbpF,Resistant (wildtype),AMRrules (PMID: 19304851)
+Cefepime,Enterococcus faecium,AMRrules-EFM0021,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC63082.1'))",ponA,Resistant (wildtype),AMRrules (PMID: 19304851)
+Ceftriaxone,Enterococcus faecium,AMRrules-EFM0022,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC63082.1'))",ponA,Resistant (wildtype),AMRrules (PMID: 19304851)
+Ceftazidime,Enterococcus faecium,AMRrules-EFM0023,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AZV36500.1'))",pbp5,Resistant (wildtype),"AMRrules (PMID: 3734749, 19304851)"
+Ceftazidime,Enterococcus faecium,AMRrules-EFM0024,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AZV36123.1'))",pbpA,Resistant (wildtype),AMRrules (PMID: 32041714)
+Ceftazidime,Enterococcus faecium,AMRrules-EFM0025,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC64635.1'))",pbpF,Resistant (wildtype),AMRrules (PMID: 19304851)
+Ceftazidime,Enterococcus faecium,AMRrules-EFM0026,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AFC63082.1'))",ponA,Resistant (wildtype),AMRrules (PMID: 19304851)

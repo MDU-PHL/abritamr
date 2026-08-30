@@ -45,7 +45,7 @@ def database_args(subparsers):
     )
     parser_sub_database.add_argument(
         "--previous-catalog",
-        default=f"{pathlib.Path(__file__).parent.parent / 'configs' / 'abritamr_reference_catalog.csv'}",
+        default=f"{pathlib.Path(__file__).parent.parent / 'db' / 'abritamr_reference_catalog.csv'}",
         help="Path to where previous reference gene catalog. Used to identify updates or changes for checking."
     )
     parser_sub_database.add_argument(

@@ -21,7 +21,7 @@ def get_cfg() -> list:
 
         return sp
     except Exception as e:
-        print(f"An error occured identifying supported species.")
+        log.critical(f"An error occured identifying supported species.")
         # raise SystemExit
 
 def url_stub() ->str:
@@ -47,7 +47,7 @@ def open_rules(pth:str) -> dict:
         df = pd.read_csv(pth, sep = "\t")
         return df.fillna("").to_dict(orient = "records")
     except Exception as e:
-        print(f"Something went wrong opening the rules file. The following error occured : {e}")
+        # print(f"Something went wrong opening the rules file. The following error occured : {e}")
         raise SystemExit(1)
 
 
@@ -75,7 +75,7 @@ def parse_rule(row:dict, simple_rules:dict) -> str:
     else:
         rl = row['gene']
         for s in simple_rules:
-            # print(f"Replacing {s} with {simple_rules[s]}")
+            # # print(f"Replacing {s} with {simple_rules[s]}")
             rl = rl.replace(s, f"contains_any(row.abritamr_accession_key,'{simple_rules[s]}')")
         rl = rl.replace("&", " && ")
         rl = rl.replace("|", " || ")
@@ -138,9 +138,9 @@ def generate_rules(species:str, evidence_grade:int, cfg:dict, output_dir:str) ->
     rule_file = get_rules(species = species, output_dir = output_dir)
     rules = open_rules(pth = rule_file)
     simple_rules = get_simple_rules(rules = rules)
-    # print(simple_rules)
+    # # print(simple_rules)
     results = wrangle_the_rules(rules = rules, simple_rules = simple_rules, species = species, evidence_grade = evidence_grade, cfg = cfg)
-    # print(results)
+    # # print(results)
     return results
 
 def get_amrrules_for_species(evidence_grade:int,output_dir:str, species:str="all", rules_dict:dict={}) -> list:
@@ -150,7 +150,7 @@ def get_amrrules_for_species(evidence_grade:int,output_dir:str, species:str="all
     if species == "all":
         
         for sp in species_list:
-            # print(sp)
+            # # print(sp)
             rules = generate_rules(species = sp, evidence_grade = evidence_grade, cfg = cfg, output_dir = output_dir)
             rules_dict[sp] = rules
     else:

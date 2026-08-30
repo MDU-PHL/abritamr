@@ -10,6 +10,7 @@ dependencies:
   - libcurl
   - xlsxwriter
   - ncbi-amrfinderplus >=4
-  - parallel
-  - make
-  - bats-core
+  - sourmash >=4.9.0
+  - pycel
+  - screed
+  

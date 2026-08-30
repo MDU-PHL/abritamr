@@ -1,0 +1,50 @@
+drugname,species,rule_id,rule_version,rule,original_rule,inferred,source
+Ceftriaxone,Enterococcus faecalis,AMRrules-EFC0001,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_070676928.1'))",pbp4,Resistant (wildtype),"AMRrules (PMID: 32041714, 14973044)"
+Cefuroxime,Enterococcus faecalis,AMRrules-EFC0002,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_070676928.1'))",pbp4,Resistant (wildtype),"AMRrules (PMID: 32041714, 14973044)"
+Cefepime,Enterococcus faecalis,AMRrules-EFC0003,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_070676928.1'))",pbp4,Resistant (wildtype),"AMRrules (PMID: 32041714, 14973044)"
+Ceftaroline,Enterococcus faecalis,AMRrules-EFC0004,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_070676928.1'))",pbp4,Resistant (wildtype),"AMRrules (PMID: 32041714, 14973044)"
+Ceftriaxone,Enterococcus faecalis,AMRrules-EFC0005,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AEA94845.1'))",pbpA,Resistant (wildtype),AMRrules (PMID: 32041714)
+Cefuroxime,Enterococcus faecalis,AMRrules-EFC0006,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AEA94845.1'))",pbpA,Resistant (wildtype),AMRrules (PMID: 32041714)
+Cefepime,Enterococcus faecalis,AMRrules-EFC0007,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AEA94845.1'))",pbpA,Resistant (wildtype),AMRrules (PMID: 32041714)
+Ceftaroline,Enterococcus faecalis,AMRrules-EFC0008,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AEA94845.1'))",pbpA,Resistant (wildtype),AMRrules (PMID: 32041714)
+Ceftriaxone,Enterococcus faecalis,AMRrules-EFC0009,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80501.1'))",pbpF,Resistant (wildtype),AMRrules (PMID: 19304851)
+Ceftriaxone,Enterococcus faecalis,AMRrules-EFC0010,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80948.1'))",ponA,Resistant (wildtype),AMRrules (PMID: 19304851)
+Ceftaroline,Enterococcus faecalis,AMRrules-EFC0011,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_070676928.1'))",pbp4,Resistant (wildtype),"AMRrules (PMID: 32041714, 14973044)"
+Ceftriaxone,Enterococcus faecalis,AMRrules-EFC0012,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AEA94845.1'))",pbpA,Resistant (wildtype),AMRrules (PMID: 32041714)
+Ceftriaxone,Enterococcus faecalis,AMRrules-EFC0013,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80501.1'))",pbpF,Resistant (wildtype),AMRrules (PMID: 19304851)
+Ceftriaxone,Enterococcus faecalis,AMRrules-EFC0014,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80948.1'))",ponA,Resistant (wildtype),AMRrules (PMID: 19304851)
+Ceftriaxone,Enterococcus faecalis,AMRrules-EFC0015,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO82800.1'))",IreK,Resistant (wildtype),AMRrules (PMID: 34672600)
+Clindamycin,Enterococcus faecalis,AMRrules-EFC0016,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_002365053.1'))",lsa(A),Resistant (wildtype),AMRrules (PMID: 12019099)
+Dalfopristin,Enterococcus faecalis,AMRrules-EFC0017,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_002365053.1'))",lsa(A),Resistant (wildtype),AMRrules (PMID: 12019099)
+Quinupristin-dalfopristin,Enterococcus faecalis,AMRrules-EFC0018,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_002365053.1'))",lsa(A),Resistant (wildtype),AMRrules (PMID: 12019099)
+Ciprofloxacin,Enterococcus faecalis,AMRrules-EFC0019,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970098.1'))",efrA,Susceptible (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Ciprofloxacin,Enterococcus faecalis,AMRrules-EFC0020,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970103.1'))",efrB,Susceptible (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Norfloxacin,Enterococcus faecalis,AMRrules-EFC0021,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970098.1'))",efrA,Unknown (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Norfloxacin,Enterococcus faecalis,AMRrules-EFC0022,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970103.1'))",efrB,Unknown (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Ofloxacin,Enterococcus faecalis,AMRrules-EFC0023,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970098.1'))",efrA,Unknown (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Ofloxacin,Enterococcus faecalis,AMRrules-EFC0024,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970103.1'))",efrB,Unknown (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Gentamicin,Enterococcus faecalis,AMRrules-EFC0025,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970098.1'))",efrA,Susceptible (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Gentamicin,Enterococcus faecalis,AMRrules-EFC0026,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970103.1'))",efrB,Susceptible (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Minocycline,Enterococcus faecalis,AMRrules-EFC0027,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970098.1'))",efrA,Susceptible (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Minocycline,Enterococcus faecalis,AMRrules-EFC0028,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970103.1'))",efrB,Susceptible (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Tetracycline ,Enterococcus faecalis,AMRrules-EFC0029,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970098.1'))",efrA,Susceptible (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Tetracycline ,Enterococcus faecalis,AMRrules-EFC0030,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970103.1'))",efrB,Susceptible (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Rifampin,Enterococcus faecalis,AMRrules-EFC0031,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970098.1'))",efrA,Susceptible (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Rifampin,Enterococcus faecalis,AMRrules-EFC0032,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'HG970103.1'))",efrB,Susceptible (wildtype),"AMRrules (PMID: 14638474, 25084670, 27381387)"
+Ciprofloxacin,Enterococcus faecalis,AMRrules-EFC0033,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80603.1'))",efrC,Susceptible (wildtype),AMRrules (PMID: 27381387)
+Ciprofloxacin,Enterococcus faecalis,AMRrules-EFC0034,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80604.1'))",efrD,Susceptible (wildtype),AMRrules (PMID: 27381387)
+Norfloxacin,Enterococcus faecalis,AMRrules-EFC0035,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80603.1'))",efrC,Unknown (wildtype),AMRrules (PMID: 27381387)
+Norfloxacin,Enterococcus faecalis,AMRrules-EFC0036,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80604.1'))",efrD,Unknown (wildtype),AMRrules (PMID: 27381387)
+Ofloxacin,Enterococcus faecalis,AMRrules-EFC0037,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80603.1'))",efrC,Unknown (wildtype),AMRrules (PMID: 27381387)
+Ofloxacin,Enterococcus faecalis,AMRrules-EFC0038,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80604.1'))",efrD,Unknown (wildtype),AMRrules (PMID: 27381387)
+Gentamicin,Enterococcus faecalis,AMRrules-EFC0039,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80603.1'))",efrC,Susceptible (wildtype),AMRrules (PMID: 27381387)
+Gentamicin,Enterococcus faecalis,AMRrules-EFC0040,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80604.1'))",efrD,Susceptible (wildtype),AMRrules (PMID: 27381387)
+Minocycline,Enterococcus faecalis,AMRrules-EFC0041,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80603.1'))",efrC,Susceptible (wildtype),AMRrules (PMID: 27381387)
+Minocycline,Enterococcus faecalis,AMRrules-EFC0042,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80604.1'))",efrD,Susceptible (wildtype),AMRrules (PMID: 27381387)
+Tetracycline ,Enterococcus faecalis,AMRrules-EFC0043,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80603.1'))",efrC,Susceptible (wildtype),AMRrules (PMID: 27381387)
+Tetracycline ,Enterococcus faecalis,AMRrules-EFC0044,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80604.1'))",efrD,Susceptible (wildtype),AMRrules (PMID: 27381387)
+Rifampin,Enterococcus faecalis,AMRrules-EFC0045,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80603.1'))",efrC,Susceptible (wildtype),AMRrules (PMID: 27381387)
+Rifampin,Enterococcus faecalis,AMRrules-EFC0046,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AAO80604.1'))",efrD,Susceptible (wildtype),AMRrules (PMID: 27381387)
+Norfloxacin,Enterococcus faecalis,AMRrules-EFC0047,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AB091338.1'))",emeA,Unknown (wildtype),"AMRrules (PMID: 11709342, 11321571)"
+Ciprofloxacin,Enterococcus faecalis,AMRrules-EFC0048,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AB091338.1'))",emeA,Susceptible (wildtype),AMRrules (PMID: 11321571)
+Trimethoprim,Enterococcus faecalis,AMRrules-EFC0049,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'AF028811.1'))",dfrE,Unknown (wildtype),AMRrules (PMID: 9869579)

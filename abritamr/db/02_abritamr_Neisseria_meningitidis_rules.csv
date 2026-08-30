@@ -1,0 +1,5 @@
+drugname,species,rule_id,rule_version,rule,original_rule,inferred,source
+-,Neisseria meningitidis,AMRrules-NMN0002,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_002224867.1'))",farB,Unknown (-),AMRrules (PMID: 10447892)
+-,Neisseria meningitidis,AMRrules-NMN0003,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_002224968.1'))",mtrC,Unknown (-),AMRrules (PMID: 14500476)
+-,Neisseria meningitidis,AMRrules-NMN0004,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_003687823.1'))",norM,Unknown (-),AMRrules (PMID: 29891604)
+-,Neisseria meningitidis,AMRrules-NMN0005,AMRrules-downloaded-2026-08-28,"(  contains_any(row.abritamr_accession_key,'WP_003693763.1'))",mtrR,Unknown (-),AMRrules (PMID: 7773394)
