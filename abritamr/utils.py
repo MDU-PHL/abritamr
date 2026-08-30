@@ -174,7 +174,7 @@ def guess_species(asm:str, sid:str="abritamr") -> str:
     str
         The guessed species name.
     """
-    sp = run_sourmash_search(query_filename = asm, SBT_filename = f"{pathlib.Path(__file__).parent / 'species_db' / 'abritamrdb.sbt.zip'}", sid = sid)
+    sp = run_sourmash_search(query_filename = asm, SBT_path = pathlib.Path(__file__).parent / 'species_db', sid = sid)
     return sp
 
 def wrangle_species(organism:str, asm:str="", sid:str="abritamr", check_species:bool = True) -> tuple:

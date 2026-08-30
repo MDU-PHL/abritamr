@@ -2,6 +2,9 @@
 
 import sourmash
 import screed
+import tempfile
+import pathlib  
+import subprocess
 from abritamr.logger import log
 
 
@@ -48,8 +51,33 @@ def sourmash_sig(query_filename:str, sid:str):
 
     return query_sig
 
+def create_sourmash_index(tdir:str,SBT_path:str):
+    """
+    Create a sourmash index from a list of signatures.
 
-def run_sourmash_search(query_filename:str, SBT_filename:str, sid:str):
+    Parameters
+    ----------
+    SBT_filename : str
+        Path to the output sourmash index file.
+    sigs : list
+        List of sourmash signatures.
+
+    Returns
+    -------
+    None
+    """
+    # check_sourmash()
+    cmd =  f"sourmash index --ksize 31 {tdir}/abritamrdb2 {SBT_path}/*.sig"
+    proc = subprocess.run(cmd, shell = True, capture_output = True, encoding = "utf-8")
+    if proc.returncode != 0:
+        err = proc.stderr.split("\n")
+        log.critical(f"The following error was reported:")
+        log.critical("\n".join(err))
+        raise SystemExit(1)
+    return f"{tdir}/abritamrdb2.sbt.zip"
+
+
+def run_sourmash_search(query_filename:str, SBT_path:str, sid:str):
     """
     Run a sourmash search using a query signature and a sourmash index.
 
@@ -71,26 +99,29 @@ def run_sourmash_search(query_filename:str, SBT_filename:str, sid:str):
     sp = ""
     # mx = 0
     # Load the sourmash index
-    tree = load_sourmash_index(SBT_filename)
-    query_sig = sourmash_sig(query_filename, sid)
-    # # Perform the search
-    results = tree.search(query_sig, threshold=0.1)
-    spc = []
-    for similarity, found_sig, filename in tree.search(query_sig, threshold=0.0001):
-        # qname = query_sig
-        sp = f"{found_sig}"
-        sim = similarity
-        spc.append({sim: sp})
-        # # print(f"Query: {qname}, Found: {' '.join(sp.split('_'))}, Similarity: {sim}")   
-    try:
-        mx = max([list(x.keys())[0] for x in spc])
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir_path = pathlib.Path(temp_dir)
         
-        if mx >= 0.01:
-            sp = [list(x.values())[0] for x in spc if list(x.keys())[0] == mx][0]
-            sp = ' '.join(sp.split('_'))
+        tree = sourmash.load_file_as_index(create_sourmash_index(tdir = temp_dir_path, SBT_path = SBT_path))
+        query_sig = sourmash_sig(query_filename, sid)
+        # # Perform the search
+        results = tree.search(query_sig, threshold=0.1)
+        spc = []
+        for similarity, found_sig, filename in tree.search(query_sig, threshold=0.0001):
+            # qname = query_sig
+            sp = f"{found_sig}"
+            sim = similarity
+            spc.append({sim: sp})
+            # # print(f"Query: {qname}, Found: {' '.join(sp.split('_'))}, Similarity: {sim}")   
+        try:
+            mx = max([list(x.keys())[0] for x in spc])
             
-        
-    except ValueError:
-        log.warning(f"No matches found for {sid} using sourmash. ")
-        
+            if mx >= 0.01:
+                sp = [list(x.values())[0] for x in spc if list(x.keys())[0] == mx][0]
+                sp = ' '.join(sp.split('_'))
+                
+            
+        except ValueError:
+            log.warning(f"No matches found for {sid} using sourmash. ")
+            
     return sp
