@@ -74,7 +74,7 @@ def apply_classes(amr:dict, species:str, sid:str, catalog:str) -> dict:
     # # print(amr)
     refgenes = get_refgenes(pth = catalog)
     for row in amr:
-        # # print(row)
+        print(row)
         _class,_subclass,pmid,db_version,key,amrrules_mut,mech = find_classes(refgenes = refgenes, accession = row['Closest reference accession'])
 
         

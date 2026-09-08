@@ -155,7 +155,7 @@ def run(
             res = amrf2dict(amrfinder = i['amrfinder'])
         for r in res:
             r['amrfinderplus_db_version'] = dbv
-        # # print(i)
+        print(res)
         # res = generate_output(species = i['species'], amr = res )
         amr = apply_classes(amr = res, species =  i['species'], sid = i['sample_id'],catalog = args.reference_catalog)
     #     # amr.extend(res)
@@ -163,7 +163,10 @@ def run(
         scanned = pd.DataFrame(amr)
         # # print(scanned.columns.tolist())
     #     # scanned['amrfinderplus_db_version'] = dbv
+        print(scanned.columns.tolist())
+        
         scanned_cols = abritamr_scan_columns()
+        print(scanned_cols)
         save_output(workdir=f"{args.workdir}",sample_id=i['sample_id'],result = scanned[scanned_cols], outname = "abritamr_scan", _format=args.format, no_keep = args.no_keep)
         amr = add_abritamr_results(amr = amr,catalog = args.reference_catalog)
         # # print(amr)
