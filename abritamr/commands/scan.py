@@ -1,52 +1,69 @@
-import click
 import pathlib
-import json
-import logging
 import pandas as pd
-import sys
 
-from abritamr.utils import output_results, check_assembly, check_amrfinder, check_any2fasta,guess_species, wrangle_species, output_results, check_path, abritamr_scan_columns
+from abritamr.utils import (
+    output_results,
+    check_assembly,
+    check_amrfinder,
+    check_any2fasta,
+    guess_species,
+    wrangle_species,
+    output_results,
+    check_path,
+    abritamr_scan_columns,
+)
 from abritamr.run_finder import run_amrf
 from abritamr.parse_finder import amrf2dict
-# from abritamr.parse_reportable import add_abritamr_results
 from abritamr.drugclasses import apply_classes
 from abritamr.logger import log
 
-def generate_output(species:str,sample_id:str,amr:list,catalog:str)-> list:
-    amr = apply_classes(amr = amr, species=species, sid = sample_id, catalog = catalog)
-    
+
+def generate_output(species: str, sample_id: str, amr: list, catalog: str) -> list:
+    amr = apply_classes(amr=amr, species=species, sid=sample_id, catalog=catalog)
+
     return amr
 
-def scan(
-    args
-        ) -> dict:
 
-    if not args.assembly and not args.amrfinderplus :
-        log.critical("You must supply an input file (assembly or amrfinder plus output). Exiting.")
+def scan(args) -> dict:
+
+    if not args.contigs and not args.amrfinderplus:
+        log.critical(
+            "You must supply an input file (assembly or amrfinder plus output). Exiting."
+        )
         raise SystemExit(1)
     amr = []
     dbv = "unknown"
-    if args.assembly:
+    if args.contigs:
         log.info("Assembly(ies) have been supplied.")
-        
-        for asm in args.assembly:  
-            
+
+        for asm in args.contigs:
             log.info(f"Will now try to run amrfinderplus on supplied assembly {asm}")
-            if check_path(pth = f"{asm}") and check_assembly(f"{asm}"):
-                species = args.species if args.species else guess_species(asm = asm, sid = args.sample_id if args.sample_id else "abritamr")
+            if check_path(pth=f"{asm}") and check_assembly(f"{asm}"):
+                species = (
+                    args.species
+                    if args.species
+                    else guess_species(
+                        asm=asm, sid=args.sample_id if args.sample_id else "abritamr"
+                    )
+                )
                 dbv = check_amrfinder()
-    
+
                 full_path = f"{pathlib.Path(f'{asm}').absolute()}"
                 sample_id = args.sample_id if args.sample_id else full_path
                 log.info(f"Running amrfinder plus")
                 res = run_amrf(
-                    min_identity = args.min_identity, 
-                    min_coverage = args.min_coverage,
+                    min_identity=args.min_identity,
+                    min_coverage=args.min_coverage,
                     asm=asm,
-                    threads=args.threads, 
-                    organism=species
-                    )
-                res = generate_output(species = species, sample_id = sample_id, amr = res, catalog =  args.reference_catalog)
+                    threads=args.threads,
+                    organism=species,
+                )
+                res = generate_output(
+                    species=species,
+                    sample_id=sample_id,
+                    amr=res,
+                    catalog=args.reference_catalog,
+                )
                 amr.extend(res)
     if args.amrfinderplus:
         for afp in args.amrfinderplus:
@@ -56,14 +73,19 @@ def scan(
             full_path = f"{pathlib.Path(f'{afp}').absolute()}"
             log.info(f"Opening existing amrfinder plus output")
 
-            res = amrf2dict(amrfinder = afp)
-            res = generate_output(species = species, sample_id = sample_id, amr = res, catalog = args.reference_catalog )
+            res = amrfdict(amrfinder=afp)
+            res = generate_output(
+                species=species,
+                sample_id=sample_id,
+                amr=res,
+                catalog=args.reference_catalog,
+            )
             amr.extend(res)
-        
+
     abritamr_columns = abritamr_scan_columns()
     amr = pd.DataFrame(amr)
-    amr['amrfinderplus_db_version'] = dbv
+    amr["amrfinderplus_db_version"] = dbv
     amr = amr[abritamr_columns]
-    
 
     return amr
+
