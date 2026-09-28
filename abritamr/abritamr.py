@@ -157,8 +157,6 @@ def cli():
     #     parser_sub_scan.# print_help(sys.stderr)
     elif len(sys.argv) <= 2 and sys.argv[1] == "utils":
         parser_sub_utils.print_help(sys.stderr)
-    elif len(sys.argv) == 2 and sys.argv[1] in psrs:
-        psrs[sys.argv[1]].print_help(sys.stderr)
     else:
         args.func(args)
 

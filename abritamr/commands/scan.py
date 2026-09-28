@@ -2,13 +2,9 @@ import pathlib
 import pandas as pd
 
 from abritamr.utils import (
-    output_results,
     check_assembly,
     check_amrfinder,
-    check_any2fasta,
     guess_species,
-    wrangle_species,
-    output_results,
     check_path,
     abritamr_scan_columns,
 )
@@ -73,7 +69,7 @@ def scan(args) -> dict:
             full_path = f"{pathlib.Path(f'{afp}').absolute()}"
             log.info(f"Opening existing amrfinder plus output")
 
-            res = amrfdict(amrfinder=afp)
+            res = amrf2dict(amrfinder=afp)
             res = generate_output(
                 species=species,
                 sample_id=sample_id,
@@ -81,11 +77,12 @@ def scan(args) -> dict:
                 catalog=args.reference_catalog,
             )
             amr.extend(res)
-
     abritamr_columns = abritamr_scan_columns()
-    amr = pd.DataFrame(amr)
+    if amr != []:
+        amr = pd.DataFrame(amr)
+    else:
+        amr = pd.DataFrame(columns=abritamr_columns)
     amr["amrfinderplus_db_version"] = dbv
     amr = amr[abritamr_columns]
 
     return amr
-
