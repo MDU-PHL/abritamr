@@ -1,3 +1,5 @@
+"""Run AMRFinderPlus and parse its tabular results."""
+
 import subprocess
 import pandas as pd
 from abritamr.utils import wrangle_species
@@ -14,6 +16,7 @@ from abritamr.logger import log
 def generate_cmd(
     min_identity: float, min_coverage: float, asm: str, threads: int, organism: str
 ) -> str:
+    """Construct the AMRFinderPlus command for an assembly and thresholds."""
     # spc = ""
     log.info(f"Will check if organism {organism} can be used.")
     # if organism != "" or "unknown" not in organism:
@@ -27,6 +30,7 @@ def generate_cmd(
 
 
 def run_cmd(cmd: str) -> str:
+    """Execute an AMRFinderPlus command and return its standard output."""
     log.info(f"Running amrfinder: {cmd}")
     proc = subprocess.run(cmd, shell=True, capture_output=True, encoding="utf-8")
     if proc.returncode != 0:
@@ -40,6 +44,7 @@ def run_cmd(cmd: str) -> str:
 
 
 def parse_output(results: str) -> dict:
+    """Convert AMRFinderPlus tabular output into record dictionaries."""
     rdict = []
     rows = results.split("\n")
     rows = [row.split("\t") for row in rows if row != ""]
@@ -57,7 +62,7 @@ def parse_output(results: str) -> dict:
 def run_amrf(
     min_identity: float, min_coverage: float, asm: str, threads: int, organism: str
 ) -> dict:
-
+    """Run AMRFinderPlus on an assembly and return parsed hit records."""
     cmd = generate_cmd(
         min_identity=min_identity,
         min_coverage=min_coverage,

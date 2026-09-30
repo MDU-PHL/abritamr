@@ -1,9 +1,11 @@
+"""Argument parser configuration for linelist generation."""
+
 import argparse, sys
 from abritamr.cli.basic_args import inputs, references, detection_args, basic_output
 
 
 def llist_args(subparsers):
-
+    """Add the linelist command and its options to the parser."""
     parser_sub_llist = subparsers.add_parser(
         "linelist",
         help="Generate a linelist report summarising genes observed by abritamr drugclass or criteria supplied.",

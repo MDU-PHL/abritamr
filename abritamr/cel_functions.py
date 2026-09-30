@@ -1,3 +1,5 @@
+"""Provide CEL rule evaluation and custom functions for abriTAMR criteria."""
+
 from cel import Context, evaluate
 
 
@@ -87,4 +89,3 @@ def contains_any(data:list, query:str) -> bool:
         if query.lower() in d.lower():
             return True
     return False
-

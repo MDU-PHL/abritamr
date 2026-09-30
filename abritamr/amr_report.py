@@ -1,3 +1,5 @@
+"""Create formatted linelist reports from AMR results."""
+
 import pandas as pd
 
 from abritamr.logger import log
@@ -5,7 +7,7 @@ from abritamr.utils import get_refgenes, abritamr_amrtype_columns
 
 
 def save_report(report: pd.DataFrame, outname: str = "", _format: str = "csv") -> bool:
-
+    """Save a report in the selected delimited format."""
     dlm = ","
     if _format == "tab":
         dlm = "\t"
@@ -17,6 +19,7 @@ def save_report(report: pd.DataFrame, outname: str = "", _format: str = "csv") -
 def wrangle_cols(
     repdf: pd.DataFrame, repmechs: dict, cols: list, simple: bool = True
 ) -> tuple:
+    """Populate report fields for each observed AMR subclass."""
     cols_final = sorted(repdf["abritamr_subclass"].unique().tolist())
     if not simple:
         refs = get_refgenes()
@@ -42,7 +45,7 @@ def summary(
     mincoverage: float = 90,
     outname: str = "abritamr_report",
 ) -> pd.DataFrame:
-
+    """Create a reportable linelist from typed AMR results."""
     cols = abritamr_amrtype_columns()
     if not results.empty:
         mincoverage = float(mincoverage)

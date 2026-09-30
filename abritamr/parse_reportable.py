@@ -1,3 +1,5 @@
+"""Annotate AMRFinder hits with catalog classes and reportability criteria."""
+
 import pandas as pd
 
 from abritamr.utils import get_refgenes
@@ -7,7 +9,7 @@ from abritamr.logger import log
 
 
 def get_class(key: str, val: str, refgenes: pd.DataFrame, _type: str) -> str:
-
+    """Look up a catalog field using a reference accession."""
     try:
         return refgenes[refgenes[key] == val][f"{_type}"].values[0]
     except:
@@ -16,7 +18,7 @@ def get_class(key: str, val: str, refgenes: pd.DataFrame, _type: str) -> str:
 
 
 def get_classes(key: str, val: str, refgenes: pd.DataFrame) -> tuple:
-
+    """Return the class and subclass for a catalog accession."""
     _class = get_class(key=key, val=val, refgenes=refgenes, _type="abritamr_class")
     _subclass = get_class(
         key=key, val=val, refgenes=refgenes, _type="abritamr_subclass"
@@ -26,7 +28,7 @@ def get_classes(key: str, val: str, refgenes: pd.DataFrame) -> tuple:
 
 
 def find_classes(refgenes: pd.DataFrame, accession: str) -> str:
-
+    """Find class annotations using the supported accession columns."""
     _class = _subclass = "unknown"
 
     for key in [
@@ -43,6 +45,7 @@ def find_classes(refgenes: pd.DataFrame, accession: str) -> str:
 
 
 def add_abritamr_results(amr: dict, sid: str = "", catalog: str = "") -> pd.DataFrame:
+    """Add catalog classes and reporting status to each AMRFinder result."""
     log.info(f"Adding abritamr classes and determining gene status.")
     refgenes = get_refgenes(pth=catalog)
     for row in amr:

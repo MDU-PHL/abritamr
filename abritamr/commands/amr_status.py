@@ -1,3 +1,5 @@
+"""Assign AMR reporting status to scan results."""
+
 import pandas as pd
 
 from abritamr.utils import (
@@ -9,12 +11,13 @@ from abritamr.parse_reportable import add_abritamr_results
 
 
 def generate_output(amr: dict, catalog: str) -> dict:
+    """Add reportable AMR classes and typing criteria to detected hits."""
     amr = add_abritamr_results(amr=amr, catalog=catalog)
     return amr
 
 
 def do_typing(amr: pd.DataFrame, reference_catalog: str) -> pd.DataFrame:
-
+    """Validate scan results and annotate each hit with its AMR status."""
     log.info(f"Will now determine status of the AMR genes detected.")
 
     if (
@@ -37,6 +40,7 @@ def do_typing(amr: pd.DataFrame, reference_catalog: str) -> pd.DataFrame:
 
 
 def amr_status(args) -> dict:
+    """Read scan output, determine AMR status, and return the annotated table."""
     log.info("Going to try to open input.")
     try:
         amr = pd.read_csv(args.amr)

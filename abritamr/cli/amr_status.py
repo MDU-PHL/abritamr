@@ -1,10 +1,12 @@
+"""Argument parser configuration for the AMR status command."""
+
 import pathlib, argparse, sys, os, logging, json
 
 from abritamr.cli.basic_args import inputs, references, detection_args, basic_output
 
 
 def status_args(subparsers):
-
+    """Add the AMR status command and its options to the parser."""
     parser_sub_status = subparsers.add_parser(
         "amr_status",
         help="Determine status of genes recovered from abritamr scan.  Outputs a file with rows populated with per-gene information.",

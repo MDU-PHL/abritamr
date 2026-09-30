@@ -1,3 +1,5 @@
+"""Run AMRFinderPlus scans or annotate existing AMRFinder results."""
+
 import pathlib
 import pandas as pd
 from collections import namedtuple
@@ -15,6 +17,7 @@ from abritamr.logger import log
 
 
 def generate_output(species: str, sample_id: str, amr: list, catalog: str) -> list:
+    """Annotate AMRFinder hits with catalog classes and sample metadata."""
     if len(amr) == 1 and set(amr[0].values()) == set("-"):
         log.warning(f"There are no genes detected for {sample_id}.")
     amr = apply_classes(amr=amr, species=species, sid=sample_id, catalog=catalog)
@@ -31,6 +34,7 @@ def runfindr(
     species: str,
     reference_catalog: str,
 ) -> list:
+    """Validate an assembly, run AMRFinderPlus, and annotate its results."""
     res = []
     log.info("Assembly(ies) have been supplied.")
     if check_path(pth=f"{asm}") and check_assembly(f"{asm}"):
@@ -60,6 +64,7 @@ def runfindr(
 
 
 def prsfindr(afp: str, species: str, sid: str, reference_catalog: str) -> list:
+    """Read existing AMRFinderPlus output and annotate its results."""
     species = species if species else ""
     full_path = f"{pathlib.Path(f'{afp}').absolute()}"
     log.info(f"Opening existing amrfinder plus output")
@@ -78,7 +83,7 @@ def prsfindr(afp: str, species: str, sid: str, reference_catalog: str) -> list:
 def run_scan(
     inputs: list,
 ) -> pd.DataFrame:
-
+    """Scan all supplied inputs and return standardized AMR hit records."""
     amr = []
     dbv = "-"
 
@@ -122,6 +127,7 @@ def run_scan(
 
 
 def generate_inputs(pth: str, sid: str, key: str) -> dict:
+    """Create an input record using a supplied or path-derived sample ID."""
     filepath = f"{pathlib.Path(pth).resolve()}"
     s_id = sid if sid else filepath
     d = {key: pth, "sample_id": s_id}
@@ -129,7 +135,7 @@ def generate_inputs(pth: str, sid: str, key: str) -> dict:
 
 
 def scan(args) -> dict:
-
+    """Build scan inputs from CLI arguments and return their results."""
     inputs = []
     if not args.contigs and not args.amrfinderplus:
         log.critical(

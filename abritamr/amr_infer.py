@@ -1,3 +1,5 @@
+"""Infer genotypic drug susceptibility from detected AMR mechanisms."""
+
 # for now - will need to be cleverer/cleaner/better
 from dataclasses import dataclass, asdict
 import json
@@ -11,7 +13,7 @@ import pathlib
 
 
 def priority_gdst() -> dict:
-
+    """Return the ordering used to prioritize inferred susceptibility results."""
     return {
         "S": 0,
         "I": 1,
@@ -20,6 +22,7 @@ def priority_gdst() -> dict:
 
 
 def combine_results(result: list) -> dict:
+    """Collect rule-relevant fields from AMR result records."""
     res = []
     to_test = {
         "abritamr_class": [],
@@ -47,7 +50,7 @@ def combine_results(result: list) -> dict:
 
 
 def find_rules(species: str, reference_folder: str) -> dict:
-
+    """Load the rule records configured for a species."""
     with open(
         f"{pathlib.Path(__file__).parent / 'configs' / 'amr_rules_config.json'}", "r"
     ) as s:
@@ -82,6 +85,7 @@ def find_rules(species: str, reference_folder: str) -> dict:
 def filter_results(
     results: pd.DataFrame, min_cov: float = 0.9, min_id: float = 0.9
 ) -> pd.DataFrame:
+    """Keep AMR hits meeting the minimum coverage and identity thresholds."""
     results = results[
         (results["% Coverage of reference"] >= min_cov)
         & (results["% Identity to reference"] >= min_id)
@@ -90,6 +94,7 @@ def filter_results(
 
 
 def create_rules(species: str, reference_folder: str) -> list:
+    """Load species rules and convert them to inference-rule objects."""
     rules = find_rules(species=species, reference_folder=reference_folder)
     try:
         rules = [InferRules(**r) for r in rules]
@@ -105,6 +110,7 @@ def gdst(
     reference_folder: str,
     dflt_result: str = "Susceptible (default)",
 ) -> list:
+    """Evaluate species rules and return inferred susceptibility results."""
     # results = pd.read_csv(results)
     # print(results)
     sid = results.iloc[0].get("sample_id", "unknown")
@@ -209,6 +215,7 @@ def gdst(
 
 
 def gdst_results_to_df_wide(gdst_results: list) -> pd.DataFrame:
+    """Convert inferred results to one row per sample with drug-specific columns."""
     rows = []
     for res in gdst_results:
         row = {
@@ -235,6 +242,7 @@ def gdst_results_to_df_wide(gdst_results: list) -> pd.DataFrame:
 
 
 def gdst_results_to_df_long(gdst_results: list) -> pd.DataFrame:
+    """Convert inferred results to one row per sample and drug."""
     rows = []
     for res in gdst_results:
         for drug_res in res["results"]:
