@@ -64,7 +64,9 @@ def linelist(args) -> dict:
         for a in amrlist:
             amr.append(a.split(dlm))
         amr = pd.DataFrame(amr[1:], columns=amr[0])
-
+    if amr.empty:
+        log.critical("No results available for generating linelist")
+        raise SystemExit(1)
     linelist = generate_linelist(
         amr=amr,
         _format=args.format,

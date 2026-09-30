@@ -65,6 +65,9 @@ def abritamr_gdst(args) -> dict:
         for a in amrlist:
             amr.append(a.split(dlm))
         amr = pd.DataFrame(amr[1:], columns=amr[0])
+    if amr.empty:
+        log.critical(f"No results available for gDST")
+        raise SystemExit(1)
     inferred = do_gdst(
         amr=amr,
         reference_folder=args.reference_folder,

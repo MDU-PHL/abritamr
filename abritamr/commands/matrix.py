@@ -60,6 +60,9 @@ def matrix(args) -> dict:
         for a in amrlist:
             amr.append(a.split(dlm))
         amr = pd.DataFrame(amr[1:], columns=amr[0])
+    if amr.empty:
+        log.critical(f"No results available for generating matrix output")
+        raise SystemExit(1)
     matrix = make_matrix(
         amr=amr,
         facet=args.facet,

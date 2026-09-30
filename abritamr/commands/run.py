@@ -162,11 +162,11 @@ def run(args) -> dict:
             log.warning(
                 f"You have not supplied an output directory. Output files will be generated in your working directory: {args.workdir}"
             )
-        species = (
-            guess_species(asm=args.contigs[0], sid=args.sample_id)
-            if args.contigs
-            else ""
-        )
+        # species = (
+        #     guess_species(asm=args.contigs[0], sid=args.sample_id)
+        #     if args.contigs
+        #     else ""
+        # )
         inputs = []
         if args.contigs:
             for contig in args.contigs:

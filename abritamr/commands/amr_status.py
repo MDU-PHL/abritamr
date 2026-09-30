@@ -51,7 +51,9 @@ def amr_status(args) -> dict:
         for a in amrlist:
             amr.append(a.split(dlm))
         amr = pd.DataFrame(amr[1:], columns=amr[0])
-
+    if amr.empty:
+        log.critical(f"No results available for amr typing")
+        raise SystemExit(1)
     amr = do_typing(amr=amr, reference_catalog=args.reference_catalog)
 
     return amr

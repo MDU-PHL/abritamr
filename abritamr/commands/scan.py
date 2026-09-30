@@ -2,6 +2,7 @@
 
 import pathlib
 import pandas as pd
+
 from collections import namedtuple
 from abritamr.utils import (
     check_assembly,
@@ -60,6 +61,8 @@ def runfindr(
             amr=res,
             catalog=reference_catalog,
         )
+    else:
+        log.critical(f"{asm} is not a valid file. Nothing further will be run")
     return res
 
 
@@ -134,7 +137,7 @@ def generate_inputs(pth: str, sid: str, key: str) -> dict:
     return d
 
 
-def scan(args) -> dict:
+def scan(args) -> list:
     """Build scan inputs from CLI arguments and return their results."""
     inputs = []
     if not args.contigs and not args.amrfinderplus:
@@ -150,13 +153,12 @@ def scan(args) -> dict:
         for afp in args.amrfinderplus:
             d = generate_inputs(pth=afp, sid=args.sample_id, key="amrfinderplus")
             inputs.append(d)
-
     for i in inputs:
         i["threads"] = args.threads
         i["species"] = args.species
         i["min_coverage"] = args.min_coverage
         i["min_identity"] = args.min_identity
-        d["reference_catalog"] = args.reference_catalog
+        i["reference_catalog"] = args.reference_catalog
 
     amr = run_scan(inputs=inputs)
 

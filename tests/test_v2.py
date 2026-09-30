@@ -97,9 +97,7 @@ def test_matrix_and_report_column_helpers(monkeypatch):
         amr_matrix, "abritamr_matrix_columns", lambda **kwargs: ["Beta"]
     )
     matrix, columns = amr_matrix.wrangle_cols(
-        pd.DataFrame(
-            {"abritamr_subclass": ["Beta"], "Element symbol": ["blaA"]}
-        ),
+        pd.DataFrame({"abritamr_subclass": ["Beta"], "Element symbol": ["blaA"]}),
         {},
         ["Sample_id"],
     )
@@ -107,9 +105,7 @@ def test_matrix_and_report_column_helpers(monkeypatch):
     assert columns == ["Sample_id", "Beta"]
 
     report, columns = amr_report.wrangle_cols(
-        pd.DataFrame(
-            {"abritamr_subclass": ["Beta"], "Element symbol": ["blaA"]}
-        ),
+        pd.DataFrame({"abritamr_subclass": ["Beta"], "Element symbol": ["blaA"]}),
         {},
         ["Sample_id"],
     )
@@ -164,12 +160,16 @@ def test_classification_and_reportability_lookups():
             "abritamr_subclass": ["Penicillin"],
         }
     )
-    assert drugclasses.get_class(
-        "abritamr_accession_key", "WP_1", refs, "abritamr_class"
-    ) == "Beta-lactam"
-    assert drugclasses.get_class(
-        "abritamr_accession_key", "missing", refs, "abritamr_class"
-    ) == "NA"
+    assert (
+        drugclasses.get_class("abritamr_accession_key", "WP_1", refs, "abritamr_class")
+        == "Beta-lactam"
+    )
+    assert (
+        drugclasses.get_class(
+            "abritamr_accession_key", "missing", refs, "abritamr_class"
+        )
+        == "NA"
+    )
     assert parse_reportable.find_classes(refs, "WP_1") == (
         "Beta-lactam",
         "Penicillin",
@@ -205,9 +205,10 @@ def test_reportability_default_for_unmatched_accession():
 def test_parse_amrtype_applies_label(monkeypatch):
     monkeypatch.setattr(parse_amrtype, "construct_filter", lambda **kwargs: "ESBL")
     rows = [{"abritamr_subclass": "Beta-lactam", "Element symbol": "blaA"}]
-    assert parse_amrtype.get_amr_type(rows, species="Species")[0][
-        "abritamr AMR type"
-    ] == "ESBL"
+    assert (
+        parse_amrtype.get_amr_type(rows, species="Species")[0]["abritamr AMR type"]
+        == "ESBL"
+    )
 
 
 def test_parse_finder_reads_tabular_records(tmp_path):
@@ -230,15 +231,13 @@ def test_gdst_rule_parsing():
         parse_gdstrules.parse_rule(row, {})
     )
     assert parse_gdstrules.special_rule_for_amrrules_rna("c.[10A>G]") == "c.[10A>G]"
-    assert parse_gdstrules.special_rule_for_amrrules_rna(
-        "c.[10A>G]extra]"
-    ) == "c.[10A>G]"
+    assert (
+        parse_gdstrules.special_rule_for_amrrules_rna("c.[10A>G]extra]") == "c.[10A>G]"
+    )
 
 
 def test_report_and_matrix_empty_results(monkeypatch):
-    monkeypatch.setattr(
-        amr_report, "abritamr_amrtype_columns", lambda: ["Sample_id"]
-    )
+    monkeypatch.setattr(amr_report, "abritamr_amrtype_columns", lambda: ["Sample_id"])
     assert amr_report.summary(pd.DataFrame()).columns.tolist() == ["Sample_id"]
 
     monkeypatch.setattr(
@@ -264,9 +263,9 @@ def test_amrfinder_command_and_output_parser(monkeypatch):
     command = run_finder.generate_cmd(90, 80, "assembly.fa", 4, "Species")
     assert "amrfinder -n assembly.fa" in command
     assert "--threads 4 -O Species" in command
-    assert run_finder.parse_output(
-        "Element symbol\tType\nblaA\tAMR\n"
-    ) == [{"Element symbol": "blaA", "Type": "AMR"}]
+    assert run_finder.parse_output("Element symbol\tType\nblaA\tAMR\n") == [
+        {"Element symbol": "blaA", "Type": "AMR"}
+    ]
 
 
 def test_sourmash_index_loader(monkeypatch):
@@ -286,16 +285,20 @@ def test_status_command_validates_and_projects_columns(monkeypatch):
     monkeypatch.setattr(
         amr_status,
         "generate_output",
-        lambda amr, catalog: [
-            {**amr[0], "abritamr_priority_status": "high"}
-        ],
+        lambda amr, catalog: [{**amr[0], "abritamr_priority_status": "high"}],
     )
     monkeypatch.setattr(
-        amr_status, "abritamr_status_columns", lambda: ["sample_id", "abritamr_priority_status"]
+        amr_status,
+        "abritamr_status_columns",
+        lambda: ["sample_id", "abritamr_priority_status"],
     )
     results = amr_status.do_typing(
         pd.DataFrame(
-            {"sample_id": ["sample-1"], "species": ["Species"], "abritamr_subclass": ["Beta"]}
+            {
+                "sample_id": ["sample-1"],
+                "species": ["Species"],
+                "abritamr_subclass": ["Beta"],
+            }
         ),
         "catalog.csv",
     )
@@ -322,14 +325,18 @@ def test_infer_and_linelist_command_wrappers(monkeypatch):
         }
     ]
     monkeypatch.setattr(infer, "gdst", lambda **kwargs: inferred)
-    monkeypatch.setattr(infer, "gdst_results_to_df_long", amr_infer.gdst_results_to_df_long)
+    monkeypatch.setattr(
+        infer, "gdst_results_to_df_long", amr_infer.gdst_results_to_df_long
+    )
     amr = pd.DataFrame({"sample_id": ["sample-1"], "species": ["Species"]})
     assert infer.do_gdst(amr, "rules", "Susceptible", "long").loc[0, "gDST"] == "R"
 
     monkeypatch.setattr(
         linelist,
         "summary",
-        lambda results, **kwargs: pd.DataFrame({"Sample_id": [results.iloc[0]["sample_id"]]}),
+        lambda results, **kwargs: pd.DataFrame(
+            {"Sample_id": [results.iloc[0]["sample_id"]]}
+        ),
     )
     line_results = pd.DataFrame(
         {
@@ -338,9 +345,9 @@ def test_infer_and_linelist_command_wrappers(monkeypatch):
             "abritamr_subclass": ["Beta", "Beta"],
         }
     )
-    assert linelist.generate_linelist(
-        line_results, "csv", "compact", False, 90, 90
-    )["Sample_id"].tolist() == ["sample-1", "sample-2"]
+    assert linelist.generate_linelist(line_results, "csv", "compact", False, 90, 90)[
+        "Sample_id"
+    ].tolist() == ["sample-1", "sample-2"]
 
 
 def test_matrix_and_run_command_helpers(monkeypatch, tmp_path):
@@ -391,7 +398,9 @@ def test_scan_input_builder_and_database_folder(tmp_path):
 def test_catalog_and_rule_commands(monkeypatch, tmp_path):
     monkeypatch.setattr(utils_catalog, "create_db_folder", lambda path: True)
     updated_catalog = []
-    monkeypatch.setattr(utils_catalog, "update_catalog", lambda args: updated_catalog.append(args))
+    monkeypatch.setattr(
+        utils_catalog, "update_catalog", lambda args: updated_catalog.append(args)
+    )
     args = types.SimpleNamespace(output_dir=str(tmp_path), catalog="catalog.csv")
     utils_catalog.catalog(args)
     assert updated_catalog == [args]
@@ -399,6 +408,8 @@ def test_catalog_and_rule_commands(monkeypatch, tmp_path):
     monkeypatch.setattr(utils_rules, "create_db_folder", lambda path: True)
     monkeypatch.setattr(utils_rules, "check_path", lambda path: True)
     updated_rules = []
-    monkeypatch.setattr(utils_rules, "update_rules", lambda args: updated_rules.append(args))
+    monkeypatch.setattr(
+        utils_rules, "update_rules", lambda args: updated_rules.append(args)
+    )
     utils_rules.rules(args)
     assert updated_rules == [args]
