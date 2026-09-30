@@ -1,11 +1,6 @@
 import subprocess
 import pandas as pd
-from abritamr.utils import (
-    check_amrfinder,
-    check_any2fasta,
-    check_assembly,
-    wrangle_species,
-)
+from abritamr.utils import wrangle_species
 import logging
 from abritamr.logger import log
 
@@ -19,10 +14,12 @@ from abritamr.logger import log
 def generate_cmd(
     min_identity: float, min_coverage: float, asm: str, threads: int, organism: str
 ) -> str:
-    spc = ""
-    if organism != "":
-        spc = wrangle_species(organism=organism, asm=asm, sid="abritamr")
-        spc = f"-O {spc}"
+    # spc = ""
+    log.info(f"Will check if organism {organism} can be used.")
+    # if organism != "" or "unknown" not in organism:
+    log.info("Wrangling species for AMRfinder use")
+    spc = wrangle_species(organism=organism, asm=asm, sid="abritamr")
+    # spc = f"-O {spc}"
 
     cmd = f"amrfinder -n {asm} --plus --ident_min {min_identity} --coverage_min {min_coverage} --threads {threads} {spc}"
 
@@ -32,7 +29,6 @@ def generate_cmd(
 def run_cmd(cmd: str) -> str:
     log.info(f"Running amrfinder: {cmd}")
     proc = subprocess.run(cmd, shell=True, capture_output=True, encoding="utf-8")
-    # # print(proc)
     if proc.returncode != 0:
         err = proc.stderr.split("\n")
         log.critical(f"The following error was reported:")
@@ -47,7 +43,7 @@ def parse_output(results: str) -> dict:
     rdict = []
     rows = results.split("\n")
     rows = [row.split("\t") for row in rows if row != ""]
-    res = pd.DataFrame(rows[1:0], columns=rows[0])
+    res = pd.DataFrame(rows[1:], columns=rows[0])
     if res.empty:
         rd = {}
         for c in rows[0]:
@@ -72,4 +68,3 @@ def run_amrf(
     stdout = run_cmd(cmd=cmd)
     amr = parse_output(results=stdout)
     return amr
-

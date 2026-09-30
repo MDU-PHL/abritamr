@@ -54,8 +54,8 @@ def check_any2fasta() -> bool:
         raise SystemExit(1)
 
 
-def abritamr_matrix_columns(group: str = "abritamr_subclass") -> list:
-    refs = get_refgenes()
+def abritamr_matrix_columns(refgenes: str, group: str = "abritamr_subclass") -> list:
+    refs = get_refgenes(pth=refgenes)
     refs["gene"] = refs["allele"].fillna(refs["gene_family"])
     cols_final = sorted(refs[group].unique().tolist())
 
@@ -259,14 +259,17 @@ def wrangle_species(
 
         organism = guess_species(asm, sid=sid)
 
-    if organism != "":
+    if organism != "unknown":
         og = "_".join(organism.split())
         if og in SPCFG:
-            return og
+            return f"-O {og}"
         elif og[0] in SPCFG:
-            return og[0]
+            return f"-O {og[0]}"
+        elif "Shigella" in og:
+            return f"-O Eschericia"
         else:
             return ""
+    return ""
 
 
 def output_results(
@@ -284,4 +287,3 @@ def output_results(
     else:
         p = pathlib.Path(workdir / f"{output}.{suf}")
         df.to_csv(p, sep=dlm, index=False)
-

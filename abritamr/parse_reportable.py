@@ -1,23 +1,12 @@
 import pandas as pd
-import numpy as np
-import logging
-import json
-import pathlib
-import sys
 
 from abritamr.utils import get_refgenes
 
 from abritamr.filter_reportable import construct_filter
 from abritamr.logger import log
 
-# logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO) 
-# handler = logging.StreamHandler(sys.stderr)
 
-# log = logging.getLogger(__name__)
-# log.addHandler(handler)
-
-
-def get_class(key:str, val:str, refgenes:pd.DataFrame, _type:str) -> str:
+def get_class(key: str, val: str, refgenes: pd.DataFrame, _type: str) -> str:
 
     try:
         return refgenes[refgenes[key] == val][f"{_type}"].values[0]
@@ -25,46 +14,41 @@ def get_class(key:str, val:str, refgenes:pd.DataFrame, _type:str) -> str:
         log.critcal("The entry is not present in the reference catalog")
         return "unknown"
 
-def get_classes(key:str, val:str, refgenes:pd.DataFrame) -> tuple:
 
-    _class = get_class(key = key, val= val, refgenes = refgenes, _type = "abritamr_class")
-    _subclass = get_class(key = key, val= val, refgenes = refgenes, _type = "abritamr_subclass")
+def get_classes(key: str, val: str, refgenes: pd.DataFrame) -> tuple:
 
-    return _class,_subclass
+    _class = get_class(key=key, val=val, refgenes=refgenes, _type="abritamr_class")
+    _subclass = get_class(
+        key=key, val=val, refgenes=refgenes, _type="abritamr_subclass"
+    )
 
-def find_classes(refgenes:pd.DataFrame,accession:str) -> str:
+    return _class, _subclass
 
-    _class = _subclass =  "unknown"
-    
-    for key in ['refseq_protein_accession', 'refseq_nucleotide_accession', 'genbank_protein_accession', 'genbank_nucleotide_accession']:
+
+def find_classes(refgenes: pd.DataFrame, accession: str) -> str:
+
+    _class = _subclass = "unknown"
+
+    for key in [
+        "refseq_protein_accession",
+        "refseq_nucleotide_accession",
+        "genbank_protein_accession",
+        "genbank_nucleotide_accession",
+    ]:
         if accession in refgenes[key].unique().tolist():
-            _class,_subclass = get_classes(key = key, val = accession,refgenes = refgenes)
+            _class, _subclass = get_classes(key=key, val=accession, refgenes=refgenes)
             break
 
-    return _class,_subclass
+    return _class, _subclass
 
-def add_abritamr_results(amr:dict, sid : str = "", catalog:str = "") -> pd.DataFrame:
+
+def add_abritamr_results(amr: dict, sid: str = "", catalog: str = "") -> pd.DataFrame:
     log.info(f"Adding abritamr classes and determining gene status.")
-    # # print(amr)
-    refgenes = get_refgenes(pth = catalog)
+    refgenes = get_refgenes(pth=catalog)
     for row in amr:
-        # _class,_subclass = find_classes(refgenes = refgenes, accession = row['Closest reference accession'])
-
-        if row['sample_id'] == "":
+        if row["sample_id"] == "":
             log.critcal(f"You must have a sample_id value.")
             raise SystemExit(1)
-        # row['abritamr_class'] = _class
-        # row['abritamr_subclass'] = _subclass
-        # row['species']= species
-        # row['sample_id'] = sid
-        row['gene'] = row['abritamr_mechanism']
-        row = construct_filter( result = row , refgenes = refgenes)
-        
-        
-        
-        # # print(row)
+        row["gene"] = row["abritamr_mechanism"]
+        row = construct_filter(result=row, refgenes=refgenes)
     return amr
-
-
-
-    

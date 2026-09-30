@@ -18,8 +18,6 @@ def wrangle_cols(
     repdf: pd.DataFrame, repmechs: dict, cols: list, simple: bool = True
 ) -> tuple:
     cols_final = sorted(repdf["abritamr_subclass"].unique().tolist())
-    # # print(cols_final)
-    # cols_final = []
     if not simple:
         refs = get_refgenes()
         cols_final = sorted(refs["abritamr_subclass"].unique().tolist())
@@ -122,34 +120,32 @@ def summary(
         ]
         nonreportable_other = results[(results["Type"] != "AMR")]
         amrtype = results["abritamr_AMR_type"].unique().tolist()
-        repmechs["Priority AMR mechansims"] = ",".join(
+        repmechs["Priority AMR mechansims"] = ";".join(
             sorted(reportable["Element symbol"].unique().tolist())
         )
-        repmechs["Other acquired AMR mechansims"] = ",".join(
+        repmechs["Other acquired AMR mechansims"] = ";".join(
             sorted(acq_results["Element symbol"].unique().tolist())
         )
-        repmechs["Other core AMR mechansims"] = ",".join(
+        repmechs["Other core AMR mechansims"] = ";".join(
             sorted(core_results["Element symbol"].unique().tolist())
         )
         if len(amrtype) == 1 and amrtype[0] == "":
             amrtype = ""
         else:
             amrtype = ";".join([a for a in amrtype if a])
-        # # print(cols)
-        # for df in [reportable, nonreportable_amr, nonreportable_other]:
         df = results[
             (results["% Identity to reference"] >= minidentity)
             & (results["% Coverage of reference"] >= mincoverage)
         ]
         repmechs, cols = wrangle_cols(df, repmechs, cols, simple=simple)
 
-        repmechs["Other AMR mechanisms"] = ",".join(
+        repmechs["Other AMR mechanisms"] = ";".join(
             sorted(nonreportable_amr["Element symbol"].unique().tolist())
         )
-        repmechs["Priority AMR mechanisms (low coverage/identity)"] = ",".join(
+        repmechs["Priority AMR mechanisms (low coverage/identity)"] = ";".join(
             sorted(reportable_amr_low["Element symbol"].unique().tolist())
         )
-        repmechs["Other"] = ",".join(
+        repmechs["Other"] = ";".join(
             sorted(nonreportable_other["Element symbol"].unique().tolist())
         )
         repmechs["Species provided"] = species

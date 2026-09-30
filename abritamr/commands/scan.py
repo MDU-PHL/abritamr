@@ -15,6 +15,8 @@ from abritamr.logger import log
 
 
 def generate_output(species: str, sample_id: str, amr: list, catalog: str) -> list:
+    if len(amr) == 1 and set(amr[0].values()) == set("-"):
+        log.warning(f"There are no genes detected for {sample_id}.")
     amr = apply_classes(amr=amr, species=species, sid=sample_id, catalog=catalog)
 
     return amr
@@ -65,7 +67,6 @@ def scan(args) -> dict:
         for afp in args.amrfinderplus:
             sample_id = args.sample_id if args.sample_id else full_path
             species = args.species if args.species else ""
-            # organism = wrangle_species(organism = species, sid = args.sample_id if args.sample_id else "abritamr")
             full_path = f"{pathlib.Path(f'{afp}').absolute()}"
             log.info(f"Opening existing amrfinder plus output")
 

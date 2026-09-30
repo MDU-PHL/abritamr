@@ -41,7 +41,9 @@ def matrix(args) -> dict:
         try:
             linelist = pd.concat(lines)
         except ValueError:
-            mcols = abritamr_matrix_columns(group=args.facet)
+            mcols = abritamr_matrix_columns(
+                refgenes=args.reference_catalog, group=args.facet
+            )
             linelist = pd.DataFrame(columns=mcols, data=[])
         return linelist
     else:
@@ -60,4 +62,3 @@ def matrix(args) -> dict:
     # minidentity:float = 90,
     # mincoverage:float = 90,
     # outname:str = "abritamr_report"
-

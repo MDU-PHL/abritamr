@@ -50,7 +50,6 @@ def run_status(args):
 def run_matrix(args):
     log.info(f"Running matrix to collate single sample results into a matrix.")
     result = matrix.matrix(args)
-    # # print(linelist)
     output_results(
         df=result, output=args.output, _format=args.format, workdir=args.workdir
     )
@@ -61,7 +60,6 @@ def run_linelist(args):
         f"Running linelist to collate single sample results into a linelist for reporting."
     )
     result = linelist.linelist(args)
-    # # print(linelist)
     output_results(
         df=result, output=args.output, _format=args.format, workdir=args.workdir
     )
@@ -70,7 +68,6 @@ def run_linelist(args):
 def run_gdst(args):
     log.info(f"Running gDST to collate single sample results into a gDST report.")
     result = infer.abritamr_gdst(args)
-    # # print(gdst)
     output_results(
         df=result, output=args.output, _format=args.format, workdir=args.workdir
     )

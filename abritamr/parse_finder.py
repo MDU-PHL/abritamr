@@ -1,16 +1,20 @@
 import pandas as pd
 import pathlib
+from abritamr.logger import log
 
 
-def amrf2dict(amrfinder:str)->dict:
+def amrf2dict(amrfinder: str) -> dict:
 
     if pathlib.Path(amrfinder).exists():
         try:
-            df = pd.read_csv(amrfinder, sep = "\t")
+            df = pd.read_csv(amrfinder, sep="\t")
 
-            amr = df.to_dict(orient = "records")
+            amr = df.to_dict(orient="records")
             return amr
 
         except Exception as e:
-            log.critical(f"Something has gone wrong opening your amrfinder output file. The following error was reported.")
+            log.critical(
+                f"Something has gone wrong opening your amrfinder output file. The following error was reported."
+            )
             raise SystemExit(1)
+

@@ -1,11 +1,6 @@
 import pandas as pd
 
 from abritamr.utils import (
-    check_assembly,
-    check_amrfinder,
-    check_any2fasta,
-    wrangle_species,
-    output_results,
     abritamr_amrtype_columns,
 )
 from abritamr.amr_report import summary
@@ -33,7 +28,6 @@ def linelist(args) -> dict:
     ):
         simple = True if args.viewtype == "compact" else False
         lines = []
-        print(amr)
         for sid in amr["sample_id"].unique().tolist():
             tmp = amr[amr["sample_id"] == sid]
 
@@ -58,14 +52,3 @@ def linelist(args) -> dict:
             f"It looks like your input file is not correctly configured. Please run abritamr scan and amr_status to generate the appropriate inut file."
         )
         raise SystemExit(1)
-
-    # results:pd.DataFrame,
-    # _format:str="csv",
-    # species:str="",
-    # genus:str="",
-    # simple:bool=False,
-    # sid:str="abritamr",
-    # genesonly:bool = False,
-    # minidentity:float = 90,
-    # mincoverage:float = 90,
-    # outname:str = "abritamr_report"

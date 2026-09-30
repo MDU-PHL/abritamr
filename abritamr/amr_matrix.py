@@ -12,7 +12,7 @@ def wrangle_cols(
     refgenes: str = "",
 ) -> tuple:
 
-    cols_final = abritamr_matrix_columns(group=group)
+    cols_final = abritamr_matrix_columns(refgenes=refgenes, group=group)
 
     for dc in cols_final:
         g = group if group != "gene" else "Element symbol"
