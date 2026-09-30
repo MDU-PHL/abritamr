@@ -80,7 +80,7 @@ def run_scan(
 ) -> pd.DataFrame:
 
     amr = []
-    dbv = "-"
+    dbv = "unknown"
 
     for input in inputs:
         Data = namedtuple("Data", input.keys())
@@ -150,7 +150,7 @@ def scan(args) -> dict:
         i["species"] = args.species
         i["min_coverage"] = args.min_coverage
         i["min_identity"] = args.min_identity
-        i["reference_catalog"] = args.reference_catalog
+        d["reference_catalog"] = args.reference_catalog
 
     amr = run_scan(inputs=inputs)
 
