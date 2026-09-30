@@ -4,6 +4,8 @@ import re
 import sys
 from types import SimpleNamespace
 from unittest.mock import Mock
+from xml.etree import ElementTree
+from zipfile import ZipFile
 
 import numpy
 import pandas
@@ -228,6 +230,115 @@ def test_reporting_logic_general_applies_species_exclusions():
     assert not_reported == ["blaL1", "blaEC-1", "other", "other"]
 
 
+def test_mdu_collects_genes_and_extracts_qc_passed_isolates(tmp_path):
+    collate = bare_mdu_collate()
+    row = (
+        0,
+        pandas.Series({"Isolate": "sample", "ESBL": "blaA,blaB", "Other": numpy.nan}),
+    )
+    assert collate.get_all_genes(row) == ["sample", "blaA", "blaB"]
+
+    qc = tmp_path / "qc.csv"
+    qc.write_text(
+        "ISOLATE,SPECIES_EXP,SPECIES_OBS,TEST_QC\n"
+        "pass,E. coli,E. coli,PASS\n"
+        "fail,E. coli,E. coli,FAIL\n"
+    )
+    collate.mduqc = qc
+    assert collate._extract_plus_isolates("E. coli") == ["pass"]
+
+
+def test_mdu_reporting_logic_salmonella_classifies_resistance():
+    collate = bare_mdu_collate()
+    frame = pandas.DataFrame(
+        {
+            "Isolate": ["1234-56789-SALM"],
+            "Ampicillin": ["blaTEM"],
+            "Sulfonamide": ["sul1"],
+            "Trimethoprim": ["dfrA"],
+            "Ciprofloxacin": [""],
+        }
+    )
+
+    result = collate.reporting_logic_salmonella(next(frame.iterrows()))
+
+    assert result["MDU Sample ID"] == "1234-56789"
+    assert result["Item code"] == "SALM"
+    assert result["Ampicillin - ResMech"] == "blaTEM"
+    assert result["Ampicillin - Interpretation"] == "Resistant"
+    assert set(result["Trim-Sulpha - ResMech"].split(";")) == {"dfrA", "sul1"}
+    assert result["Ciprofloxacin - Interpretation"] == "Susceptible"
+
+
+def test_mdu_reporting_salmonella_selects_requested_isolates(tmp_path):
+    collate = bare_mdu_collate()
+    match = tmp_path / "matches.tsv"
+    pandas.DataFrame({"Isolate": ["keep", "skip"], "Ampicillin": ["blaA", "blaB"]}).to_csv(
+        match, sep="\t", index=False
+    )
+    collate.reporting_logic_salmonella = Mock(
+        side_effect=lambda row: {
+            "MDU Sample ID": row[1]["Isolate"],
+            "Item code": "",
+            **{
+                f"{name} - {suffix}": "None detected"
+                for name in [
+                    "Ampicillin",
+                    "Cefotaxime (ESBL)",
+                    "Cefotaxime (AmpC)",
+                    "Tetracycline",
+                    "Gentamicin",
+                    "Kanamycin",
+                    "Streptomycin",
+                    "Sulfathiazole",
+                    "Trimethoprim",
+                    "Trim-Sulpha",
+                    "Chloramphenicol",
+                    "Ciprofloxacin",
+                    "Meropenem",
+                    "Azithromycin",
+                    "Aminoglycosides (RMT)",
+                    "Colistin",
+                    "Other",
+                ]
+                for suffix in ["ResMech", "Interpretation"]
+            },
+        }
+    )
+
+    result = collate.mdu_reporting_salmonella(match, ["keep"])
+
+    assert list(result["MDU Sample ID"]) == ["keep"]
+
+
+def test_mdu_spreadsheet_saves_general_and_interpreted_results(tmp_path, monkeypatch):
+    collate = bare_mdu_collate()
+    collate.sop_name = "report"
+    collate.runid = "RUN"
+    monkeypatch.chdir(tmp_path)
+    matches = pandas.DataFrame({"value": ["match"]})
+    partials = pandas.DataFrame({"value": ["partial"]})
+
+    collate.save_spreadsheet_general(matches, partials)
+
+    output = tmp_path / "RUN_report.xlsx"
+    assert output.exists()
+    with ZipFile(output) as workbook:
+        contents = ElementTree.fromstring(workbook.read("xl/workbook.xml"))
+    namespace = {"xlsx": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+    assert [sheet.attrib["name"] for sheet in contents.findall(".//xlsx:sheet", namespace)] == [
+        "report",
+        "Passed QC partial",
+    ]
+
+    collate.save_spreadsheet_interpreted([("Salmonella enterica", matches)])
+    with ZipFile(output) as workbook:
+        contents = ElementTree.fromstring(workbook.read("xl/workbook.xml"))
+    assert [sheet.attrib["name"] for sheet in contents.findall(".//xlsx:sheet", namespace)] == [
+        "report-01"
+    ]
+
+
 def test_update_transforms_and_config(update_module):
     update = update_module
     assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", update._get_date())
@@ -252,6 +363,56 @@ def test_update_transforms_and_config(update_module):
         "Arsenic",
     )
     assert update.virulence({"class": "", "subclass": ""}) == ("Virulence", "Other")
+
+
+def test_update_classification_helpers(update_module):
+    update = update_module
+    assert update._get_keys(
+        {
+            "rename_key": {"A": "B"},
+            "other_amr": ["AMR"],
+            "other_non_amr": ["NON-AMR"],
+            "oxa_phen_list": ["gene"],
+            "email_address": "review@example.org",
+        }
+    ) == ({"A": "B"}, ["AMR"], ["NON-AMR"], ["gene"], "review@example.org")
+
+    row = {"gene_family": "cfr", "class": "", "subclass": "OXAZOLIDINONE"}
+    assert update.cfr(row) == ("Multidrug", "Oxazolidinone")
+    aminoglycoside = {
+        "product_name": "16S rRNA methyltransferase",
+        "class": "AMINOGLYCOSIDE",
+        "subclass": "AMINOGLYCOSIDE",
+    }
+    assert update._aminoglycosides(aminoglycoside) == (
+        "Aminoglycoside",
+        "Aminoglycosides (Ribosomal methyltransferase)",
+    )
+    assert update._rename(
+        {"FLUOROQUINOLONE": "Quinolone", "CARBAPENEM": "Carbapenemase"},
+        {"class": "FLUOROQUINOLONE", "subclass": "CARBAPENEM"},
+    ) == ("Quinolone", "Carbapenemase")
+    assert update.virulence({"class": "INTIMIN", "subclass": "ECOLI"}) == (
+        "Virulence",
+        "Intimin_ecoli",
+    )
+    assert update.virulence({"class": "STX2", "subclass": "STX"}) == ("Virulence", "Stx")
+
+
+def test_update_existing_catalog_helpers(update_module, monkeypatch):
+    update = update_module
+    expected_path = update.pathlib.Path(update.__file__).parent / "db" / "refgenes_latest.csv"
+    assert update._check_existing() == expected_path
+
+    monkeypatch.setattr(update, "_check_existing", lambda: False)
+    assert update._get_previous_refgenes() is False
+
+    previous = pandas.DataFrame(
+        [{"key": "existing", "class_new": "AMR", "subclass_new": "ESBL"}]
+    )
+    monkeypatch.setattr(update, "_check_existing", lambda: expected_path)
+    monkeypatch.setattr(update.pandas, "read_csv", lambda path: previous.copy())
+    assert update._get_previous_refgenes().equals(previous)
 
 
 @pytest.mark.parametrize(
@@ -505,3 +666,21 @@ def test_pipeline_entrypoints_orchestrate_components(cli_module, monkeypatch):
     collate.assert_called_once_with("amr")
     collate.return_value.run.assert_called_once_with()
 
+
+def test_report_and_update_entrypoints_orchestrate_components(cli_module, monkeypatch):
+    cli = cli_module
+    setup = Mock()
+    setup.return_value.setup.return_value = "report inputs"
+    report = Mock()
+    monkeypatch.setattr(cli, "SetupMDU", setup)
+    monkeypatch.setattr(cli, "MduCollate", report)
+
+    cli.mdu(SimpleNamespace())
+
+    setup.assert_called_once()
+    report.assert_called_once_with("report inputs")
+    report.return_value.run.assert_called_once_with()
+
+    monkeypatch.setattr(cli, "create_refgenes", Mock())
+    cli.update_db(SimpleNamespace())
+    cli.create_refgenes.assert_called_once_with()
