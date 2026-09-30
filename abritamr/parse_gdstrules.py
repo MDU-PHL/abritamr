@@ -1,3 +1,5 @@
+"""Download, parse, and combine AMRverse genotypic susceptibility rules."""
+
 import re
 
 import pandas as pd
@@ -14,7 +16,7 @@ from abritamr.utils import _get_date
 
 
 def get_cfg() -> list:
-
+    """Load species and evidence-grade configuration for AMR rules."""
     try:
         with open(f"{pathlib.Path(__file__).parent / 'configs' / 'amr_rules_config.json'}", "r") as s:
             sp = json.load(s)
@@ -25,12 +27,12 @@ def get_cfg() -> list:
         # raise SystemExit
 
 def url_stub() ->str:
-
+    """Return the base URL for AMRverse rule files."""
     return "https://raw.githubusercontent.com/AMRverse/AMRrules/refs/heads/main/rules/"
 
 
 def get_rules(species:str, output_dir:str) -> dict:
-
+    """Download the AMRverse rule file for a species."""
     sfx = "_".join(species.split(" "))
     url = url_stub()
     p = subprocess.run(f"wget -nc -O {output_dir}/amr_rules_{sfx}.tsv {url}{sfx}.tsv", shell = True, capture_output = True, encoding = "utf-8")
@@ -42,7 +44,7 @@ def get_rules(species:str, output_dir:str) -> dict:
         raise SystemExit
     
 def open_rules(pth:str) -> dict:
-
+    """Read a tab-delimited rule file into record dictionaries."""
     try:
         df = pd.read_csv(pth, sep = "\t")
         return df.fillna("").to_dict(orient = "records")
@@ -53,18 +55,20 @@ def open_rules(pth:str) -> dict:
 
 
 def get_accession_key(row:dict) -> str:
+    """Choose and normalize the protein or nucleotide accession in a rule."""
     acc = row['protein accession'] if row['protein accession'] != '-' else row['nucleotide accession']
     acc = acc.split(":")[0] if ":" in acc else acc
     return acc
 
 def special_rule_for_amrrules_rna(mutation : str) -> str:
+    """Normalize an RNA mutation expression for rule matching."""
     if mutation.endswith("]"):
         return f"{mutation.split(']')[0]}]"
     else:
         return mutation
 
 def parse_rule(row:dict, simple_rules:dict) -> str:
-
+    """Translate a source rule's gene and mutation into a CEL expression."""
     acc = get_accession_key(row = row)
     
     mt = f"contains_any(row.amrrules_mutation, '{special_rule_for_amrrules_rna(row['mutation'])}') && " if row['mutation'] != "-" else ""
@@ -84,7 +88,7 @@ def parse_rule(row:dict, simple_rules:dict) -> str:
 
 
 def get_simple_rules(rules:list) -> list:
-
+    """Map simple AMR rule identifiers to their accession keys."""
     # rows = []
     simple_rules = {}
     for rule in rules:
@@ -98,7 +102,7 @@ def get_simple_rules(rules:list) -> list:
         
 
 def wrangle_the_rules(rules:list, simple_rules:dict, species:str, cfg:dict, evidence_grade:str = 'very low') -> list:
-
+    """Filter source rules by evidence grade and format them for abriTAMR."""
     grades = cfg['grades']
     ccl = cfg['clinical_category']
     row = []
@@ -134,7 +138,7 @@ def wrangle_the_rules(rules:list, simple_rules:dict, species:str, cfg:dict, evid
 
 
 def generate_rules(species:str, evidence_grade:int, cfg:dict, output_dir:str) -> list:
-
+    """Download and convert the rules for one species."""
     rule_file = get_rules(species = species, output_dir = output_dir)
     rules = open_rules(pth = rule_file)
     simple_rules = get_simple_rules(rules = rules)
@@ -144,6 +148,7 @@ def generate_rules(species:str, evidence_grade:int, cfg:dict, output_dir:str) ->
     return results
 
 def get_amrrules_for_species(evidence_grade:int,output_dir:str, species:str="all", rules_dict:dict={}) -> list:
+    """Generate AMRverse rules for one or all configured species."""
     cfg = get_cfg()
     species_list = cfg['species']
     
@@ -165,6 +170,7 @@ def get_amrrules_for_species(evidence_grade:int,output_dir:str, species:str="all
 
 
 def get_additional_rules(pth:str) -> list:
+    """Read user-supplied inference rules from a CSV file."""
     log.info(f"Opening additional rules file {pth}")
     try:
         rules = pd.read_csv(pth)
@@ -175,6 +181,7 @@ def get_additional_rules(pth:str) -> list:
     
 
 def add_rules_to_existing(rules:dict, additional_rules:str) -> list:
+    """Append user-supplied rules to the corresponding species rule sets."""
     additional_rules = get_additional_rules(pth = additional_rules)
     for ar in additional_rules:
         sp = ar['species']
@@ -193,5 +200,4 @@ def add_rules_to_existing(rules:dict, additional_rules:str) -> list:
 #     rule:str
 #     inferred:str
 #     source:str = "not supplied"
-
 

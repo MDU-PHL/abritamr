@@ -1,10 +1,12 @@
+"""Argument parser configuration for AMR matrix generation."""
+
 import pathlib, argparse, sys, os, logging,json
 from abritamr.cli.basic_args import inputs, references, detection_args, basic_output
 
 
 
 def matrix_args(subparsers):
-
+    """Add the matrix command and its options to the parser."""
 
     parser_sub_matrix = subparsers.add_parser('matrix', help='Generate a presence/absence table based on genes or drugclasses', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_matrix.add_argument(

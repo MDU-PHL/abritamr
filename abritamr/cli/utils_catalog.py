@@ -1,3 +1,5 @@
+"""Argument parser configuration for gene catalog generation."""
+
 import pathlib, argparse, sys, os, logging,json
 
 
@@ -10,6 +12,7 @@ spcs.extend(sp['species'])
 
 
 def catalog_args(subparsers):
+    """Add the gene-catalog utility and its options to the parser."""
     # parser_sub_utils_catalog = subparsers.add_parser('catalog', help='Generate the reference gene catalog for abritamr.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_catalog = subparsers.add_parser('generate_gene_catalog', help='Create a reference gene catalogue ONLY for abritamr (this will not update any rules for genomic DST)', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sub_catalog.add_argument(

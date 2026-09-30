@@ -1,3 +1,5 @@
+"""Generate AMR presence/absence matrices from typed results."""
+
 import pathlib
 import pandas as pd
 
@@ -13,6 +15,7 @@ def make_matrix(
     min_identity: float,
     reference_catalog: str,
 ) -> pd.DataFrame:
+    """Create one matrix per sample using the requested AMR facet."""
     if (
         "sample_id" in amr.columns.tolist()
         and "species" in amr.columns.tolist()
@@ -45,7 +48,7 @@ def make_matrix(
 
 
 def matrix(args) -> dict:
-
+    """Read typed AMR input and generate a matrix from command options."""
     try:
         amr = pd.read_csv(args.amr)
         # amr = amr.to_dict(orient = "records")

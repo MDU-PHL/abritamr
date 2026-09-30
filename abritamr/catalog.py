@@ -1,3 +1,5 @@
+"""Build and annotate the reference gene catalog used by abriTAMR."""
+
 import re
 
 import pandas as pd
@@ -18,6 +20,7 @@ from abritamr.utils import _get_date,check_path
 
 
 def _get_new_catalog() -> str:
+    """Download the latest AMRFinderPlus reference gene catalog."""
     log.info(f"Getting reference catalog from ncbi.")
     updated_html = f"https://ftp.ncbi.nlm.nih.gov/pathogen/Antimicrobial_resistance/AMRFinderPlus/database/latest/ReferenceGeneCatalog.txt"
                     
@@ -30,6 +33,7 @@ def _get_new_catalog() -> str:
         raise SystemExit
 
 def _make_key(df):
+    """Add accession keys used to match catalog rows and mutations."""
     if 'abritamr_accession_key' not in list(df.columns):
         df['abritamr_accession_key'] =df[['refseq_protein_accession','genbank_protein_accession', 'refseq_nucleotide_accession', 'genbank_nucleotide_accession']].apply(lambda x: '_'.join([i for i in x if i != '']), axis = 1)
         df['mut_acc'] = df[['allele','whitelisted_taxa','refseq_protein_accession','genbank_protein_accession', 'refseq_nucleotide_accession', 'genbank_nucleotide_accession']].apply( lambda x: '_'.join([i for i in x if i != '']), axis = 1)
@@ -38,7 +42,7 @@ def _make_key(df):
     return df
 
 def catalog_df(catalog:str,src:str = 'abritamr') -> pd.DataFrame: # will need to generalise for amrrules and others??
-
+    """Read a reference catalog and normalize its gene and accession fields."""
     new_catalog = catalog
     if catalog == "":
         new_catalog = _get_new_catalog()
@@ -53,7 +57,7 @@ def catalog_df(catalog:str,src:str = 'abritamr') -> pd.DataFrame: # will need to
     return refs
 
 def _capitalise(x):
-
+    """Normalize capitalization of slash-separated class names."""
     a = x.split('/')
     a = [i.capitalize() for i in a]
     _list = list(map(lambda x: x.replace('Carbapenem','Carbapenemase'), a))
@@ -61,7 +65,7 @@ def _capitalise(x):
     return '/'.join(_list)
 
 def get_current(pth:str) -> pd.DataFrame:
-
+    """Read an existing catalog, or return an empty frame if it is absent."""
     if check_path(pth):
         current = pd.read_csv(pth)
         current = current.fillna("")
@@ -70,19 +74,20 @@ def get_current(pth:str) -> pd.DataFrame:
 
 
 def get_reportable_criteria(cfgpath: str) -> dict:
-
+    """Load AMR reporting criteria from a configuration file."""
     rcdict = get_abritamr_reporting(cfgpath = cfgpath)
 
     return rcdict
 
 def get_class_criteria(cfgpath:str) -> dict:
-
+    """Load drug-class definitions from a configuration file."""
     ccdict = get_abritamr_defs(cfgpath = cfgpath)
 
     return ccdict
 
 
 def _updated_entries(new_catalog, previous_catalog) -> pd.DataFrame:
+    """Mark changed catalog entries and retain their previous class labels."""
     previous_catalog = previous_catalog.rename(columns = {"class_new": "class_prev", "subclass_new":"subclass_prev"})
     _tmp= new_catalog.merge(previous_catalog, on = ['abritamr_accession_key'])
     _tmp['changed'] = numpy.where((_tmp['class_prev'] != _tmp['class']) , 'updated', '')
@@ -98,7 +103,7 @@ def _updated_entries(new_catalog, previous_catalog) -> pd.DataFrame:
 
 
 def _new_entries(new_catalog, previous_catalog) -> pd.DataFrame:
-    
+    """Mark entries as new or existing and identify changed records."""
     log.info(f"Checking for new entries.")
     new_catalog['Status'] = numpy.where(new_catalog['abritamr_accession_key'].isin(list(previous_catalog['abritamr_accession_key'])), 'existing','new')
     log.info(f"Checking for updated entries.")
@@ -106,12 +111,13 @@ def _new_entries(new_catalog, previous_catalog) -> pd.DataFrame:
     return new_catalog
 
 def _update_status(new_catalog, previous_catalog) -> pd.DataFrame:
-
+    """Add status metadata by comparing catalogs."""
     new_catalog = _new_entries(new_catalog=new_catalog,previous_catalog=previous_catalog)
 
     return new_catalog
 
 def _compare_to_existing(new_catalog, previous_catalog) -> pd.DataFrame:
+    """Compare against an existing catalog when one is available."""
     try:
         if isinstance(previous_catalog,pd.DataFrame):
             new_catalog = _update_status(new_catalog=new_catalog,previous_catalog=previous_catalog)
@@ -126,7 +132,7 @@ def _compare_to_existing(new_catalog, previous_catalog) -> pd.DataFrame:
     
 
 def construct_refgenes_starter(catalog:str, previous_catalog:str, src:str= "abritamr") -> list:
-
+    """Load the reference catalog and return normalized records."""
     refs = catalog_df(catalog = catalog)
     crnt = get_current(pth = previous_catalog)
     refs = _compare_to_existing(new_catalog = refs, previous_catalog = crnt)
@@ -137,6 +143,7 @@ def construct_refgenes_starter(catalog:str, previous_catalog:str, src:str= "abri
 
 
 def apply_classes(class_definitions: list, refgenes : list, src: str = 'abritamr') -> list:
+    """Apply configured class definitions to reference gene records."""
     # rename = _get_rename()
     rows = []
     for row in refgenes:
@@ -168,12 +175,14 @@ def apply_classes(class_definitions: list, refgenes : list, src: str = 'abritamr
 
 
 def mutant_nomenclature_converter() -> dict:
+    """Return the mapping from amino-acid one-letter to three-letter codes."""
     converter = {'G': 'Gly', 'A': 'Ala', 'S': 'Ser', 'P': 'Pro', 'T': 'Thr', 'C': 'Cys', 'V': 'Val', 'L': 'Leu', 'I': 'Ile', 
                  'M': 'Met', 'N': 'Asn', 'Q': 'Gln', 'K': 'Lys', 'R': 'Arg', 'H': 'His', 'D': 'Asp', 'E': 'Glu', 'W': 'Trp', 
                  'Y': 'Tyr', 'F': 'Phe'}
     return converter
 
 def sub_aa_del(ref:str, pos:int, alt:str, xtr:str) -> str:
+    """Format an amino-acid deletion using protein HGVS-like notation."""
     cvt = mutant_nomenclature_converter()
     pos1 = f"{pos}"
     pos2 = f"{pos+len(ref)-1}"
@@ -187,6 +196,7 @@ def sub_aa_del(ref:str, pos:int, alt:str, xtr:str) -> str:
     return f"p.{res}"
 
 def sub_aa_mutations(ref:str,pos:int, alt:str, xtr:str) -> str:
+    """Format an amino-acid substitution or deletion for AMR rule matching."""
     reqa = len(ref) == len(alt) # check if it is a deletion or mutli substitution
     if 'del' in alt and reqa == False:
         # alt = f"del{alt.replace('del','')}"
@@ -207,10 +217,12 @@ def sub_aa_mutations(ref:str,pos:int, alt:str, xtr:str) -> str:
     return var
 
 def sub_nt_mutations(ref:str, pos:int, alt:str, promoter: bool = False) -> str:
+    """Format a nucleotide mutation for AMR rule matching."""
     var = f"c.{pos}{ref}>{alt}" if promoter else f"c.[{pos}{ref}>{alt}]"
     return var
 
 def parse_snps_for_amrrules(refgenes:list) -> list:
+    """Parse point mutations into notation used by AMR rules."""
     rgx = re.compile(r'(\D+)(-?\d+)(\D+)(.*)')
     for row in refgenes:
         if "POINT" == row['subtype']:
@@ -231,6 +243,7 @@ def parse_snps_for_amrrules(refgenes:list) -> list:
     return refgenes
 
 def get_amrrules(output_dir:str) -> dict:
+    """Load species-specific AMR rules from the generated database."""
     cfg = get_cfg()
     species_list = cfg['species']
     rules_dict = {}
@@ -241,7 +254,7 @@ def get_amrrules(output_dir:str) -> dict:
     return rules_dict
 
 def apply_amrrule_genecontext(output_dir:str, rows:list, dflt_rs: str= 'low', dflt_hg : str = 'high') -> list:
-
+    """Apply AMR rule gene-context priorities to reference records."""
     rules_dict = get_amrrules(output_dir = output_dir)
     for row in rows:
         if row['priority_status'] != dflt_hg:
@@ -259,7 +272,7 @@ def apply_amrrule_genecontext(output_dir:str, rows:list, dflt_rs: str= 'low', df
 
 
 def apply_amrtyping(amrtyping_definitions:list,refgenes:list, dflt_rs: str= '-') -> list:
-
+    """Apply configured AMR typing criteria to reference records."""
 
     rows = []
     for row in refgenes:
@@ -287,13 +300,13 @@ def apply_amrtyping(amrtyping_definitions:list,refgenes:list, dflt_rs: str= '-')
     return rows
 
 def abritamr_mechanism(refgenes:list) -> list:
-
+    """Set each record's mechanism to its allele or gene family."""
     for row in refgenes:
         row['abritamr_mechanism'] = row['allele'] if row['allele'] != "" else row['gene_family']
     return refgenes
 
 def wrangle_catalog(catalog:str, previous_catalog:str, amrtyping_definitions:str, class_definitions:str, output_dir:str, src:str = "abritamr") -> bool:
-
+    """Build a reference catalog with classes, typing, priorities, and mechanisms."""
     refgenes = construct_refgenes_starter(catalog = catalog, previous_catalog=previous_catalog, src = src)
    
     ccdict = get_class_criteria(cfgpath = class_definitions)

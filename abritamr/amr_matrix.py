@@ -1,3 +1,5 @@
+"""Build tabular matrices summarizing AMR results."""
+
 import pandas as pd
 
 from abritamr.logger import log
@@ -11,7 +13,7 @@ def wrangle_cols(
     group: str = "abritamr_subclass",
     refgenes: str = "",
 ) -> tuple:
-
+    """Populate matrix values for each configured AMR class."""
     cols_final = abritamr_matrix_columns(refgenes=refgenes, group=group)
 
     for dc in cols_final:
@@ -38,7 +40,7 @@ def summary(
     mincoverage: float = 90,
     refgenes: str = "",
 ) -> bool:
-
+    """Summarize typed AMR results as a sample-by-class matrix."""
     mincoverage = float(mincoverage)
     minidentity = float(minidentity)
     results = results.fillna("")

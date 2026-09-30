@@ -1,3 +1,5 @@
+"""Command-line entry point for running abriTAMR workflows."""
+
 import argparse, sys, os, logging, json
 
 from abritamr.commands import (
@@ -24,13 +26,8 @@ from abritamr.version import __version__, db
 from abritamr.utils import output_results
 from abritamr.logger import log
 
-"""
-abritamr is designed to implement AMRFinder and parse the results for reporting and inferrence of AST. It may also be used for other purposes where the format of output is compatible.
-
-"""
-
-
 def run_scan(args):
+    """Run gene detection and write the scan results."""
     log.info(f"Running scan to identify genes and and drugclasses")
     amr = scan.scan(args)
     output_results(
@@ -39,7 +36,7 @@ def run_scan(args):
 
 
 def run_status(args):
-
+    """Determine AMR status from scan results and write the report."""
     log.info(
         f"Determining the amr status of the sequence based on genes and drug classes."
     )
@@ -48,6 +45,7 @@ def run_status(args):
 
 
 def run_matrix(args):
+    """Build and write a matrix from sample results."""
     log.info(f"Running matrix to collate single sample results into a matrix.")
     result = matrix.matrix(args)
     output_results(
@@ -56,6 +54,7 @@ def run_matrix(args):
 
 
 def run_linelist(args):
+    """Build and write a reportable linelist from sample results."""
     log.info(
         f"Running linelist to collate single sample results into a linelist for reporting."
     )
@@ -66,6 +65,7 @@ def run_linelist(args):
 
 
 def run_gdst(args):
+    """Infer and write genotypic drug susceptibility results."""
     log.info(f"Running gDST to collate single sample results into a gDST report.")
     result = infer.abritamr_gdst(args)
     output_results(
@@ -74,31 +74,35 @@ def run_gdst(args):
 
 
 def run_complete(args):
+    """Run the complete abriTAMR workflow."""
     log.info(f"Running all amr modules. Please be patient this may take some time.")
 
     result = run.run(args)
 
 
 def _update_databases(args):
+    """Generate or update the local reference database."""
     log.info(f"Will generate an abritamr compatible reference gene catalog.")
 
     catalog = update_database.generate_database(args)
 
 
 def _update_catalog(args):
+    """Generate or update the reference gene and rules catalog."""
     log.info(f"Will generate an abritamr compatible reference gene and rules catalog.")
 
     catalog = utils_catalog.catalog(args)
 
 
 def _update_rules(args):
+    """Generate or update the AMR rules catalog."""
     log.info(f"Will generate an abritamr compatible rules catalog.")
 
     catalog = utils_rules.rules(args)
 
 
 def cli():
-
+    """Parse command-line arguments and dispatch the selected command."""
     parser = argparse.ArgumentParser(
         description=f"****abritamr - AMR gene detection and reporting pipeline - version {__version__}****",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,

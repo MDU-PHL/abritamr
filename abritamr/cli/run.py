@@ -1,9 +1,12 @@
+"""Argument parser configuration for the complete workflow."""
+
 import pathlib, argparse, sys, os, logging, json
 
 from abritamr.cli.basic_args import inputs, references, detection_args
 
 
 def run_args(subparsers):
+    """Add the complete workflow command and its options to the parser."""
     parser_sub_complete = subparsers.add_parser(
         "run",
         help="Run the complete suite of abritamr functions. This will create a folder for each sample and generate a linelist report and inferred antibiogram (if supported for your species).",

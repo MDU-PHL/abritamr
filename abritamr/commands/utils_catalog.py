@@ -1,3 +1,4 @@
+"""Implement the gene-catalog utility command."""
 
 import pathlib
 import json
@@ -12,6 +13,7 @@ from abritamr.commands.update_database import create_db_folder,update_catalog
 
 
 def catalog(args) -> bool:
+    """Generate a gene catalog and report failures through the CLI logger."""
     if create_db_folder(args.output_dir):
         log.info(f"Database folder created at {args.output_dir}")
 

@@ -1,3 +1,5 @@
+"""Assign AMR types to detected mechanisms using configured criteria."""
+
 import pandas as pd
 import numpy as np
 
@@ -13,7 +15,7 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 def get_amr_type(amr:dict, species: str= "", genus:str="", cfgpath:str="") -> pd.DataFrame:
-    
+    """Add an AMR type label to each detected mechanism."""
     for row in amr:
         
         result_tocheck = {
