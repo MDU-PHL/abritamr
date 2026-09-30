@@ -11,13 +11,11 @@ def run_args(subparsers):
     )
     parser_sub_complete = inputs(parser=parser_sub_complete)
     parser_sub_complete.add_argument(
-        "--outdir",
-        help="Output directory for collated output files. If not supplied will put output files in workdir",
-        default="",
+        "--outdir",, help="Output directory for collated output files. If not supplied will put output files in workdir", default="abritamr"
     )
     parser_sub_complete.add_argument(
         "--multi",
-        help="Tab-delimited file with columns sample_id, path to contigs (and/or amrfinder outputs), species (optional). Note sample_id will be used as the output directory when using multi.",
+        help="Tab-delimited file with columns sample_id, path to assembly (and/or amrfinder outputs) and species (optional).",
         default="",
     )
     parser_sub_complete.add_argument(
@@ -68,3 +66,4 @@ def run_args(subparsers):
     parser_sub_catalog = references(parser=parser_sub_complete)
 
     return parser_sub_complete
+
