@@ -11,6 +11,45 @@ from abritamr.amr_infer import gdst, gdst_results_to_df_long, gdst_results_to_df
 from abritamr.logger import log
 
 
+def do_gdst(
+    amr: pd.DataFrame, reference_folder: str, dflt_result: str, reporttype: str
+) -> pd.DataFrame:
+
+    if "sample_id" in amr.columns.tolist() and "species" in amr.columns.tolist():
+        # simple = True if args.viewtype == 'compact' else False
+        lines = []
+        for sid in amr["sample_id"].unique().tolist():
+            tmp = amr[amr["sample_id"] == sid]
+            sp = tmp["species"].iloc[0]
+            line = gdst(
+                results=tmp,
+                species=sp,
+                reference_folder=reference_folder,
+                dflt_result=dflt_result,
+            )
+            lines.extend(line)
+        if lines != []:
+            if reporttype == "long":
+                linelist = gdst_results_to_df_long(lines)
+            elif reporttype == "wide":
+                linelist = gdst_results_to_df_wide(lines)
+            else:
+                log.critical(
+                    f"Report type {reporttype} is not recognized. Please use 'long' or 'wide'."
+                )
+                raise SystemExit(1)
+
+            return linelist
+        else:
+            log.warning(f"There were no results possible")
+            return []
+    else:
+        log.critical(
+            f"It looks like your input file is not correctly configured. Please run abritamr scan to generate the appropriate inut file."
+        )
+        raise SystemExit(1)
+
+
 def abritamr_gdst(args) -> dict:
 
     try:
@@ -24,42 +63,12 @@ def abritamr_gdst(args) -> dict:
         for a in amrlist:
             amr.append(a.split(dlm))
         amr = pd.DataFrame(amr[1:], columns=amr[0])
-
-    if "sample_id" in amr.columns.tolist() and "species" in amr.columns.tolist():
-        # simple = True if args.viewtype == 'compact' else False
-        lines = []
-        for sid in amr["sample_id"].unique().tolist():
-            tmp = amr[amr["sample_id"] == sid]
-            sp = tmp["species"].iloc[0]
-            line = gdst(
-                results=tmp,
-                species=sp,
-                reference_folder=args.reference_folder,
-                dflt_result=args.dflt_result,
-            )
-            lines.extend(line)
-        if lines != []:
-            if args.reporttype == "long":
-                linelist = gdst_results_to_df_long(lines)
-            elif args.reporttype == "wide":
-                linelist = gdst_results_to_df_wide(lines)
-            else:
-                log.critical(
-                    f"Report type {args.reporttype} is not recognized. Please use 'long' or 'wide'."
-                )
-                raise SystemExit(1)
-
-            return linelist
-        else:
-            log.warning(f"There were no results possible")
-            raise SystemExit(0)
-
-    else:
-        log.critical(
-            f"It looks like your input file is not correctly configured. Please run abritamr scan to generate the appropriate inut file."
-        )
-        raise SystemExit(1)
-
+    gdst = do_gdst(
+        amr=amr,
+        reference_folder=args.reference_folder,
+        dflt_result=args.dflt_result,
+        reporttype=args.reporttype,
+    )
     # results:pd.DataFrame,
     # _format:str="csv",
     # species:str="",

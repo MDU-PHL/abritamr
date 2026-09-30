@@ -6,6 +6,44 @@ from abritamr.logger import log
 from abritamr.utils import abritamr_matrix_columns
 
 
+def make_matrix(
+    amr: pd.DataFrame,
+    facet: str,
+    min_coverage: float,
+    min_identity: float,
+    reference_catalog: str,
+) -> pd.DataFrame:
+    if (
+        "sample_id" in amr.columns.tolist()
+        and "species" in amr.columns.tolist()
+        and "abritamr_subclass" in amr.columns.tolist()
+    ):
+        lines = []
+        for sid in amr["sample_id"].unique().tolist():
+            tmp = amr[amr["sample_id"] == sid]
+
+            line = summary(
+                results=tmp,
+                facet=facet,
+                sid=sid,
+                minidentity=min_identity,
+                mincoverage=min_coverage,
+                refgenes=reference_catalog,
+            )
+            lines.append(line)
+        try:
+            linelist = pd.concat(lines)
+        except ValueError:
+            mcols = abritamr_matrix_columns(refgenes=reference_catalog, group=facet)
+            linelist = pd.DataFrame(columns=mcols, data=[])
+        return linelist
+    else:
+        log.critical(
+            f"It looks like your input file is not correctly configured. Please run abritamr scan and amr_status to generate the appropriate inut file."
+        )
+        raise SystemExit(1)
+
+
 def matrix(args) -> dict:
 
     try:
@@ -19,39 +57,15 @@ def matrix(args) -> dict:
         for a in amrlist:
             amr.append(a.split(dlm))
         amr = pd.DataFrame(amr[1:], columns=amr[0])
+    matrix = make_matrix(
+        amr=amr,
+        facet=args.facet,
+        min_coverage=args.min_coverage,
+        min_identity=args.min_identity,
+        reference_catalog=args.reference_catalog,
+    )
 
-    if (
-        "sample_id" in amr.columns.tolist()
-        and "species" in amr.columns.tolist()
-        and "abritamr_subclass" in amr.columns.tolist()
-    ):
-        lines = []
-        for sid in amr["sample_id"].unique().tolist():
-            tmp = amr[amr["sample_id"] == sid]
-
-            line = summary(
-                results=tmp,
-                facet=args.facet,
-                sid=sid,
-                minidentity=args.min_identity,
-                mincoverage=args.min_coverage,
-                refgenes=args.reference_catalog,
-            )
-            lines.append(line)
-        try:
-            linelist = pd.concat(lines)
-        except ValueError:
-            mcols = abritamr_matrix_columns(
-                refgenes=args.reference_catalog, group=args.facet
-            )
-            linelist = pd.DataFrame(columns=mcols, data=[])
-        return linelist
-    else:
-        log.critical(
-            f"It looks like your input file is not correctly configured. Please run abritamr scan and amr_status to generate the appropriate inut file."
-        )
-        raise SystemExit(1)
-
+    return matrix
     # results:pd.DataFrame,
     # _format:str="csv",
     # species:str="",

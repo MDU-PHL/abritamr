@@ -190,7 +190,9 @@ def gdst(
             for key in ["mechanisms", "rule_id", "rule_version", "source", "inferred"]:
                 # # print(f"Joining {key} for {drug}: {rlt[drug][key]}")
                 rs = (
-                    ";".join(list(set(rlt[drug][key]))) if rlt[drug][key] != [] else "-"
+                    ";".join(rlt[drug][key])
+                    if rlt[drug][key] != [] or set(rlt[drug][key]) != {"-"}
+                    else "-"
                 )
                 # # print(f"Joined {key} for {drug}: {rs}")
                 rlt[drug][key] = rs

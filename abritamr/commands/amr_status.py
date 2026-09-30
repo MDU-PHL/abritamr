@@ -13,6 +13,29 @@ def generate_output(amr: dict, catalog: str) -> dict:
     return amr
 
 
+def do_typing(amr: pd.DataFrame, reference_catalog: str) -> pd.DataFrame:
+
+    log.info(f"Will now determine status of the AMR genes detected.")
+
+    if (
+        "sample_id" in amr.columns.tolist()
+        and "species" in amr.columns.tolist()
+        and "abritamr_subclass" in amr.columns.tolist()
+    ):
+        amr = amr.to_dict(orient="records")
+        amr = generate_output(amr=amr, catalog=reference_catalog)
+    else:
+        log.critical(
+            f"It looks like your input file is not correctly configured. Please run abritamr scan to generate the appropriate inut file."
+        )
+        raise SystemExit(1)
+    abritamr_cols = abritamr_status_columns()
+    amr = pd.DataFrame(amr)
+    amr = amr[abritamr_cols]
+
+    return amr
+
+
 def amr_status(args) -> dict:
     log.info("Going to try to open input.")
     try:
@@ -24,22 +47,7 @@ def amr_status(args) -> dict:
         for a in amrlist:
             amr.append(a.split(dlm))
         amr = pd.DataFrame(amr[1:], columns=amr[0])
-    log.info(f"Will now determine status of the AMR genes detected.")
 
-    if (
-        "sample_id" in amr.columns.tolist()
-        and "species" in amr.columns.tolist()
-        and "abritamr_subclass" in amr.columns.tolist()
-    ):
-        amr = amr.to_dict(orient="records")
-        amr = generate_output(amr=amr, catalog=args.reference_catalog)
-    else:
-        log.critical(
-            f"It looks like your input file is not correctly configured. Please run abritamr scan to generate the appropriate inut file."
-        )
-        raise SystemExit(1)
-    abritamr_cols = abritamr_status_columns()
-    amr = pd.DataFrame(amr)
-    amr = amr[abritamr_cols]
+    amr = do_typing(amr=amr, reference_catalog=args.reference_catalog)
 
     return amr

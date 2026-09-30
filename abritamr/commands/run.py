@@ -17,7 +17,11 @@ from abritamr.utils import (
     check_path,
     guess_species,
 )
-from abritamr.commands.scan import run_scan
+from abritamr.commands.scan import run_scan, generate_inputs
+from abritamr.commands.amr_status import do_typing
+from abritamr.commands.linelist import generate_linelist
+from abritamr.commands.matrix import make_matrix
+from abritamr.commands.infer import do_gdst
 
 
 def save_output(
@@ -26,34 +30,32 @@ def save_output(
     result: pd.DataFrame,
     outname: str,
     _format: str = "csv",
-    no_keep: bool = False,
 ) -> bool:
 
-    if not no_keep:
-        dlm = ","
-        if _format == "tab":
-            dlm = "\t"
-            _format = "txt"
+    dlm = ","
+    if _format == "tab":
+        dlm = "\t"
+        _format = "txt"
 
-        if sample_id != "":
-            log.info(f"Creating output directory for {sample_id}")
-            fldr = pathlib.Path(workdir, sample_id)
-        else:
-            fldr = pathlib.Path(workdir)
-        try:
-            fldr.mkdir(exist_ok=True)
+    if sample_id != "":
+        log.info(f"Creating output directory for {sample_id}")
+        fldr = pathlib.Path(workdir, sample_id)
+    else:
+        fldr = pathlib.Path(workdir)
+    try:
+        fldr.mkdir(exist_ok=True)
 
-            log.info(f"Creating output file {outname}")
+        log.info(f"Creating output file {outname}")
 
-            result.to_csv(f"{fldr}/{outname}.{_format}", sep=dlm, index=False)
+        result.to_csv(f"{fldr}/{outname}.{_format}", sep=dlm, index=False)
 
-            return True
+        return True
 
-        except Exception as e:
-            log.critical(
-                f"Something has gone wrong saving {outname}. The following error was encountered : {e}"
-            )
-            raise SystemExit(1)
+    except Exception as e:
+        log.critical(
+            f"Something has gone wrong saving {outname}. The following error was encountered : {e}"
+        )
+        raise SystemExit(1)
 
     return True
 
@@ -154,39 +156,99 @@ def run(args) -> dict:
             log.warning(
                 f"You have not supplied a sample id - please note that path to input will be used as sample id"
             )
-            args.sample_id = args.contigs if args.contigs != "" else args.amrfinderplus
         if args.outdir == "":
             log.warning(
                 f"You have not supplied an output directory. Output files will be generated in your working directory: {args.workdir}"
             )
-            args.outdir = args.workdir
         species = (
             guess_species(asm=args.contigs[0], sid=args.sample_id)
             if args.contigs
             else ""
         )
-        inputs = [
-            {
-                "sample_id": args.sample_id,
-                "contigs": args.contigs if args.contigs else "",
-                "amrfinder": args.amrfinderplus if args.amrfinderplus else "",
-                "species": species,
-                "outdir": args.outdir,
-            }
-        ]
+        inputs = []
+        if args.contigs:
+            for contig in args.contigs:
+                d = generate_inputs(pth=contig, sid=args.sample_id, key="contigs")
+                inputs.append(d)
+        if args.amrfinderplus:
+            for afp in args.amrfinderplus:
+                d = generate_inputs(pth=afp, sid=args.sample_id, key="amrfinderplus")
+                inputs.append(d)
+
+        for i in inputs:
+            i["species"] = args.species
+            i["outdir"] = args.outdir
     else:
         inputs = check_multi(pth=args.multi, workdir=pathlib.Path(args.workdir))
 
     for i in inputs:
         i["threads"] = args.threads
         i["min_identity"] = args.min_identity
+        i["min_coverage"] = args.min_coverage
+        i["reference_catalog"] = args.reference_catalog
+
+    scanned = run_scan(inputs=inputs)
+    typed = do_typing(amr=scanned, reference_catalog=args.reference_catalog)
+    linelist = generate_linelist(
+        amr=typed,
+        _format=args.format,
+        viewtype=args.viewtype,
+        genesonly=args.genesonly,
+        min_identity=args.min_identity,
+        min_coverage=args.min_coverage,
+    )
+    matrix = make_matrix(
+        amr=typed,
+        facet=args.facet,
+        reference_catalog=args.reference_catalog,
+        min_coverage=args.min_coverage,
+        min_identity=args.min_identity,
+    )
+    infer_res = do_gdst(
+        amr=typed,
+        dflt_result=args.dflt_result,
+        reference_folder=args.reference_folder,
+        reporttype=args.reporttype,
+    )
+    outputs = {
+        "scan": scanned,
+        "typed": typed,
+        "linelist": linelist,
+        "matrix": matrix,
+        "infer": infer_res,
+    }
+
+    if args.multi or (len(args.contigs) == 1 and args.sample_id != ""):
+        for o in outputs:
+            if not outputs[o].empty:
+                for i in inputs:
+                    idcol = outputs[o].columns.tolist()[0]
+                    ts = outputs[o][outputs[o][f"{idcol}"] == i["sample_id"]]
+                    save_output(
+                        workdir=f"{args.workdir}",
+                        sample_id=i["outdir"],
+                        result=ts,
+                        outname=f"abritamr_{o}",
+                        _format=args.format,
+                    )
+    else:
+        for o in outputs:
+            if not outputs[o].empty:
+                save_output(
+                    workdir=f"{args.workdir}",
+                    sample_id=args.outdir,
+                    result=outputs[o],
+                    outname=f"abritamr_{o}",
+                    _format=args.format,
+                )
 
 
 # linelists = []
 # matrices = []
 # infers = []
-# for i in inputs:
+# r i in inputs:
 #     amr = []
+#     t
 #     dbv = "unknown"
 #     # # print(i)
 #     res = []

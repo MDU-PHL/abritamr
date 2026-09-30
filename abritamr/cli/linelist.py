@@ -33,4 +33,3 @@ def llist_args(subparsers):
     parser_sub_llist = detection_args(parser=parser_sub_llist)
 
     return parser_sub_llist
-
