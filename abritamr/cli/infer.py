@@ -1,10 +1,12 @@
+"""Argument parser configuration for genotypic susceptibility inference."""
+
 import pathlib, argparse, sys, os, logging, json
 
 from abritamr.cli.basic_args import inputs, references, detection_args, basic_output
 
 
 def infer_args(subparsers):
-
+    """Add the inference command and its options to the parser."""
     parser_sub_infer = subparsers.add_parser(
         "infer",
         help="Infer phenotype from detected AMR mechanisms.",
@@ -35,4 +37,3 @@ def infer_args(subparsers):
     parser_sub_infer = detection_args(parser=parser_sub_infer)
 
     return parser_sub_infer
-

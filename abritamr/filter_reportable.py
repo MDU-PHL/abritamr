@@ -1,9 +1,12 @@
+"""Apply reportability and AMR typing criteria to AMRFinder results."""
+
 import pandas as pd
 from abritamr.logger import log
 from abritamr.cel_functions import create_cel_context, evaluate_rule
 
 
 def construct_filter(result: dict, refgenes: pd.DataFrame):
+    """Annotate one AMRFinder result with its catalog reporting criteria."""
     result["abritamr_priority_status"] = "not-reportable"
     result["criteria_id"] = ""
     result["criteria_version"] = ""
@@ -45,4 +48,3 @@ def construct_filter(result: dict, refgenes: pd.DataFrame):
         )
 
     return result
-

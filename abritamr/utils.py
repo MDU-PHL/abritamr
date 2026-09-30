@@ -1,3 +1,5 @@
+"""Shared validation, catalog, species, and output utilities."""
+
 from datetime import datetime
 import pathlib
 import subprocess
@@ -17,11 +19,12 @@ from abritamr.run_sourmash import run_sourmash_search
 
 
 def _get_date():
-
+    """Return today's date in ISO format."""
     return datetime.today().strftime("%Y-%m-%d")
 
 
 def check_path(pth: str) -> bool:
+    """Return whether a filesystem path exists."""
     log.info(f"Checking path: {pth}")
     if not pathlib.Path(pth).exists():
         return False
@@ -30,7 +33,7 @@ def check_path(pth: str) -> bool:
 
 # this needs to be user defined!!
 def get_refgenes(pth) -> pd.DataFrame:
-
+    """Read the reference gene catalog at the given path."""
     if check_path(pth=pth):
         rf = pathlib.Path(pth)
         return pd.read_csv(rf)
@@ -40,6 +43,7 @@ def get_refgenes(pth) -> pd.DataFrame:
 
 
 def check_any2fasta() -> bool:
+    """Check that any2fasta is installed, exiting if it is unavailable."""
     log.info(f"Checking that any2fasta is installed.")
     proc = subprocess.run(
         "any2fasta -v", shell=True, capture_output=True, encoding="utf-8"
@@ -55,6 +59,7 @@ def check_any2fasta() -> bool:
 
 
 def abritamr_matrix_columns(refgenes: str, group: str = "abritamr_subclass") -> list:
+    """Return sorted matrix columns from the selected catalog field."""
     refs = get_refgenes(pth=refgenes)
     refs["gene"] = refs["allele"].fillna(refs["gene_family"])
     cols_final = sorted(refs[group].unique().tolist())
@@ -63,6 +68,7 @@ def abritamr_matrix_columns(refgenes: str, group: str = "abritamr_subclass") -> 
 
 
 def abritamr_amrtype_columns() -> list:
+    """Return the ordered columns used by AMR linelist reports."""
     return [
         "Sample_id",
         "Priority AMR mechansims",
@@ -77,6 +83,7 @@ def abritamr_amrtype_columns() -> list:
 
 
 def abritamr_scan_columns() -> list:
+    """Return the ordered columns used by scan output."""
     return [
         "sample_id",
         "Element symbol",
@@ -111,6 +118,7 @@ def abritamr_scan_columns() -> list:
 
 
 def abritamr_status_columns() -> list:
+    """Return the ordered columns used by AMR status output."""
     return [
         "sample_id",
         "Element symbol",
@@ -145,6 +153,7 @@ def abritamr_status_columns() -> list:
 
 
 def check_sourmash() -> bool:
+    """Check that sourmash is installed, exiting if it is unavailable."""
     log.info(f"Checking that sourmash is installed.")
     proc = subprocess.run(
         "sourmash -v", shell=True, capture_output=True, encoding="utf-8"
@@ -160,6 +169,7 @@ def check_sourmash() -> bool:
 
 
 def check_amrfinder() -> bool:
+    """Check AMRFinderPlus installation and return its database version."""
     log.info(
         f"Checking that amrfinder plus is installed and database versions are compatible."
     )
@@ -192,6 +202,7 @@ def check_amrfinder() -> bool:
 
 
 def check_assembly(pth) -> bool:
+    """Validate an assembly file with any2fasta."""
     log.info(f"Checking assembly is in a correct format")
     if check_any2fasta():
         # try:
@@ -241,7 +252,7 @@ def guess_species(asm: str, sid: str = "abritamr") -> str:
 def wrangle_species(
     organism: str, asm: str = "", sid: str = "abritamr", check_species: bool = True
 ) -> tuple:
-
+    """Map a species name to the AMRFinderPlus organism option."""
     try:
         with open(
             f"{pathlib.Path(__file__).parent / 'configs' / 'amrfinder_species.json'}"
@@ -278,7 +289,7 @@ def output_results(
     _format: str = "csv",
     workdir: str = f"{pathlib.Path.cwd()}",
 ) -> bool:
-
+    """Write a dataframe to stdout or a file in CSV or tab-delimited format."""
     dlm = "," if _format == "csv" else "\t"
     suf = "csv" if _format == "csv" else "txt"
 

@@ -1,3 +1,5 @@
+"""Create and update local reference catalogs and inference rules."""
+
 
 import pathlib
 import json
@@ -11,6 +13,7 @@ from abritamr.parse_gdstrules import add_rules_to_existing, get_amrrules_for_spe
 
 
 def create_db_folder(pth:str) -> bool:
+    """Create the destination directory for generated database files."""
     try:
         pathlib.Path(pth).absolute().mkdir(parents=True, exist_ok=True)
         return True
@@ -19,7 +22,7 @@ def create_db_folder(pth:str) -> bool:
         raise SystemExit(1)
 
 def update_catalog(args) -> bool:
-
+    """Build the reference gene catalog from the supplied definitions."""
     if create_db_folder(args.output_dir):
         log.info(f"Database folder created at {args.output_dir}")
 
@@ -41,7 +44,7 @@ def update_catalog(args) -> bool:
         #     raise SystemExit(1)
 
 def update_rules(args) -> bool:
-    
+    """Generate species inference rules and save them in the output folder."""
     if create_db_folder(args.output_dir):
         log.info(f"Database folder created at {args.output_dir}")
         log.info(f"Generating rules for {args.species} with evidence grade {args.evidence_grade}")
@@ -70,6 +73,7 @@ def update_rules(args) -> bool:
         
 
 def generate_database(args) -> bool:
+    """Generate both the reference gene catalog and inference rules."""
     update_catalog(args = args)
     update_rules(args = args)
     log.info(f"Database generation complete. Please check the output folder {args.output_dir} for the generated files.")

@@ -1,3 +1,5 @@
+"""Look up AMR classes and mechanisms in the reference gene catalog."""
+
 import pandas as pd
 import numpy as np
 from abritamr.logger import log
@@ -8,7 +10,7 @@ warnings.simplefilter(action="ignore", category="UserWarning")
 
 
 def get_class(key: str, val: str, refgenes: pd.DataFrame, _type: str) -> str:
-
+    """Look up a catalog value by key and return the requested field."""
     try:
         if refgenes[refgenes[key] == val].empty:
             return "NA"
@@ -19,7 +21,7 @@ def get_class(key: str, val: str, refgenes: pd.DataFrame, _type: str) -> str:
 
 
 def get_amrrules_mutation(val: str, refgenes: pd.DataFrame) -> str:
-
+    """Look up the AMR-rule mutation associated with an accession key."""
     try:
         if refgenes[refgenes["abritamr_accession_key"] == val].empty:
             return "-"
@@ -31,7 +33,7 @@ def get_amrrules_mutation(val: str, refgenes: pd.DataFrame) -> str:
 
 
 def get_mechanism(val: str, refgenes: pd.DataFrame, symbol: str) -> str:
-
+    """Find the mechanism matching an accession key and element symbol."""
     try:
         if refgenes[
             refgenes["abritamr_accession_key"].str.contains(val, regex=False)
@@ -58,7 +60,7 @@ def get_mechanism(val: str, refgenes: pd.DataFrame, symbol: str) -> str:
 
 
 def get_accession_key(key: str, val: str, symbol: str, refgenes: pd.DataFrame) -> str:
-
+    """Resolve a hit to its catalog accession key."""
     try:
         if refgenes[
             refgenes["abritamr_accession_key"].str.contains(val, regex=False)
@@ -82,6 +84,7 @@ def get_accession_key(key: str, val: str, symbol: str, refgenes: pd.DataFrame) -
 
 
 def get_classes(key: str, val: str, refgenes: pd.DataFrame, symbol: str) -> tuple:
+    """Return class, subclass, provenance, accession, mutation, and mechanism."""
     abacc = get_accession_key(key=key, val=val, refgenes=refgenes, symbol=symbol)
     # log.info(f"Found {abacc}")
     _class = get_class(key=key, val=val, refgenes=refgenes, _type="abritamr_class")
@@ -98,7 +101,7 @@ def get_classes(key: str, val: str, refgenes: pd.DataFrame, symbol: str) -> tupl
 
 
 def find_classes(refgenes: pd.DataFrame, accession: str, symbol: str) -> str:
-
+    """Look up catalog annotations by any supported reference accession."""
     _class = _subclass = pmid = db_version = akey = amrrules_mut = mech = "-"
 
     for key in [
@@ -117,6 +120,7 @@ def find_classes(refgenes: pd.DataFrame, accession: str, symbol: str) -> str:
 
 
 def apply_classes(amr: dict, species: str, sid: str, catalog: str) -> dict:
+    """Annotate AMRFinder hits with catalog classes and sample metadata."""
     refgenes = get_refgenes(pth=catalog)
     for row in amr:
         _class, _subclass, pmid, db_version, key, amrrules_mut, mech = find_classes(

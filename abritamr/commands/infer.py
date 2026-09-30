@@ -1,3 +1,5 @@
+"""Run genotypic drug susceptibility inference on scan results."""
+
 import click
 import pathlib
 import json
@@ -14,7 +16,7 @@ from abritamr.logger import log
 def do_gdst(
     amr: pd.DataFrame, reference_folder: str, dflt_result: str, reporttype: str
 ) -> pd.DataFrame:
-
+    """Infer susceptibility for each sample and format the requested report."""
     if "sample_id" in amr.columns.tolist() and "species" in amr.columns.tolist():
         # simple = True if args.viewtype == 'compact' else False
         lines = []
@@ -51,7 +53,7 @@ def do_gdst(
 
 
 def abritamr_gdst(args) -> dict:
-
+    """Read scan results and infer genotypic susceptibility using CLI options."""
     try:
         amr = pd.read_csv(args.amr)
         # amr = amr.to_dict(orient = "records")
@@ -79,4 +81,3 @@ def abritamr_gdst(args) -> dict:
     # minidentity:float = 90,
     # mincoverage:float = 90,
     # outname:str = "abritamr_report"
-

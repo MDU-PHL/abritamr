@@ -1,3 +1,5 @@
+"""Data models and loaders for AMR classification and inference criteria."""
+
 from dataclasses import dataclass
 from dataclasses import asdict
 from typing import Optional,Literal
@@ -9,6 +11,8 @@ import pathlib
 
 @dataclass(frozen=True)
 class InferRules:
+    """Represent a rule that infers susceptibility for a drug and species."""
+
     drugname: str
     species: str
     rule_id:str
@@ -21,6 +25,8 @@ class InferRules:
 
 @dataclass(frozen=True)
 class ClassDefintion:
+    """Represent a rule assigning AMR classes to reference catalog entries."""
+
     class_id:int
     class_curation_id:str
     definition:str
@@ -29,7 +35,7 @@ class ClassDefintion:
 
 @dataclass(frozen=True)
 class Criteria:
-    
+    """Represent configured reporting, typing, or susceptibility criteria."""
     criteria_id: str
     criteria_version:str
     criteria: str
@@ -43,7 +49,7 @@ class Criteria:
     translation: str = None
 
     def __post_init__(self):
-        
+        """Require a drug name for inference and either status or inference."""
         if not self.drugname   and self.inferred:
             raise ValueError(f"You must supply a 'drugname'")
         if not self.status and not self.inferred:
@@ -51,7 +57,7 @@ class Criteria:
       
 
 def get_abritamr_reporting(cfgpath:str= "") -> list:
-
+    """Load reporting and typing criteria from a CSV configuration file."""
     abritamr_rep = []
     try:
         reps = pd.read_csv(f"{cfgpath}")
@@ -66,7 +72,7 @@ def get_abritamr_reporting(cfgpath:str= "") -> list:
     return abritamr_rep
 
 def get_abritamr_defs(cfgpath:str= "") -> list:
-
+    """Load class definitions from a CSV configuration file."""
     abritamr_defs = []
     try:
         defs = pd.read_csv(f"{cfgpath}")

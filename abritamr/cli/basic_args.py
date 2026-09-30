@@ -1,8 +1,10 @@
+"""Shared command-line argument groups used by abriTAMR commands."""
+
 import pathlib, argparse, sys, os, logging, json
 
 
 def references(parser):
-
+    """Add reference catalog and folder options to a command parser."""
     parser.add_argument(
         "--reference-folder",
         default=f"{pathlib.Path(__file__).parent.parent / 'db'}",
@@ -18,7 +20,7 @@ def references(parser):
 
 
 def inputs(parser):
-
+    """Add assembly, AMRFinder output, sample, species, and thread options."""
     parser.add_argument(
         "--contigs",
         "-c",
@@ -51,6 +53,7 @@ def inputs(parser):
 
 
 def detection_args(parser):
+    """Add minimum identity and coverage options to a command parser."""
     parser.add_argument(
         "--min-identity",
         default=0.9,
@@ -66,7 +69,7 @@ def detection_args(parser):
 
 
 def basic_output(parser):
-
+    """Add common work directory, output path, and format options."""
     parser.add_argument(
         "--workdir",
         "-w",
@@ -83,4 +86,3 @@ def basic_output(parser):
     )
 
     return parser
-

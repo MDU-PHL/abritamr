@@ -1,3 +1,5 @@
+"""Create sourmash signatures and search species reference indexes."""
+
 import sourmash
 import screed
 import tempfile

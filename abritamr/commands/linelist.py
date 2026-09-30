@@ -1,3 +1,5 @@
+"""Generate reportable linelists from typed AMR results."""
+
 import pandas as pd
 
 from abritamr.utils import (
@@ -15,7 +17,7 @@ def generate_linelist(
     min_identity: float,
     min_coverage: float,
 ) -> pd.DataFrame:
-
+    """Create one linelist report per sample and combine the results."""
     if (
         "sample_id" in amr.columns.tolist()
         and "species" in amr.columns.tolist()
@@ -50,7 +52,7 @@ def generate_linelist(
 
 
 def linelist(args) -> dict:
-
+    """Read typed AMR input and generate a linelist from command options."""
     try:
         amr = pd.read_csv(args.amr)
         # amr = amr.to_dict(orient = "records")

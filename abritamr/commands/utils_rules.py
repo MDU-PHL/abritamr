@@ -1,3 +1,4 @@
+"""Implement the AMR-rules utility command."""
 
 import pathlib
 import json
@@ -11,6 +12,7 @@ from abritamr.commands.update_database import create_db_folder,update_rules
 
 
 def rules(args) -> bool:
+    """Generate rules when the configured reference catalog is available."""
     if create_db_folder(args.output_dir):
         log.info(f"Database folder created at {args.output_dir}")
         if check_path(args.catalog):

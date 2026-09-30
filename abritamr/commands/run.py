@@ -1,3 +1,5 @@
+"""Orchestrate complete AMR workflows and save per-sample outputs."""
+
 import pathlib
 
 import pandas as pd
@@ -31,7 +33,7 @@ def save_output(
     outname: str,
     _format: str = "csv",
 ) -> bool:
-
+    """Save a result dataframe under the selected sample and output name."""
     dlm = ","
     if _format == "tab":
         dlm = "\t"
@@ -61,7 +63,7 @@ def save_output(
 
 
 def check_multi(pth: str, workdir: pathlib.Path) -> bool:
-
+    """Validate a multi-sample input table and build per-sample settings."""
     if check_path(f"{workdir}"):
         if check_path(pth):
             df = pd.read_csv(pth, sep="\t")
@@ -130,7 +132,7 @@ def check_multi(pth: str, workdir: pathlib.Path) -> bool:
 
 
 def wrangle_outputs(amr: list, cols: list = []) -> pd.DataFrame:
-
+    """Convert result records into a dataframe with the requested columns."""
     if amr != []:
         df = pd.DataFrame(amr)
         cols = cols if cols != [] else df.columns.tolist()
@@ -142,7 +144,7 @@ def wrangle_outputs(amr: list, cols: list = []) -> pd.DataFrame:
 
 
 def run(args) -> dict:
-
+    """Run scan, typing, reporting, matrix, and inference workflows."""
     simple = True if args.viewtype == "compact" else False
     # dbv = "unknown"
     if not args.contigs and not args.amrfinderplus and not args.multi:
