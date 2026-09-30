@@ -63,13 +63,13 @@ def linelist(args) -> dict:
             amr.append(a.split(dlm))
         amr = pd.DataFrame(amr[1:], columns=amr[0])
 
-        linelist = generate_linelist(
-            amr=amr,
-            _format=args.format,
-            viewtype=args.viewtype,
-            genesonly=args.genesonly,
-            min_identity=args.min_identity,
-            min_coverage=args.min_coverage,
-        )
+    linelist = generate_linelist(
+        amr=amr,
+        _format=args.format,
+        viewtype=args.viewtype,
+        genesonly=args.genesonly,
+        min_identity=args.min_identity,
+        min_coverage=args.min_coverage,
+    )
 
-        return linelist
+    return linelist

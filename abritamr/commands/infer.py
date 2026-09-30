@@ -42,7 +42,7 @@ def do_gdst(
             return linelist
         else:
             log.warning(f"There were no results possible")
-            return []
+            return pd.DataFrame()
     else:
         log.critical(
             f"It looks like your input file is not correctly configured. Please run abritamr scan to generate the appropriate inut file."
@@ -63,12 +63,13 @@ def abritamr_gdst(args) -> dict:
         for a in amrlist:
             amr.append(a.split(dlm))
         amr = pd.DataFrame(amr[1:], columns=amr[0])
-    gdst = do_gdst(
+    inferred = do_gdst(
         amr=amr,
         reference_folder=args.reference_folder,
         dflt_result=args.dflt_result,
         reporttype=args.reporttype,
     )
+    return inferred
     # results:pd.DataFrame,
     # _format:str="csv",
     # species:str="",

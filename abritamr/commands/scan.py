@@ -80,7 +80,7 @@ def run_scan(
 ) -> pd.DataFrame:
 
     amr = []
-    dbv = "unknown"
+    dbv = "-"
 
     for input in inputs:
         Data = namedtuple("Data", input.keys())
