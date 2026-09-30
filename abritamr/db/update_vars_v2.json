@@ -165,7 +165,7 @@
                                     "operator":"eq"
                                 },
                                 {
-                                    "columen":"subclass",
+                                    "column":"subclass",
                                     "value":"CARBAPENEM",
                                     "operator":"not eq"
                                 }
@@ -183,7 +183,7 @@
                                     "operator":"not in"
                                 },
                                 {
-                                    "columen":"product_name",
+                                    "column":"product_name",
                                     "value":"extended[-|\\s]{1}spectrum",
                                     "operator":"r in"
                                 }
@@ -242,4 +242,3 @@
         }
     }
 }
-
