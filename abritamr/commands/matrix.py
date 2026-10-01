@@ -1,6 +1,5 @@
 """Generate AMR presence/absence matrices from typed results."""
 
-import pathlib
 import pandas as pd
 
 from abritamr.amr_matrix import summary

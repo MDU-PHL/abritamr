@@ -1,17 +1,11 @@
 """Download, parse, and combine AMRverse genotypic susceptibility rules."""
 
-import re
-
 import pandas as pd
 import pathlib
-import datetime
 import json
 import subprocess
-from dataclasses import asdict
 from abritamr.logger import log
 from abritamr.utils import _get_date, clean_gtdb_species
-# from abritamr.utils import get_refgenes
-# from abritamr.criteria import get_abritamr_reporting,get_abritamr_defs
 
 
 def get_cfg() -> list:

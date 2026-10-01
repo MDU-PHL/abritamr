@@ -3,14 +3,7 @@
 import subprocess
 import pandas as pd
 from abritamr.utils import wrangle_species
-import logging
 from abritamr.logger import log
-
-# logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p')
-# log = logging.getLogger(__name__)
-# log.setLevel(logging.DEBUG)
-
-# pd.DataFrame(rows[1:], columns = rows[0]).to_dict(orient= "records")
 
 
 def generate_cmd(

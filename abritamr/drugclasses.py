@@ -1,7 +1,6 @@
 """Look up AMR classes and mechanisms in the reference gene catalog."""
 
 import pandas as pd
-import numpy as np
 from abritamr.logger import log
 from abritamr.utils import get_refgenes
 import warnings

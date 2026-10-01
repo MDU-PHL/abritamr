@@ -1,14 +1,7 @@
 """Run genotypic drug susceptibility inference on scan results."""
 
-import click
-import pathlib
-import json
-import logging
 import pandas as pd
-import sys
-from io import StringIO
 
-from abritamr.utils import wrangle_species
 from abritamr.amr_infer import gdst, gdst_results_to_df_long, gdst_results_to_df_wide
 from abritamr.logger import log
 

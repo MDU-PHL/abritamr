@@ -1,6 +1,6 @@
 """Command-line entry point for running abriTAMR workflows."""
 
-import argparse, sys, os, logging, json
+import argparse, sys
 
 from abritamr.commands import (
     scan,
@@ -25,6 +25,7 @@ from abritamr.cli.utils_catalog import catalog_args
 from abritamr.version import __version__, db
 from abritamr.utils import output_results
 from abritamr.logger import log
+
 
 def run_scan(args):
     """Run gene detection and write the scan results."""
@@ -143,14 +144,6 @@ def cli():
     parser_sub_utils_rules.set_defaults(func=_update_rules)
     parser_sub_utils_catalog.set_defaults(func=_update_catalog)
     args = parser.parse_args()
-
-    psrs = {
-        "run": parser_sub_run,
-        "scan": parser_sub_scan,
-        "linelist": parser_sub_llist,
-        "matrix": parser_sub_matrix,
-        "infer": parser_sub_infer,
-    }
 
     if len(sys.argv) < 2:
         parser.print_help(sys.stderr)

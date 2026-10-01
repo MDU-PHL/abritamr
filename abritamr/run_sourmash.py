@@ -22,7 +22,6 @@ def load_sourmash_index(SBT_filename: str):
     sourmash.Index
         The loaded sourmash index.
     """
-    # check_sourmash()
     tree = sourmash.load_file_as_index(SBT_filename)
     return tree
 
@@ -42,7 +41,6 @@ def sourmash_sig(query_filename: str, sid: str):
     -------
     None
     """
-    # check_sourmash()
 
     # Load the sourmash index
     minhash = sourmash.MinHash(ksize=31, n=0, scaled=10000)
@@ -99,7 +97,6 @@ def run_sourmash_search(query_filename: str, SBT_path: str, sid: str):
     """
     # check_sourmash()
     sp = "unknown"
-    # mx = 0
     # Load the sourmash index
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir_path = pathlib.Path(temp_dir)
@@ -116,7 +113,6 @@ def run_sourmash_search(query_filename: str, SBT_path: str, sid: str):
             sp = f"{found_sig}"
             sim = similarity
             spc.append({sim: sp})
-            # # print(f"Query: {qname}, Found: {' '.join(sp.split('_'))}, Similarity: {sim}")
         try:
             mx = max([list(x.keys())[0] for x in spc])
 

@@ -268,9 +268,6 @@ def wrangle_species(
         organism = guess_species(asm)
     organism = clean_gtdb_species(species=organism)
     ctx = create_cel_context(data={"species": [organism]}, name="row")
-    # log.info(
-    #     f"Now checking species rules for use in AMRFinderPlus. Species detected: {organism}. Using context {ctx}"
-    # )
     for rule in species_rules:
         # log.info(rule)
         species_criteria = rule["criteria"]

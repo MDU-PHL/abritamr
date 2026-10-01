@@ -1,10 +1,7 @@
 """Create and update local reference catalogs and inference rules."""
 
 import pathlib
-import json
-import logging
 import pandas as pd
-import sys
 
 from abritamr.logger import log
 from abritamr.catalog import wrangle_catalog
@@ -26,8 +23,6 @@ def update_catalog(args) -> bool:
     if create_db_folder(args.output_dir):
         log.info(f"Database folder created at {args.output_dir}")
 
-        # try:
-
         created = wrangle_catalog(
             catalog=args.catalog,
             previous_catalog=args.previous_catalog,
@@ -42,10 +37,6 @@ def update_catalog(args) -> bool:
             f"The basic reference gene catalogue has been created: {args.output_dir}/01_abritamr_reference_gene_catalog.csv"
         )
 
-        # except Exception as e:
-        #     log.critical(f"Looks like something has gone wrong with generating the reference catalogue. The following error was reported : {e}. Please try again.")
-        #     raise SystemExit(1)
-
 
 def update_rules(args) -> bool:
     """Generate species inference rules and save them in the output folder."""
@@ -57,16 +48,12 @@ def update_rules(args) -> bool:
 
         rules_dict = {}
         if not args.no_amrrules:
-            # try:
             rules_dict = get_amrrules_for_species(
                 evidence_grade=args.evidence_grade,
                 species=args.species,
                 rules_dict=rules_dict,
                 output_dir=args.output_dir,
             )
-            # except Exception as e:
-            #     log.critical(f"Looks like something has gone wrong with generating the AMR rules. The following error was reported : {e}. Please try again.")
-            #     raise SystemExit(1)
 
         rules_dict = add_rules_to_existing(
             rules=rules_dict, additional_rules=args.inference_definitions
@@ -101,4 +88,3 @@ def generate_database(args) -> bool:
     log.info(
         f"Database generation complete. Please check the output folder {args.output_dir} for the generated files."
     )
-

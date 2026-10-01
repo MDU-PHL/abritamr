@@ -4,17 +4,7 @@ import pathlib
 
 import pandas as pd
 
-from collections import namedtuple
-
-from abritamr.amr_infer import gdst, gdst_results_to_df_long, gdst_results_to_df_wide
-from abritamr.amr_matrix import summary as matrix_summary
-from abritamr.amr_report import summary
-
-from abritamr.drugclasses import apply_classes
 from abritamr.logger import log
-from abritamr.parse_finder import amrf2dict
-from abritamr.parse_reportable import add_abritamr_results
-from abritamr.run_finder import run_amrf
 from abritamr.utils import (
     check_path,
     guess_species,
@@ -145,8 +135,6 @@ def wrangle_outputs(amr: list, cols: list = []) -> pd.DataFrame:
 
 def run(args) -> dict:
     """Run scan, typing, reporting, matrix, and inference workflows."""
-    simple = True if args.viewtype == "compact" else False
-    # dbv = "unknown"
     if not args.contigs and not args.amrfinderplus and not args.multi:
         log.critical(
             "You must supply an input file (input file with multiple samples OR as single assembly or single amrfinder plus output). Exiting."
@@ -162,11 +150,6 @@ def run(args) -> dict:
             log.warning(
                 f"You have not supplied an output directory. Output files will be generated in your working directory: {args.workdir}"
             )
-        # species = (
-        #     guess_species(asm=args.contigs[0], sid=args.sample_id)
-        #     if args.contigs
-        #     else ""
-        # )
         inputs = []
         if args.contigs:
             for contig in args.contigs:
