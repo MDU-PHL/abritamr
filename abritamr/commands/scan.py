@@ -6,7 +6,6 @@ import pandas as pd
 from collections import namedtuple
 from abritamr.utils import (
     check_assembly,
-    check_amrfinder,
     guess_species,
     check_path,
     abritamr_scan_columns,
@@ -34,6 +33,7 @@ def runfindr(
     threads: int,
     species: str,
     reference_catalog: str,
+    species_rules: str,
 ) -> list:
     """Validate an assembly, run AMRFinderPlus, and annotate its results."""
     res = []
@@ -44,9 +44,7 @@ def runfindr(
             if species
             else guess_species(asm=asm, sid=sid if sid else "abritamr")
         )
-        dbv = check_amrfinder()
 
-        full_path = f"{pathlib.Path(f'{asm}').absolute()}"
         log.info(f"Running amrfinder plus on {sid}")
         res = run_amrf(
             min_identity=min_identity,
@@ -54,6 +52,7 @@ def runfindr(
             asm=asm,
             threads=threads,
             organism=species,
+            species_rules=species_rules,
         )
         res = generate_output(
             species=species,
@@ -69,7 +68,6 @@ def runfindr(
 def prsfindr(afp: str, species: str, sid: str, reference_catalog: str) -> list:
     """Read existing AMRFinderPlus output and annotate its results."""
     species = species if species else ""
-    full_path = f"{pathlib.Path(f'{afp}').absolute()}"
     log.info(f"Opening existing amrfinder plus output")
 
     res = amrf2dict(amrfinder=afp)
@@ -107,6 +105,7 @@ def run_scan(
                 threads=data.threads,
                 reference_catalog=data.reference_catalog,
                 species=data.species,
+                species_rules=data.species_rules,
             )
 
             amr.extend(res)
@@ -159,7 +158,7 @@ def scan(args) -> list:
         i["min_coverage"] = args.min_coverage
         i["min_identity"] = args.min_identity
         i["reference_catalog"] = args.reference_catalog
-
+        i["species_rules"] = args.species_rules
     amr = run_scan(inputs=inputs)
 
     return amr

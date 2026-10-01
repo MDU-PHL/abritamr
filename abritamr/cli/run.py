@@ -2,7 +2,7 @@
 
 import pathlib, argparse, sys, os, logging, json
 
-from abritamr.cli.basic_args import inputs, references, detection_args
+from abritamr.cli.basic_args import inputs, references, rules, detection_args
 
 
 def run_args(subparsers):
@@ -67,6 +67,7 @@ def run_args(subparsers):
         choices=["long", "wide"],
         default="long",
     )
+    parser_sub_complete = rules(parser=parser_sub_complete)
     parser_sub_complete = detection_args(parser=parser_sub_complete)
     parser_sub_catalog = references(parser=parser_sub_complete)
 

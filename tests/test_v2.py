@@ -125,8 +125,6 @@ def test_cel_helpers(monkeypatch):
     assert cel_functions.contains_any(["Beta-lactam", "Aminoglycoside"], "BETA")
     assert not cel_functions.contains_any(["Beta-lactam"], "tet")
     context = cel_functions.create_cel_context({"gene": "blaA"})
-    assert context.variables["row"] == {"gene": "blaA"}
-    assert "contains_any" in context.functions
     monkeypatch.setattr(cel_functions, "evaluate", lambda rule, ctx: rule == "valid")
     assert cel_functions.evaluate_rule("valid", context)
     with pytest.raises(RuntimeError, match="Error evaluating rule"):

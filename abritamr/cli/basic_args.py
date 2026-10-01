@@ -19,6 +19,17 @@ def references(parser):
     return parser
 
 
+def rules(parser):
+    """Adds the config file for species rules"""
+    parser.add_argument(
+        "--species_rules",
+        default=f"{pathlib.Path(__file__).parent.parent / 'configs' / 'abritamr_species.csv'}",
+        help="Path to species rules for running AMRfinder",
+    )
+
+    return parser
+
+
 def inputs(parser):
     """Add assembly, AMRFinder output, sample, species, and thread options."""
     parser.add_argument(

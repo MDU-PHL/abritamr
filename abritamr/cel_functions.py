@@ -1,9 +1,10 @@
 """Provide CEL rule evaluation and custom functions for abriTAMR criteria."""
 
 from cel import Context, evaluate
+from abritamr.logger import log
 
 
-def evaluate_rule(rule:str, ctx: Context, name:str='row') -> bool:
+def evaluate_rule(rule: str, ctx: Context, name: str = "row") -> bool:
     """
     Evaluate a CEL rule against the provided data.
 
@@ -28,9 +29,8 @@ def evaluate_rule(rule:str, ctx: Context, name:str='row') -> bool:
     except Exception as e:
         raise RuntimeError(f"Error evaluating rule: {e}")
 
-    
-def create_cel_context(data: dict, name:str='row') -> Context:
 
+def create_cel_context(data: dict, name: str = "row") -> Context:
     """
     Create a CEL context with the provided data.
 
@@ -48,7 +48,6 @@ def create_cel_context(data: dict, name:str='row') -> Context:
     """
     ctx = Context()
     ctx.add_variable(name, data)
-
     for cst in custom_rules():
         ctx.add_function(cst, custom_rules()[cst])
 
@@ -68,8 +67,8 @@ def custom_rules() -> dict:
         "contains_any": contains_any,
     }
 
-def contains_any(data:list, query:str) -> bool:
 
+def contains_any(data: list, query: str) -> bool:
     """
     Custom CEL function to check if a class contains a query string.
 

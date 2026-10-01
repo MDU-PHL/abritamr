@@ -14,14 +14,19 @@ from abritamr.logger import log
 
 
 def generate_cmd(
-    min_identity: float, min_coverage: float, asm: str, threads: int, organism: str
+    min_identity: float,
+    min_coverage: float,
+    asm: str,
+    threads: int,
+    organism: str,
+    species_rules: str,
 ) -> str:
     """Construct the AMRFinderPlus command for an assembly and thresholds."""
     # spc = ""
     log.info(f"Will check if organism {organism} can be used.")
     # if organism != "" or "unknown" not in organism:
     log.info("Wrangling species for AMRfinder use")
-    spc = wrangle_species(organism=organism, asm=asm, sid="abritamr")
+    spc = wrangle_species(organism=organism, asm=asm, species_rules=species_rules)
     # spc = f"-O {spc}"
 
     cmd = f"amrfinder -n {asm} --plus --ident_min {min_identity} --coverage_min {min_coverage} --threads {threads} {spc}"
@@ -37,7 +42,7 @@ def run_cmd(cmd: str) -> str:
         err = proc.stderr.split("\n")
         log.critical(f"The following error was reported:")
         log.critical("\n".join(err))
-
+        raise SystemExit(1)
     else:
         log.info("AMRfinder plus was successful.")
         return proc.stdout
@@ -60,7 +65,12 @@ def parse_output(results: str) -> dict:
 
 
 def run_amrf(
-    min_identity: float, min_coverage: float, asm: str, threads: int, organism: str
+    min_identity: float,
+    min_coverage: float,
+    asm: str,
+    threads: int,
+    organism: str,
+    species_rules: str,
 ) -> dict:
     """Run AMRFinderPlus on an assembly and return parsed hit records."""
     cmd = generate_cmd(
@@ -69,6 +79,7 @@ def run_amrf(
         asm=asm,
         threads=threads,
         organism=organism,
+        species_rules=species_rules,
     )
     stdout = run_cmd(cmd=cmd)
     amr = parse_output(results=stdout)

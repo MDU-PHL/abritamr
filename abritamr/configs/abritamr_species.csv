@@ -1,0 +1,36 @@
+criteria_id,criteria_version,criteria,afpspecies
+abritamrspecies00001,0.0.1,"(contains_any(row.species,'Shigella'))",Escherichia
+abritamrspecies00002,0.0.1,"(contains_any(row.species,'Klebsiella pasteurii'))",Klebsiella_oxytoca
+abritamrspecies00003,0.0.1,"(contains_any(row.species,'Klebsiella michiganensis'))", Klebsiella_oxytoca
+abritamrspecies00004,0.0.1,"(contains_any(row.species,'Klebsiella spallanzanii'))",Klebsiella_oxytoca
+abritamrspecies00005,0.0.1,"(contains_any(row.species,'Klebsiella grimontii'))",Klebsiella_oxytoca
+abritamrspecies00006,0.0.1,"(contains_any(row.species,'Klebsiella hauxiensis'))",Klebsiella_oxytoca
+abritamrspecies00007,0.0.1,"(contains_any(row.species,'Acinetobacter baumannii'))",Acinetobacter_baumannii
+abritamrspecies00008,0.0.1,"(contains_any(row.species,'Burkholderia cepacia'))",Burkholderia_cepacia
+abritamrspecies00009,0.0.1,"(contains_any(row.species,'Burkholderia pseudomallei'))",Burkholderia_pseudomallei
+abritamrspecies00010,0.0.1,"(contains_any(row.species,'Burkholderia mallei'))",Burkholderia_mallei
+abritamrspecies00011,0.0.1,"(contains_any(row.species,'Campylobacter'))",Campylobacter
+abritamrspecies00012,0.0.1,"(contains_any(row.species,'Citrobacter freundii'))",Citrobacter_freundii
+abritamrspecies00013,0.0.1,"(contains_any(row.species,'Clostridioides difficile'))",Clostridioides_difficile
+abritamrspecies00013,0.0.1,"(contains_any(row.species,'Clostridium difficile'))",Clostridioides_difficile  
+abritamrspecies00014,0.0.1,"(contains_any(row.species,'Corynebacterium diphtheriae'))",Corynebacterium_diphtheriae
+abritamrspecies00015,0.0.1,"(contains_any(row.species,'Enterobacter asburiae'))",Enterobacter_asburiae
+abritamrspecies00016,0.0.1,"(contains_any(row.species,'Enterobacter cloacae'))",Enterobacter_cloacae
+abritamrspecies00017,0.0.1,"(contains_any(row.species,'Enterococcus faecalis'))",Enterococcus_faecalis
+abritamrspecies00018,0.0.1,"(contains_any(row.species,'Enterococcus faecium'))",Enterococcus_faecium
+abritamrspecies00019,0.0.1,"(contains_any(row.species,'Eschericia'))",Escherichia
+abritamrspecies00020,0.0.1,"(contains_any(row.species,'Klebsiella oxytoca'))",Klebsiella_oxytoca
+abritamrspecies00021,0.0.1,"(contains_any(row.species,'Klebsiella pneumoniae'))",Klebsiella_pneumoniae
+abritamrspecies00022,0.0.1,"(contains_any(row.species,'Neisseria gonorrhoeae'))",Neisseria_gonorrhoeae
+abritamrspecies00023,0.0.1,"(contains_any(row.species,'Neisseria meningitidis'))",Neisseria_meningitidis
+abritamrspecies00024,0.0.1,"(contains_any(row.species,'Pseudomonas aeruginosa'))",Pseudomonas_aeruginosa
+abritamrspecies00025,0.0.1,"(contains_any(row.species,'Salmonella'))",Salmonella
+abritamrspecies00026,0.0.1,"(contains_any(row.species,'Serratia marcescens'))",Serratia_marcescens
+abritamrspecies00027,0.0.1,"(contains_any(row.species,'Staphylococcus aureus'))",Staphylococcus_aureus
+abritamrspecies00028,0.0.1,"(contains_any(row.species,'Staphylococcus pseudintermedius'))",Staphylococcus_pseudintermedius
+abritamrspecies00029,0.0.1,"(contains_any(row.species,'Streptococcus agalactiae'))",Streptococcus_agalactiae
+abritamrspecies00030,0.0.1,"(contains_any(row.species,'Streptococcus pneumoniae'))",Streptococcus_pneumoniae
+abritamrspecies00031,0.0.1,"(contains_any(row.species,'Streptococcus pyogenes'))",Streptococcus_pyogenes
+abritamrspecies00032,0.0.1,"(contains_any(row.species,'Vibrio cholerae'))",Vibrio_cholerae
+abritamrspecies00033,0.0.1,"(contains_any(row.species,'Vibrio_vulfinicus'))",Vibrio_vulfinicus
+abritamrspecies00034,0.0.1,"(contains_any(row.species,'Vibrio_parahaemolyticus'))",Vibrio_parahaemolyticus

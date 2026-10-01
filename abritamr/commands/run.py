@@ -188,7 +188,7 @@ def run(args) -> dict:
         i["min_identity"] = args.min_identity
         i["min_coverage"] = args.min_coverage
         i["reference_catalog"] = args.reference_catalog
-
+        i["species_rules"] = args.species_rules
     scanned = run_scan(inputs=inputs)
     typed = do_typing(amr=scanned, reference_catalog=args.reference_catalog)
     linelist = generate_linelist(

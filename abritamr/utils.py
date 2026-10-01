@@ -6,16 +6,9 @@ import subprocess
 from abritamr.version import db
 import pandas as pd
 import sys
-import logging
-import json
 from abritamr.logger import log
 from abritamr.run_sourmash import run_sourmash_search
-# logging.basicConfig(format = '[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p', level=logging.INFO)
-# handler = logging.StreamHandler(sys.stderr)
-
-# log = logging.getLogger(__name__)
-# log.addHandler(handler)
-# log.setLevel(logging.DEBUG)
+from abritamr.cel_functions import evaluate_rule, create_cel_context
 
 
 def _get_date():
@@ -249,16 +242,20 @@ def guess_species(asm: str, sid: str = "abritamr") -> str:
     return sp
 
 
+def clean_gtdb_species(species: str) -> str:
+    """Remove the gtdb prefix and suffices from species"""
+
+    species = species.replace("s__", "").split("_")[0]
+
+    return species
+
+
 def wrangle_species(
-    organism: str, asm: str = "", sid: str = "abritamr", check_species: bool = True
+    organism: str, asm: str = "", species_rules: str = "", check_species: bool = True
 ) -> tuple:
     """Map a species name to the AMRFinderPlus organism option."""
     try:
-        with open(
-            f"{pathlib.Path(__file__).parent / 'configs' / 'amrfinder_species.json'}"
-        ) as j:
-            SPCFG = json.load(j)
-
+        species_rules = pd.read_csv(f"{species_rules}").to_dict(orient="records")
     except Exception as e:
         log.critical(f"Something has gone very wrong : {e}.")
         raise SystemExit
@@ -268,18 +265,23 @@ def wrangle_species(
             "No species supplied - will use sourmash to try to guess the best match for AMR classification."
         )
 
-        organism = guess_species(asm, sid=sid)
+        organism = guess_species(asm)
+    organism = clean_gtdb_species(species=organism)
+    ctx = create_cel_context(data={"species": [organism]}, name="row")
+    # log.info(
+    #     f"Now checking species rules for use in AMRFinderPlus. Species detected: {organism}. Using context {ctx}"
+    # )
+    for rule in species_rules:
+        # log.info(rule)
+        species_criteria = rule["criteria"]
+        # log.info(f"Checking rule: {species_criteria}")
+        if species_criteria != "":
+            rpt = evaluate_rule(species_criteria, ctx)
+            if rpt:
+                log.info(f"{rule['criteria_id']} has returned true")
 
-    if organism != "unknown":
-        og = "_".join(organism.split())
-        if og in SPCFG:
-            return f"-O {og}"
-        elif og[0] in SPCFG:
-            return f"-O {og[0]}"
-        elif "Shigella" in og:
-            return f"-O Eschericia"
-        else:
-            return ""
+                return f"-O {rule['afpspecies']}"
+
     return ""
 
 
