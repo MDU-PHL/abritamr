@@ -16,7 +16,6 @@ def status_args(subparsers):
         "--amr",
         "-a",
         help="result file(s) from 'abritamr scan'. Default stdin",
-        type=argparse.FileType("r"),  # metavar='FILE',
         nargs="?",
         default=sys.stdin,
     )

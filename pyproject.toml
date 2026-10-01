@@ -30,7 +30,8 @@ classifiers = [
 dependencies = [
     "pandas",
     "xlsxwriter",
-    "pycel",
+    "common-expression-language==0.5.6",
+    "typing_extensions",
     "sourmash",
     "screed"
 ]

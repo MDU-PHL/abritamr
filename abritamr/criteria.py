@@ -10,6 +10,7 @@ class InferRules:
 
     drugname: str
     species: str
+    amrrules_species: str
     rule_id: str
     rule_version: str
     rule: str
@@ -84,4 +85,3 @@ def get_abritamr_defs(cfgpath: str = "") -> list:
         abritamr_defs.append(dfs)
 
     return abritamr_defs
-
