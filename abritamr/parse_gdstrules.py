@@ -142,7 +142,7 @@ def wrangle_the_rules(
                     else rule["drug class"].capitalize()
                 )
                 rule_id = f"AMRrules-{rule['ruleID']}"
-                amrrules_species = clean_gtdb_species(species=rule["species"])
+                amrrules_species = clean_gtdb_species(species=rule["organism"])
                 rule_version = f"AMRrules-downloaded-{_get_date()}"
                 cc = (
                     ccl[rule["clinical category"]]
