@@ -205,7 +205,7 @@ def check_assembly(pth) -> bool:
         )
         if proc.returncode == 0:
             log.info(
-                f"{pth} is a valid assembly file. Will no proceed with running amrfinder."
+                f"{pth} is a valid assembly file. Will now proceed with running amrfinder."
             )
             return True
         else:

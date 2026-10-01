@@ -20,7 +20,6 @@ def priority_gdst() -> dict:
 
 def combine_results(result: list) -> dict:
     """Collect rule-relevant fields from AMR result records."""
-    res = []
     to_test = {
         "abritamr_class": [],
         "abritamr_subclass": [],
@@ -33,7 +32,7 @@ def combine_results(result: list) -> dict:
             if col in row:
                 to_test[col].append(row[col])
 
-    return res
+    return to_test
 
 
 def find_rules(species: str, reference_folder: str) -> dict:
@@ -54,7 +53,6 @@ def find_rules(species: str, reference_folder: str) -> dict:
             ruleset = pd.read_csv(
                 f"{reference_folder}/02_abritamr_{s.replace(' ', '_')}_rules.csv"
             )
-
             rules.append(ruleset.fillna(""))
     if rules == []:
         log.warning(
@@ -107,46 +105,52 @@ def gdst(
     gdst_final = []
     for row in resultsmooshed:
         gdst_results = {"sample_id": sid, "species": species}
-        ctx = create_cel_context(data=row, name="row")
+        data = {row: resultsmooshed[row]}
+        ctx = create_cel_context(data=data, name="row")
         rlt = {}
         for rule in rules:
-            if rule.drugname not in rlt:
-                rlt[rule.drugname] = {
-                    "drugname": rule.drugname,
-                    "mechanisms": [],
-                    "inferred": [],
-                    "rule_id": [],
-                    "rule_version": [],
-                    "source": [],
-                }
-            if evaluate_rule(rule=rule.rule, ctx=ctx):
-                mechs = []
-                for key in row:
-                    if key in rule.rule:
-                        vals = row[key] if isinstance(row[key], list) else [row[key]]
-                        keys = [i for i in vals if i in rule.rule]
-                        keys = []
-                        for i in vals:
-                            for j in i.split("_"):
-                                if j in rule.rule:
-                                    keys.append(j)
-                        mechs = []
-                        for k in keys:
-                            tmp = (
-                                results[
-                                    results["abritamr_accession_key"].str.contains(
-                                        k, na=False
-                                    )
-                                ]["abritamr_mechanism"]
-                                .unique()
-                                .tolist()
+            if row in rule.rule:
+                if rule.drugname not in rlt:
+                    rlt[rule.drugname] = {
+                        "drugname": rule.drugname,
+                        "mechanisms": [],
+                        "inferred": [],
+                        "rule_id": [],
+                        "rule_version": [],
+                        "source": [],
+                    }
+                if evaluate_rule(rule=rule.rule, ctx=ctx):
+                    mechs = []
+                    for key in results:
+                        if key in rule.rule:
+                            vals = (
+                                resultsmooshed[key]
+                                if isinstance(resultsmooshed[key], list)
+                                else [resultsmooshed[key]]
                             )
-                            mechs.extend(tmp)
-                rlt[rule.drugname]["mechanisms"].extend(mechs)
-                rlt[rule.drugname]["inferred"].append(rule.inferred)
-                rlt[rule.drugname]["rule_id"].append(rule.rule_id)
-                rlt[rule.drugname]["rule_version"].append(rule.rule_version)
-                rlt[rule.drugname]["source"].append(rule.source)
+                            keys = [i for i in vals if i in rule.rule]
+                            keys = []
+                            for i in vals:
+                                for j in i.split("_"):
+                                    if j in rule.rule:
+                                        keys.append(j)
+                            mechs = []
+                            for k in keys:
+                                tmp = (
+                                    results[
+                                        results["abritamr_accession_key"].str.contains(
+                                            k, na=False
+                                        )
+                                    ]["abritamr_mechanism"]
+                                    .unique()
+                                    .tolist()
+                                )
+                                mechs.extend(tmp)
+                    rlt[rule.drugname]["mechanisms"].extend(mechs)
+                    rlt[rule.drugname]["inferred"].append(rule.inferred)
+                    rlt[rule.drugname]["rule_id"].append(rule.rule_id)
+                    rlt[rule.drugname]["rule_version"].append(rule.rule_version)
+                    rlt[rule.drugname]["source"].append(rule.source)
         for drug in rlt:
             if rlt[drug]["inferred"] == []:
                 rlt[drug]["inferred"] = [dflt_result]
