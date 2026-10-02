@@ -33,9 +33,9 @@ AMR genes the MDU PHL in Victoria, Australia.
 % abritamr run -c genome.fasta
 
 % ls abritamr
-abritamr.log         summary_partials.txt
-amrfinder.out        summary_virulence.txt
-summary_matches.txt  update_abritamr_db.log
+abritamr.txt          summary_partials.txt
+amrfinder.out         summary_virulence.txt
+summary_matches.txt
 
 % cat abritamr/abritamr.txt
 Isolate	Methicillin	Tetracycline	Tigecycline	Beta-lactam	Penicillin resistance (Staphylococcus aureus)
@@ -118,74 +118,30 @@ optional arguments:
 
 ## Output
 
-### `abritAMR run` 
+### `abritamr run`
 
-Outputs 4 summary files and retains the raw AMRFinderPlus output for each sequence input.
+For a single assembly, the `--prefix` directory (default: `abritamr`) contains:
 
-1. `amrfinder.out` raw output from AMRFinder plus (per sequence). For more information please see AMRFinderPlus help [here](https://github.com/ncbi/amr/wiki/Interpreting-results) 
+| File | Contents |
+|:---|:---|
+| `amrfinder.out` | Raw AMRFinderPlus results for the assembly. See [AMRFinderPlus result interpretation](https://github.com/ncbi/amr/wiki/Interpreting-results) for the format. |
+| `summary_matches.txt` | Tab-delimited table with one row per sample and AMR drug classes as columns. Contains AMR hits AMRFinderPlus classifies as matches. |
+| `summary_partials.txt` | Tab-delimited table with one row per sample and AMR drug classes as columns. Contains AMR hits classified separately from matches by abriTAMR. |
+| `summary_virulence.txt` | Tab-delimited table with one row per sample and AMRFinderPlus virulence/stress subtypes as columns. |
+| `abritamr.txt` | Combined tab-delimited table of matches, partials, and virulence/stress results. Partial hits are marked with `^`; non-exact gene-family hits are marked with `*`. |
 
-2.  `summary_matches.txt` 
-  * Tab-delimited file, with a row per sequence, and columns representing functional drug classes 
-  * Only genes recovered from sequence which have >90% coverage of the gene reported and greater than the desired identity threshold (default 90%). 
-    
-    I. Genes annotated with `*` indicate >90% coverage and > identity threshold < 100% identity.
-    
-    II. No further annotation indicates that the gene recovered exhibits 100% coverage and 100% identity to a gene in the gene catalog.
-    
-    III. Point mutations detected (if `--species` supplied) will also be present in this file in the form of `gene_AAchange`.
+The three summary tables group genes by drug class (or virulence/stress subtype); multiple genes in a cell are comma-separated. A `*` marks a non-`EXACTX`/non-`ALLELEX` gene-family hit. When `--species` is supplied, detected point mutations are included in `summary_matches.txt`.
 
-3. `summary_partials.txt`
-  * Tab-delimited file, with a row per sequence, and columns representing functional drug classes 
-  * Genes recovered from sequence which have >50% but <90% coverage of the gene reported and greater than the desired identity threshold (default 90%). 
+In batch mode, each sample's raw `amrfinder.out` is written to a directory named for that sample (the first column of the input TSV); the three summary tables and combined table are written to the current working directory. The `abritamr.log` run log is written to the current working directory in either mode.
 
-4. `summary_virulence.txt`
-  * Tab-delimited file, with a row per sequence, and columns representing AMRFinderPlus virulence gene classification
-  * Genes recovered from sequence which have >50% coverage of the gene reported and greater than the desired identity threshold (default 90%). 
+### `abritamr report`
 
-      * Genes recovered with >50% but <90% coverage of a gene in the gene catalog will be annotated with `^`.
-      * Genes annotated with `*` indicate >90% coverage and > identity threshold < 100% identity.
+The report command writes an Excel workbook named `{runid}_{sop_name}.xlsx`, using the values provided with `--runid` and `--sop_name`.
 
-4. `abritamr.txt`
-  * Tab-delimited file, combining `summary_matches.txt`, `summary_partials.txt`, `summary_virulence.txt` with a row per sequence, and columns representing AMRFinderPlus virulence gene classification and/or functional drug classes.
-  * Genes recovered from sequence which have >50% coverage of the gene reported and greater than the desired identity threshold (default 90%). 
+* With `--sop general`, the workbook has a matches sheet named for `sop_name` and a partials sheet named `Passed QC partial`. The rows contain the MDU sample ID and item code, reportable and non-reportable resistance genes, observed and expected species, and the AMRFinderPlus database version.
+* With `--sop plus`, the workbook contains an interpreted resistance report for QC-passing _Salmonella enterica_ samples, with resistance mechanisms and interpretations for the reported drug classes. The sheet is named `{sop_name}-01`.
 
-      * Genes recovered with >50% but <90% coverage of a gene in the gene catalog will be annotated with `^`.
-      * Genes annotated with `*` indicate >90% coverage and > identity threshold < 100% identity.
-
-### `abritamr report` 
-
-will output spreadsheets `general_runid.xlsx` (NATA accredited) or `plus_runid.xlsx` (validated - not yet accredited) depending upon the sop chosen.
-
-* `general_rundid.xlsx` has two tabs, one for matches and one for partials (corresponding to genes reported in the `summary_matches.txt` and `summary_partials.txt`). Each tab has 7 columns 
-
-| Column | Interpretation |
-|:---: | :---: |
-| MDU sample ID | Sample ID |
-|Item code | suffix (MDU specific) |
-| Resistance genes (alleles) detected | genes detected that are reportable (based on species and drug classification)|
-| Resistance genes (alleles) det (non-rpt) | other genes detected that are not not reportable for the species detected.
-| Species_obs | Species observed (supplied in input file) |
-| Species_exp | Species expected (supplied in input file) |
-| db_version | Version of the AMRFinderPlus DB used |
-
-* `plus_runid.xlsx` output is a spreadsheet with the different drug resistance mechanims and the corresponding interpretation (based on validation of genotype and phenotype) for drug-classes relevant to reporting of anti-microbial resistance in _Salmonella enterica_ (other species will be added as validation of genotype vs phenotype is performed).
-
-* Ampicillin
-* Cefotaxime (ESBL) 
-* Cefotaxime (AmpC)
-* Tetracycline
-* Gentamicin
-* Kanamycin
-* Streptomycin
-* Sulfathiazole
-* Trimethoprim
-* Trim-Sulpha
-* Chloramphenicol 
-* Ciprofloxacin
-* Meropenem 
-* Azithromycin
-* Aminoglycosides (RMT)
-* Colistin 
+The report command also writes `abritamr.log` in the current working directory. The `update_db` command writes its separate `update_abritamr_db.log` there.
 
 ## References
 
