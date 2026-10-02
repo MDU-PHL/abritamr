@@ -9,11 +9,7 @@ _abritAMR_ is an AMR gene/variant detection pipeline  that runs AMRFinderPlus on
 
 _abriTAMR_ is accredited by NATA for use in identifying the presence of reportable AMR genes the MDU PHL in Victoria, Australia.
 
-Usage instructions can be found [here](usage/quickguide.md)
-
-## abriTAMR V2
-
-For current command-line documentation, see the [abriTAMR V2 guide](v2/index.md).
+Usage instructions can be found [here](v2/index.md).
 
 ## Installation
 
