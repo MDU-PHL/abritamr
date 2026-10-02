@@ -11,6 +11,10 @@ _abriTAMR_ is accredited by NATA for use in identifying the presence of reportab
 
 Usage instructions can be found [here](usage/quickguide.md)
 
+## abriTAMR V2
+
+For current command-line documentation, see the [abriTAMR V2 guide](v2/index.md).
+
 ## Installation
 
 
