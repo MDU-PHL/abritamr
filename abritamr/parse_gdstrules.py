@@ -91,7 +91,6 @@ def parse_rule(row: dict, simple_rules: dict) -> str:
     else:
         rl = row["gene"]
         for s in simple_rules:
-            # # print(f"Replacing {s} with {simple_rules[s]}")
             rl = rl.replace(
                 s, f"contains_any(row.abritamr_accession_key,'{simple_rules[s]}')"
             )
@@ -129,7 +128,7 @@ def wrangle_the_rules(
         try:
             ev = int(grades[rule["evidence grade"].strip()])
             yev = int(grades[evidence_grade.strip()])
-            if ev >= yev:
+            if ev >= yev and rule["protein accession"] != "-":
                 dr = (
                     rule["drug"].capitalize()
                     if rule["drug"] != "-"

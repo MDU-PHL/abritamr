@@ -44,7 +44,7 @@ def _make_key(df):
                 "refseq_nucleotide_accession",
                 "genbank_nucleotide_accession",
             ]
-        ].apply(lambda x: "_".join([i for i in x if i != ""]), axis=1)
+        ].apply(lambda x: "|".join([i for i in x if i != ""]), axis=1)
         df["mut_acc"] = df[
             [
                 "allele",
@@ -54,7 +54,7 @@ def _make_key(df):
                 "refseq_nucleotide_accession",
                 "genbank_nucleotide_accession",
             ]
-        ].apply(lambda x: "_".join([i for i in x if i != ""]), axis=1)
+        ].apply(lambda x: "|".join([i for i in x if i != ""]), axis=1)
         # df['abritamr_accession_key'] = numpy.where(df['refseq_protein_accession'] == '',df['genbank_protein_accession'],df['refseq_protein_accession'])
         df["abritamr_accession_key"] = numpy.where(
             df["subtype"] == "POINT", df["mut_acc"], df["abritamr_accession_key"]
@@ -313,7 +313,7 @@ def sub_aa_mutations(ref: str, pos: int, alt: str, xtr: str) -> str:
         if "Ter" not in alt:
             alt = alt.replace(c, cvt[c])
 
-    var = f"p.{ref}{pos}{alt}{xtr},p.{pos}{alt}{xtr}"
+    var = f"p.{ref}{pos}{alt}{xtr}|p.{pos}{alt}{xtr}"
     return var
 
 
@@ -469,4 +469,3 @@ def wrangle_catalog(
     # pd.DataFrame(refgenes).to_csv(f"{output}", index = False)
 
     return refgenes
-

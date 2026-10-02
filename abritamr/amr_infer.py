@@ -95,7 +95,9 @@ def gdst(
     """Evaluate species rules and return inferred susceptibility results."""
 
     sid = results.iloc[0].get("sample_id", "unknown")
-    resultsmooshed = combine_results(result=results.to_dict(orient="records"))
+    resultsmooshed = combine_results(
+        result=results.fillna("").to_dict(orient="records")
+    )
     rules = create_rules(species=species, reference_folder=reference_folder)
     if rules == []:
         log.info(
@@ -103,83 +105,82 @@ def gdst(
         )
         return []
     gdst_final = []
-    for row in resultsmooshed:
-        gdst_results = {"sample_id": sid, "species": species}
-        data = {row: resultsmooshed[row]}
-        ctx = create_cel_context(data=data, name="row")
-        rlt = {}
-        for rule in rules:
-            if row in rule.rule:
-                if rule.drugname not in rlt:
-                    rlt[rule.drugname] = {
-                        "drugname": rule.drugname,
-                        "mechanisms": [],
-                        "inferred": [],
-                        "rule_id": [],
-                        "rule_version": [],
-                        "source": [],
-                    }
-                if evaluate_rule(rule=rule.rule, ctx=ctx):
+    rlt = {}
+    # for row in resultsmooshed:
+    #     gdst_results = {"sample_id": sid, "species": species}
+    #     data = {row: resultsmooshed[row]}
+    ctx = create_cel_context(data=resultsmooshed, name="row")
+    #     rlt = {}
+    for rule in rules:
+        if rule.drugname not in rlt:
+            rlt[rule.drugname] = {
+                "drugname": rule.drugname,
+                "mechanisms": [],
+                "inferred": [],
+                "rule_id": [],
+                "rule_version": [],
+                "source": [],
+            }
+        if evaluate_rule(rule=rule.rule, ctx=ctx):
+            mechs = []
+            for key in results:
+                if key in rule.rule:
+                    vals = (
+                        resultsmooshed[key]
+                        if isinstance(resultsmooshed[key], list)
+                        else [resultsmooshed[key]]
+                    )
+                    # print(vals)
+                    keys = []
+                    for i in vals:
+                        for j in i.split("|"):
+                            if j != "" and j in rule.rule:
+                                keys.append(j)
                     mechs = []
-                    for key in results:
-                        if key in rule.rule:
-                            vals = (
-                                resultsmooshed[key]
-                                if isinstance(resultsmooshed[key], list)
-                                else [resultsmooshed[key]]
+                    for k in keys:
+                        if k != "":
+                            tmp = (
+                                results[results[key].str.contains(k, na=False)][
+                                    "abritamr_mechanism"
+                                ]
+                                .unique()
+                                .tolist()
                             )
-                            keys = [i for i in vals if i in rule.rule]
-                            keys = []
-                            for i in vals:
-                                for j in i.split("_"):
-                                    if j in rule.rule:
-                                        keys.append(j)
-                            mechs = []
-                            for k in keys:
-                                tmp = (
-                                    results[
-                                        results["abritamr_accession_key"].str.contains(
-                                            k, na=False
-                                        )
-                                    ]["abritamr_mechanism"]
-                                    .unique()
-                                    .tolist()
-                                )
-                                mechs.extend(tmp)
-                    rlt[rule.drugname]["mechanisms"].extend(mechs)
-                    rlt[rule.drugname]["inferred"].append(rule.inferred)
-                    rlt[rule.drugname]["rule_id"].append(rule.rule_id)
-                    rlt[rule.drugname]["rule_version"].append(rule.rule_version)
-                    rlt[rule.drugname]["source"].append(rule.source)
-        for drug in rlt:
-            if rlt[drug]["inferred"] == []:
-                rlt[drug]["inferred"] = [dflt_result]
-            else:
-                rlt[drug]["inferred"] = [
-                    sorted(
-                        rlt[drug]["inferred"],
-                        key=lambda x: (
-                            priority_gdst()[x[0].upper()]
-                            if x[0].upper() in priority_gdst()
-                            else -1
-                        ),
-                        reverse=True,
-                    )[0]
-                ]
-            for key in ["mechanisms", "rule_id", "rule_version", "source", "inferred"]:
-                rs = (
-                    ";".join(rlt[drug][key])
-                    if rlt[drug][key] != [] or set(rlt[drug][key]) != {"-"}
-                    else "-"
-                )
-                rlt[drug][key] = rs
+                            mechs.extend(tmp)
+            rlt[rule.drugname]["mechanisms"].extend(mechs)
+            rlt[rule.drugname]["inferred"].append(rule.inferred)
+            rlt[rule.drugname]["rule_id"].append(rule.rule_id)
+            rlt[rule.drugname]["rule_version"].append(rule.rule_version)
+            rlt[rule.drugname]["source"].append(rule.source)
+    for drug in rlt:
+        if rlt[drug]["inferred"] == []:
+            rlt[drug]["inferred"] = [dflt_result]
+        else:
+            rlt[drug]["inferred"] = [
+                sorted(
+                    rlt[drug]["inferred"],
+                    key=lambda x: (
+                        priority_gdst()[x[0].upper()]
+                        if x[0].upper() in priority_gdst()
+                        else -1
+                    ),
+                    reverse=True,
+                )[0]
+            ]
+        for key in ["mechanisms", "rule_id", "rule_version", "source", "inferred"]:
+            rs = (
+                ";".join(list(set(rlt[drug][key])))
+                if rlt[drug][key] != [] or set(rlt[drug][key]) != {"-"}
+                else "-"
+            )
+            rlt[drug][key] = rs
 
-        gdst_results = {
-            "sample_id": sid,
-            "species": species,
-            "results": list(rlt.values()),
-        }
-        gdst_final.append(gdst_results)
+    gdst_results = {
+        "sample_id": sid,
+        "species": species,
+        "results": list(rlt.values()),
+    }
+    gdst_final.append(gdst_results)
 
     return gdst_final
 

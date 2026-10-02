@@ -1,7 +1,7 @@
 drugname,species,amrrules_species,rule_id,rule_version,rule,original_rule,inferred,source
-Chloramphenicol,Salmonella enterica,Salmonella enterica,AMRrules-SAL0001,AMRrules-downloaded-2026-10-01,"(  contains_any(row.abritamr_accession_key,'AE006468.2'))",mdsA,Susceptible (wildtype),AMRrules (PMID: 20497225)
-Chloramphenicol,Salmonella enterica,Salmonella enterica,AMRrules-SAL0002,AMRrules-downloaded-2026-10-01,"(  contains_any(row.abritamr_accession_key,'AE006468.2'))",mdsB,Susceptible (wildtype),AMRrules (PMID: 20497225)
-Aminoglycoside antibiotic,Salmonella enterica,Salmonella enterica,AMRrules-SAL0003,AMRrules-downloaded-2026-10-01,"(  contains_any(row.abritamr_accession_key,'WP_000354865.1'))",aac(6')-Iaa,Resistant (wildtype),AMRrules (PMID: 12679553)
+Chloramphenicol,Salmonella enterica,Salmonella enterica,AMRrules-SAL0001,AMRrules-downloaded-2026-10-02,"(  contains_any(row.abritamr_accession_key,'AE006468.2'))",mdsA,Susceptible (wildtype),AMRrules (PMID: 20497225)
+Chloramphenicol,Salmonella enterica,Salmonella enterica,AMRrules-SAL0002,AMRrules-downloaded-2026-10-02,"(  contains_any(row.abritamr_accession_key,'AE006468.2'))",mdsB,Susceptible (wildtype),AMRrules (PMID: 20497225)
+Aminoglycoside antibiotic,Salmonella enterica,Salmonella enterica,AMRrules-SAL0003,AMRrules-downloaded-2026-10-02,"(  contains_any(row.abritamr_accession_key,'WP_000354865.1'))",aac(6')-Iaa,Resistant (wildtype),AMRrules (PMID: 12679553)
 Colistin,Salmonella enterica,,abritAMRsalmo000001,0.0.1,('Colistin' in row.abritamr_subclass),,Resistant,abritamr (PMID:36599823)
 Aminoglycosides (RMT),Salmonella enterica,,abritAMRsalmo000002,0.0.1,('Aminoglycosides (Ribosomal methyltransferase)' in row.abritamr_subclass),,Resistant,abritamr (PMID:36599823)
 Chloramphenicol,Salmonella enterica,,abritAMRsalmo000003,0.0.1,"(contains_any(row.abritamr_subclass,'phenicol'))",,Resistant,abritamr

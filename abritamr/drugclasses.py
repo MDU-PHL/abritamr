@@ -43,6 +43,20 @@ def get_mechanism(val: str, refgenes: pd.DataFrame, symbol: str) -> str:
             (refgenes["abritamr_accession_key"].str.contains(val, regex=False))
             & (refgenes["abritamr_mechanism"].str.contains(symbol, regex=False))
         ].empty:
+            # log.info(
+            #     refgenes[
+            #         (refgenes["abritamr_accession_key"].str.contains(val, regex=False))
+            #         & (refgenes["abritamr_mechanism"].str.contains(symbol, regex=False))
+            #     ].shape
+            # )
+            # log.info(f"val: {val}, symbol: {symbol}")
+            # log.info(
+            #     refgenes[
+            #         (refgenes["abritamr_accession_key"].str.contains(val, regex=False))
+            #         & (refgenes["abritamr_mechanism"].str.contains(symbol, regex=False))
+            #     ]["abritamr_mechanism"].values[0]
+            # )
+            #
             return refgenes[
                 (refgenes["abritamr_accession_key"].str.contains(val, regex=False))
                 & (refgenes["abritamr_mechanism"].str.contains(symbol, regex=False))
@@ -84,6 +98,7 @@ def get_accession_key(key: str, val: str, symbol: str, refgenes: pd.DataFrame) -
 
 def get_classes(key: str, val: str, refgenes: pd.DataFrame, symbol: str) -> tuple:
     """Return class, subclass, provenance, accession, mutation, and mechanism."""
+    # log.info(f"looking for {val} and {symbol} with {key}")
     abacc = get_accession_key(key=key, val=val, refgenes=refgenes, symbol=symbol)
     # log.info(f"Found {abacc}")
     _class = get_class(key=key, val=val, refgenes=refgenes, _type="abritamr_class")
@@ -92,11 +107,10 @@ def get_classes(key: str, val: str, refgenes: pd.DataFrame, symbol: str) -> tupl
     )
     pmid = get_class(key=key, val=val, refgenes=refgenes, _type="pubmed_reference")
     db_version = get_class(key=key, val=val, refgenes=refgenes, _type="db_version")
-    key = get_class(key=key, val=val, refgenes=refgenes, _type="abritamr_accession_key")
     amrrules_mut = get_amrrules_mutation(val=abacc, refgenes=refgenes)
     mech = get_mechanism(val=abacc, refgenes=refgenes, symbol=symbol)
 
-    return _class, _subclass, pmid, db_version, key, amrrules_mut, mech
+    return _class, _subclass, pmid, db_version, abacc, amrrules_mut, mech
 
 
 def find_classes(refgenes: pd.DataFrame, accession: str, symbol: str) -> str:
@@ -114,7 +128,7 @@ def find_classes(refgenes: pd.DataFrame, accession: str, symbol: str) -> str:
                 key=key, val=accession, refgenes=refgenes, symbol=symbol
             )
             break
-
+    # log.info(f"returning abritamr_accession_key: {akey}")
     return _class, _subclass, pmid, db_version, akey, amrrules_mut, mech
 
 
