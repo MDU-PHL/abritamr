@@ -167,14 +167,36 @@ def check_amrfinder() -> bool:
         f"Checking that amrfinder plus is installed and database versions are compatible."
     )
     vrsn = subprocess.run(
-        "amrfinder -V", shell=True, capture_output=True, encoding="utf-8"
+        "amrfinder --version", shell=True, capture_output=True, encoding="utf-8"
     )
     if vrsn.returncode != 0:
         log.critical(
-            f"Something is wrong with your environment. amrfinderplus is required for abritamr to run. Please follow installation instructions and try again."
+            f"Something is wrong with your environment. amrfinderplus must be installed for abritamr to run. Please follow installation instructions and try again."
         )
+        raise SystemExit(1)
+
     else:
-        dbv = [i for i in vrsn.stdout.split("\n") if "Database version" in i]
+        log.info(f"AMRfinder is installed - will now check the database.")
+        dbversion = subprocess.run(
+            "amrfinder -V", shell=True, capture_output=True, encoding="utf-8"
+        )
+        if dbversion.returncode != 0:
+            log.warning(
+                f"It looks like your amrfinderplus database is not installed. Will now try to install this."
+            )
+            ddb = subprocess.run(
+                f"amrfinder -u", shell=True, capture_output=True, encoding="utf-8"
+            )
+            if ddb.returncode != 0:
+                log.critical(
+                    f"It looks like we can't install the amrfinder plus database. The following error was reported : {ddb.stderr}. Please check your installation and try again."
+                )
+                raise SystemExit(1)
+            else:
+                dbversion = subprocess.run(
+                    "amrfinder -V", shell=True, capture_output=True, encoding="utf-8"
+                )
+        dbv = [i for i in dbversion.stdout.split("\n") if "Database version" in i]
         # # print(dbv)
         dbv = dbv[0].split(":")[-1].strip() if dbv != [] else ""
         if dbv == "":

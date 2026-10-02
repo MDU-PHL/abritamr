@@ -7,16 +7,26 @@
 _abritAMR_ is an AMR gene/variant detection pipeline  that runs AMRFinderPlus on bacterial genome assemblies, prioritises the mechanisms based on the species from which the sequences were derived. Additionally, abritAMR will generate genomic DST, based on [AMRrules](https://github.com/AMRverse/AMRrules) or abritAMR (_S. enterica_) for a selection of species.
 
 
-_abriTAMR_ is accredited by NATA for use in identifying the presence of reportable AMR genes the MDU PHL in Victoria, Australia.
+_abritAMR_ is accredited by NATA for use in identifying the presence of reportable AMR genes by MDU PHL in Victoria, Australia.
 
-Usage instructions can be found [here](./docs/v2/index.md).
+Usage instructions can be found [here](usage/quickguide.md)
+
+## abriTAMR V2
+
+For current command-line documentation, see the [abriTAMR V2 guide](docs/v2/index.md).
 
 ## Installation
-abritAMR v2 has not yet been release
+
+abritAMR v2 has not yet been released. 
 
 ### Recommended (conda or mamba)
 
 To come
+
+## Other AMR resources
+
+[AMRFinderPlus](https://www.ncbi.nlm.nih.gov/pathogens/antimicrobial-resistance/AMRFinder)
+[AMRrules](https://github.com/AMRverse/AMRrules)
 
 
 ## Citation
