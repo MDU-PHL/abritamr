@@ -61,24 +61,30 @@ def update_rules(args) -> bool:
         for sp in rules_dict:
             fn = sp.split()
             tmp = pd.DataFrame(rules_dict[sp])
+            tmp = tmp[tmp["drugname"] != "-"]
             if len(fn) <= 2:
-                tmp.to_csv(
-                    f"{args.output_dir}/02_abritamr_{'_'.join(fn)}_rules.csv",
-                    index=False,
-                )
-                log.info(
-                    f"Rules for {sp} have been created: {args.output_dir}/02_abritamr_{'_'.join(fn)}_rules.csv"
-                )
-            else:
-                for s in tmp["amrrules_species"].unique():
-                    tmp2 = tmp[tmp["amrrules_species"] == s]
-                    tmp2.to_csv(
-                        f"{args.output_dir}/02_abritamr_{'_'.join(s.split())}_rules.csv",
+                tmp = tmp[tmp["drugname"] != "-"]
+                if not tmp.empty:
+                    tmp.to_csv(
+                        f"{args.output_dir}/02_abritamr_{'_'.join(fn)}_rules.csv",
                         index=False,
                     )
                     log.info(
-                        f"Rules for {s} have been created: {args.output_dir}/02_abritamr_{'_'.join(s.split())}_rules.csv"
+                        f"Rules for {sp} have been created: {args.output_dir}/02_abritamr_{'_'.join(fn)}_rules.csv"
                     )
+            else:
+                for s in tmp["amrrules_species"].unique():
+                    tmp2 = tmp[
+                        (tmp["amrrules_species"] == s) & (tmp["drugname"] != "-")
+                    ]
+                    if not tmp2.empty:
+                        tmp2.to_csv(
+                            f"{args.output_dir}/02_abritamr_{'_'.join(s.split())}_rules.csv",
+                            index=False,
+                        )
+                        log.info(
+                            f"Rules for {s} have been created: {args.output_dir}/02_abritamr_{'_'.join(s.split())}_rules.csv"
+                        )
 
 
 def generate_database(args) -> bool:
