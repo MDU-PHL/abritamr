@@ -8,6 +8,16 @@ nav:
       - How do I?: cookbook/how_to.md
       - Troubleshooting: cookbook/faq.md
   - Usage:
+      - V2 guide:
+          - Overview: v2/index.md
+          - Full workflow: v2/workflow.md
+          - Commands:
+              - scan: v2/commands/scan.md
+              - amr_status: v2/commands/amr_status.md
+              - linelist: v2/commands/linelist.md
+              - matrix: v2/commands/matrix.md
+              - infer: v2/commands/infer.md
+          - Catalog and rules: v2/catalog-and-rules.md
       - Quick guide: usage/quickguide.md
       - Inputs: usage/inputs.md
       - Species detection: usage/species.md
