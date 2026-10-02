@@ -12,16 +12,11 @@ _abriTAMR_ is accredited by NATA for use in identifying the presence of reportab
 Usage instructions can be found [here](v2/index.md).
 
 ## Installation
-
+abritAMR v2 has not yet been release
 
 ### Recommended (conda or mamba)
 
-
-```
-% conda create -n abritamr -c bioconda abritamr
-% conda activate abritamr
-% abritamr --version
-```
+To come
 
 
 ## Citation
