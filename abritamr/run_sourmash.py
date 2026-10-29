@@ -98,29 +98,39 @@ def run_sourmash_search(query_filename: str, SBT_path: str, sid: str):
     # check_sourmash()
     sp = "unknown"
     # Load the sourmash index
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_dir_path = pathlib.Path(temp_dir)
+    try:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_dir_path = pathlib.Path(temp_dir)
 
-        tree = sourmash.load_file_as_index(
-            create_sourmash_index(tdir=temp_dir_path, SBT_path=SBT_path)
+            tree = sourmash.load_file_as_index(
+                create_sourmash_index(tdir=temp_dir_path, SBT_path=SBT_path)
+            )
+            query_sig = sourmash_sig(query_filename, sid)
+            # # Perform the search
+            results = tree.search(query_sig, threshold=0.1)
+            spc = []
+            for similarity, found_sig, filename in tree.search(
+                query_sig, threshold=0.0001
+            ):
+                # qname = query_sig
+                sp = f"{found_sig}"
+                sim = similarity
+                spc.append({sim: sp})
+            try:
+                mx = max([list(x.keys())[0] for x in spc])
+
+                if mx >= 0.01:
+                    sp = [list(x.values())[0] for x in spc if list(x.keys())[0] == mx][
+                        0
+                    ]
+                    sp = " ".join(sp.split("_"))
+
+            except ValueError:
+                log.warning(f"No matches found for {sid} using sourmash. ")
+        log.info(f"Will use {sp} species throughout abritamr")
+    except Exception as e:
+        log.warning(
+            f"No species could be determined, the following error was encountered by sourmash {e}. If you require species specific functionality, please provide the species in the command and try again."
         )
-        query_sig = sourmash_sig(query_filename, sid)
-        # # Perform the search
-        results = tree.search(query_sig, threshold=0.1)
-        spc = []
-        for similarity, found_sig, filename in tree.search(query_sig, threshold=0.0001):
-            # qname = query_sig
-            sp = f"{found_sig}"
-            sim = similarity
-            spc.append({sim: sp})
-        try:
-            mx = max([list(x.keys())[0] for x in spc])
 
-            if mx >= 0.01:
-                sp = [list(x.values())[0] for x in spc if list(x.keys())[0] == mx][0]
-                sp = " ".join(sp.split("_"))
-
-        except ValueError:
-            log.warning(f"No matches found for {sid} using sourmash. ")
-    log.info(f"Will use {sp} species throughout abritamr")
     return sp
