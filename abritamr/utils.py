@@ -181,21 +181,22 @@ def check_amrfinder() -> bool:
             "amrfinder -V", shell=True, capture_output=True, encoding="utf-8"
         )
         if dbversion.returncode != 0:
-            log.warning(
+            log.critical(
                 f"It looks like your amrfinderplus database is not installed. Will now try to install this."
             )
-            ddb = subprocess.run(
-                f"amrfinder -u", shell=True, capture_output=True, encoding="utf-8"
-            )
-            if ddb.returncode != 0:
-                log.critical(
-                    f"It looks like we can't install the amrfinder plus database. The following error was reported : {ddb.stderr}. Please check your installation and try again."
-                )
-                raise SystemExit(1)
-            else:
-                dbversion = subprocess.run(
-                    "amrfinder -V", shell=True, capture_output=True, encoding="utf-8"
-                )
+            raise SystemExit(1)
+            # ddb = subprocess.run(
+            #     f"amrfinder -u", shell=True, capture_output=True, encoding="utf-8"
+            # )
+            # if ddb.returncode != 0:
+            #     log.critical(
+            #         f"It looks like we can't install the amrfinder plus database. The following error was reported : {ddb.stderr}. Please check your installation and try again."
+            #     )
+            #     raise SystemExit(1)
+            # else:
+            #     dbversion = subprocess.run(
+            #         "amrfinder -V", shell=True, capture_output=True, encoding="utf-8"
+            #     )
         dbv = [i for i in dbversion.stdout.split("\n") if "Database version" in i]
         # # print(dbv)
         dbv = dbv[0].split(":")[-1].strip() if dbv != [] else ""

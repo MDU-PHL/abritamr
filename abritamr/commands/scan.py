@@ -6,6 +6,7 @@ import pandas as pd
 from collections import namedtuple
 from abritamr.utils import (
     check_assembly,
+    check_amrfinder,
     guess_species,
     check_path,
     abritamr_scan_columns,
@@ -86,8 +87,8 @@ def run_scan(
 ) -> pd.DataFrame:
     """Scan all supplied inputs and return standardized AMR hit records."""
     amr = []
-    dbv = "unknown"
-
+    # dbv = "unknown"
+    dbv = check_amrfinder()
     for input in inputs:
         Data = namedtuple("Data", input.keys())
         data = Data(**input)
