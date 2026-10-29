@@ -71,7 +71,7 @@ def abritamr_amrtype_columns() -> list:
         "Priority AMR mechanisms (low coverage/identity)",
         "Other core AMR mechansims",
         "Other AMR mechanisms",
-        "Other",
+        "Other non-AMR mechansims",
     ]
 
 

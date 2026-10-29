@@ -148,7 +148,7 @@ def summary(
         repmechs["Priority AMR mechanisms (low coverage/identity)"] = ";".join(
             sorted(reportable_amr_low["Element symbol"].unique().tolist())
         )
-        repmechs["Other"] = ";".join(
+        repmechs["Other non-AMR mechansims"] = ";".join(
             sorted(nonreportable_other["Element symbol"].unique().tolist())
         )
         repmechs["Species provided"] = species
