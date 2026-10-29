@@ -58,6 +58,11 @@ def inputs(parser):
         help="Species from which assemblies were derived. If not supplied, will be guessed using sourmash and used for SNP detection and inference.",
     )
     parser.add_argument(
+        "--no-species",
+        action="store_true",
+        help="Set if you want to prevent sourmash from running to extract possible species value. Only use if you do not require any species specific funciotnality.",
+    )
+    parser.add_argument(
         "--threads", "--cpus", help="Number of max CPU cores to run.", default=1
     )
     return parser

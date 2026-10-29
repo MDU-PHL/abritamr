@@ -52,13 +52,13 @@ def save_output(
     return True
 
 
-def check_multi(pth: str, workdir: pathlib.Path) -> bool:
+def check_multi(pth: str, workdir: pathlib.Path, no_species: bool = False) -> bool:
     """Validate a multi-sample input table and build per-sample settings."""
     if check_path(f"{workdir}"):
         if check_path(pth):
             df = pd.read_csv(pth, sep="\t")
             if "species" not in df.columns:
-                df["species"] = ""
+                df["species"] = "" if not no_species else "unknown"
             if "sample_id" not in df.columns:
                 log.critical(
                     f"You must supply a sample_id column when using multi mode. Please check your inputs and try again."
@@ -161,7 +161,7 @@ def run(args) -> dict:
                 inputs.append(d)
 
         for i in inputs:
-            i["species"] = args.species
+            i["species"] = args.species if not args.no_species else "unknown"
             i["outdir"] = args.outdir
     else:
         inputs = check_multi(pth=args.multi, workdir=pathlib.Path(args.workdir))
@@ -172,7 +172,7 @@ def run(args) -> dict:
         i["min_coverage"] = args.min_coverage
         i["reference_catalog"] = args.reference_catalog
         i["species_rules"] = args.species_rules
-    scanned = run_scan(inputs=inputs)
+    scanned = run_scan(inputs=inputs, no_species=args.no_species)
     typed = do_typing(amr=scanned, reference_catalog=args.reference_catalog)
     linelist = generate_linelist(
         amr=typed,

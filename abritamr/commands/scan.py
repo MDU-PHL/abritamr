@@ -91,11 +91,11 @@ def run_scan(
     for input in inputs:
         Data = namedtuple("Data", input.keys())
         data = Data(**input)
+
         if not data.contigs and not data.amrfinderplus:
             log.critical(
                 "You must supply an input file (assembly or amrfinder plus output)."
             )
-
         if data.contigs:
             res = runfindr(
                 asm=data.contigs,
@@ -154,7 +154,7 @@ def scan(args) -> list:
             inputs.append(d)
     for i in inputs:
         i["threads"] = args.threads
-        i["species"] = args.species
+        i["species"] = args.species if not args.no_species else "unknown"
         i["min_coverage"] = args.min_coverage
         i["min_identity"] = args.min_identity
         i["reference_catalog"] = args.reference_catalog
