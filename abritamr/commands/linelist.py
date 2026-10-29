@@ -9,6 +9,15 @@ from abritamr.amr_report import summary
 from abritamr.logger import log
 
 
+def order_cols(cols: list) -> list:
+
+    cl = abritamr_amrtype_columns()
+    cols_to_order = sorted([i for i in cols if i not in cl])
+    cl.extend(cols_to_order)
+
+    return cl
+
+
 def generate_linelist(
     amr: pd.DataFrame,
     _format: str,
@@ -40,6 +49,8 @@ def generate_linelist(
             lines.append(line)
         if lines != []:
             linelist = pd.concat(lines)
+            cl = order_cols(cols=linelist.columns.tolist())
+            linelist = linelist[cl]
         else:
             cl = abritamr_amrtype_columns()
             linelist = pd.DataFrame(columns=cl, data=[])
