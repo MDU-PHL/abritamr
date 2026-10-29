@@ -238,4 +238,4 @@ def gdst_results_to_df_long(gdst_results: list) -> pd.DataFrame:
         "source",
     ]
 
-    return pd.DataFrame(rows)[cols_long].sort_values(by=["drugname"])
+    return pd.DataFrame(rows)[cols_long].sort_values(by=["sample_id"])
