@@ -13,6 +13,7 @@ from abritamr.commands import (
     utils_rules,
     infer,
     utils_check,
+    utils_combine,
 )
 from abritamr.cli.run import run_args
 from abritamr.cli.scan import scan_args
@@ -24,6 +25,7 @@ from abritamr.cli.utils_database import database_args
 from abritamr.cli.utils_rules import rules_args
 from abritamr.cli.utils_catalog import catalog_args
 from abritamr.cli.utils_check import check_args
+from abritamr.cli.utils_combine import combine_args
 from abritamr.version import __version__, db
 from abritamr.utils import output_results
 from abritamr.logger import log
@@ -111,6 +113,13 @@ def _check_deps(args):
     checked = utils_check.check_deps()
 
 
+def _combine(args):
+    """Combine the outputs from abritamr"""
+
+    log.info(f"Will combine output files.")
+    combined = utils_combine.combine_files(args)
+
+
 def cli():
     """Parse command-line arguments and dispatch the selected command."""
     parser = argparse.ArgumentParser(
@@ -142,6 +151,7 @@ def cli():
     parser_sub_utils_rules = rules_args(subparsers=parser_sub_utils_level2)
     parser_sub_utils_catalog = catalog_args(subparsers=parser_sub_utils_level2)
     parser_sub_utils_check = check_args(subparsers=parser_sub_utils_level2)
+    parser_sub_utils_combine = combine_args(subparsers=parser_sub_utils_level2)
     # tie parsers to functions
     parser_sub_run.set_defaults(func=run_complete)
     parser_sub_scan.set_defaults(func=run_scan)
@@ -153,6 +163,7 @@ def cli():
     parser_sub_utils_rules.set_defaults(func=_update_rules)
     parser_sub_utils_catalog.set_defaults(func=_update_catalog)
     parser_sub_utils_check.set_defaults(func=_check_deps)
+    parser_sub_utils_combine.set_defaults(func=_combine)
     args = parser.parse_args()
 
     if len(sys.argv) < 2:

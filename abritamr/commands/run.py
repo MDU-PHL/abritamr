@@ -213,7 +213,7 @@ def run(args) -> dict:
                         workdir=f"{args.workdir}",
                         sample_id=i["outdir"],
                         result=ts,
-                        outname=f"abritamr_{o}",
+                        outname=f"{args.prefix}_{o}",
                         _format=args.format,
                     )
     else:
@@ -223,7 +223,7 @@ def run(args) -> dict:
                     workdir=f"{args.workdir}",
                     sample_id=args.outdir,
                     result=outputs[o],
-                    outname=f"abritamr_{o}",
+                    outname=f"{args.prefix}_{o}",
                     _format=args.format,
                 )
 

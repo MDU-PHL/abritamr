@@ -40,6 +40,9 @@ def run_args(subparsers):
         default="abritamr_subclass",
     )
     parser_sub_complete.add_argument(
+        "--prefix", default="abritamr", help="Prefix for naming output files."
+    )
+    parser_sub_complete.add_argument(
         "--workdir",
         "-w",
         help="Working directory where output folders and results will be created.",
