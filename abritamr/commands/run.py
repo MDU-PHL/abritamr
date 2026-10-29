@@ -93,7 +93,7 @@ def check_multi(pth: str, workdir: pathlib.Path) -> bool:
                         else:
                             d[ip] = row[1][f"{ip}"]
 
-                if row[1]["species"] != "":
+                if row[1]["species"] == "":
                     guess = (
                         guess_species(asm=row[1]["contigs"], sid=row[1]["sample_id"])
                         if row[1]["contigs"] != ""
